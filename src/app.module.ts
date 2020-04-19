@@ -11,8 +11,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     UsersModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
       username: '',
       password: '',
       database: 'soundbase',
