@@ -22,10 +22,10 @@ import { LoggerModule } from 'nestjs-pino';
       pinoHttp: {
         level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
         prettyPrint: process.env.NODE_ENV !== 'production',
-      }
-    })
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

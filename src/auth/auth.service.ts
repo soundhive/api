@@ -7,7 +7,7 @@ import { User } from 'src/users/user.entity';
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<User> {
@@ -21,7 +21,7 @@ export class AuthService {
   async login(user: any) {
     const payload = { username: user.username, sub: user.userId };
     return {
-      'access_token': this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload),
     };
   }
 }
