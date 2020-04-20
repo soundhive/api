@@ -1,12 +1,29 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
-
-import { User } from "./user.entity";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
+import { CreateUserDTO } from './dto/create-user.dto';
 
 @Injectable()
-export class UsersService extends TypeOrmCrudService<User> {
-  constructor(@InjectRepository(User) repo) {
-    super(repo);
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
+
+  create(createUserDTO: CreateUserDTO) {
+    return this.usersRepository.save(createUserDTO);
+  }
+
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
+
+  findOne(id: string): Promise<User> {
+    return this.usersRepository.findOne(id);
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.usersRepository.delete(id);
   }
 }
