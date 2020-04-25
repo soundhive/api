@@ -10,14 +10,7 @@ import { LoggerModule } from 'nestjs-pino';
   imports: [
     AuthModule,
     UsersModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      username: '',
-      password: '',
-      database: 'soundbase',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot(),
     LoggerModule.forRoot({
       pinoHttp: {
         level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',

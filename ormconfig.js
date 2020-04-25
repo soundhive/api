@@ -1,17 +1,19 @@
-const process = require('process');
-const username = process.env.POSTGRES_USER || "";
-const password = process.env.POSTGRES_PASSWORD || "";
+// const process = require('process');
+const parse = require('pg-connection-string').parse;
+
+const config = parse(process.env.DATABASE_URL || "postgres://:@localhost:5432/");
+
 module.exports = {
   "type": "postgres",
-  "host": "localhost",
-  "port": 5432,
-  username,
-  password,
-  "database": "soundbase",
+  "host": config.host || "localhost",
+  "port": config.port || 5432,
+  "username": config.user || "",
+  "password": config.password || "",
+  "database": config.database || "soundbase",
   "synchronize": true,
   "dropSchema": false,
   "logging": true,
-  "entities": [__dirname + "/src/**/*.entity.ts", __dirname + "/dist/**/*.entity.js"],
+  "entities": ['dist/**/*.entity.js'],
   "migrations": ["migrations/**/*.ts"],
   "subscribers": ["subscriber/**/*.ts", "dist/subscriber/**/.js"],
   "cli": {
