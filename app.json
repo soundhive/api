@@ -1,7 +1,5 @@
 {
     "addons": [
-        {
-            "plan": "heroku-postgresql:hobby-dev"
-        }
+        "heroku-postgresql:hobby-dev"
     ]
 }
