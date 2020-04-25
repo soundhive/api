@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const options = new DocumentBuilder()
-    .setTitle('Soundbase API')
+    .setTitle('Soundhive API')
     .setDescription('The soundhive API description')
     .setVersion('0.1')
     .build();
