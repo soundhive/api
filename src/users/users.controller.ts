@@ -21,11 +21,11 @@ export class UserController {
     return this.usersService.create(createUserDTO);
   }
 
-  // @UseGuards(AuthGuard('jwt'))
-  // @Get()
-  // findAll() {
-  //   return this.usersService.find();
-  // }
+  @UseGuards(AuthGuard('jwt'))
+  @Get()
+  findAll() {
+    return this.usersService.find();
+  }
 
   // @UseGuards(AuthGuard('jwt'))
   @Get(':id')
@@ -33,15 +33,15 @@ export class UserController {
     return this.usersService.findOne(id);
   }
 
-  // @UseGuards(AuthGuard('jwt'))
-  // @Put(':id')
-  // update(@Param('id') id: string, @Body() userDto: UserDto) {
-  //   return this.usersService.updateUser(id, userDto);
-  // }
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':id')
+  update(@Param('id') id: string, @Body() userDto: UserDto) {
+    return this.usersService.updateUser(id, userDto);
+  }
 
-  // @UseGuards(AuthGuard('jwt'))
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.softDelete(id);
-  // }
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.usersService.softDelete(id);
+  }
 }
