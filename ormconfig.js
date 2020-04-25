@@ -8,7 +8,7 @@ module.exports = {
   "port": config.port || 5432,
   "username": config.user || "",
   "password": config.password || "",
-  "database": config.database || "soundbase",
+  "database": config.database || "soundhive",
   "synchronize": true,
   "dropSchema": false,
   "logging": true,

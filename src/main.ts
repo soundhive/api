@@ -7,7 +7,7 @@ async function bootstrap() {
 
   const options = new DocumentBuilder()
     .setTitle('Soundbase API')
-    .setDescription('The soundbase API description')
+    .setDescription('The soundhive API description')
     .setVersion('0.1')
     .build();
   const document = SwaggerModule.createDocument(app, options);
