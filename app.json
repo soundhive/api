@@ -1,5 +1,10 @@
 {
     "addons": [
         "heroku-postgresql:hobby-dev"
-    ]
+    ],
+    "scripts": {},
+    "env": {},
+    "formation": {},
+    "buildpacks": [],
+    "stack": "heroku-18"
 }
