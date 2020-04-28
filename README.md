@@ -4,6 +4,9 @@
   
 <p align="center">Soundhive is a free music and community streaming service allowing independent artists to share their music and others to discover and identify music thanks to fingerprinting.</p>
   
+## Description
+This repository contains the API of Soundhive.
+  
 ## Installation
 
 ```bash
