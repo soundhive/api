@@ -24,7 +24,7 @@
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
-    "@nestjs/common": "^7.0.0",
+    "@nestjs/common": "^7.0.9",
     "@nestjs/config": "^0.4.0",
     "@nestjs/core": "^7.0.0",
     "@nestjs/jwt": "^7.0.0",
