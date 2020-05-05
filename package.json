@@ -30,7 +30,7 @@
     "@nestjs/jwt": "^7.0.0",
     "@nestjs/passport": "^7.0.0",
     "@nestjs/platform-express": "^7.0.9",
-    "@nestjs/swagger": "^4.5.3",
+    "@nestjs/swagger": "^4.5.4",
     "@nestjs/typeorm": "^7.0.0",
     "class-transformer": "^0.2.3",
     "nestjs-pino": "^1.1.3",
