@@ -1,5 +1,7 @@
 export class CreateUserDTO {
-  firstname: string;
-  lastname: string;
-  password: string;
+  fullName: string;
+  username: string;
+  email: string;
+  passwordHash: string;
+  birthDate: Date;
 }

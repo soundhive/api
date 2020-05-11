@@ -3,34 +3,34 @@ import { Exclude } from 'class-transformer';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column()
-  name: string;
+  @Column({ name: 'full_name' })
+  fullName: string;
 
-  @Column({ unique: true })
+  @Column({ name: 'username', unique: true })
   username: string;
 
-  @Column()
+  @Column({ name: 'password_hash' })
   @Exclude()
-  password: string;
+  passwordHash: string;
 
-  @Column()
+  @Column({ name: 'email' })
   email: string;
 
-  @Column()
-  birthDate: string;
+  @Column({ name: 'birth_date' })
+  birthDate: Date;
 
-  @Column({ default: true })
+  @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @VersionColumn()
+  @VersionColumn({ name: 'version_column' })
   dataVersion: number;
 }
