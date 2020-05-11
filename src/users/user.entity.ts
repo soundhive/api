@@ -6,31 +6,31 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column({ name: 'full_name' })
+  @Column()
   fullName: string;
 
-  @Column({ name: 'username', unique: true })
+  @Column()
   username: string;
 
-  @Column({ name: 'password_hash' })
+  @Column()
   @Exclude()
-  passwordHash: string;
+  password: string;
 
-  @Column({ name: 'email' })
+  @Column()
   email: string;
 
-  @Column({ name: 'birth_date' })
+  @Column()
   birthDate: Date;
 
-  @Column({ name: 'is_active', default: true })
+  @Column({ default: true })
   isActive: boolean;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @VersionColumn({ name: 'version_column' })
+  @VersionColumn()
   dataVersion: number;
 }

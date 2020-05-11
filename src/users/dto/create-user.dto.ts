@@ -2,6 +2,6 @@ export class CreateUserDTO {
   fullName: string;
   username: string;
   email: string;
-  passwordHash: string;
+  password: string;
   birthDate: Date;
 }
