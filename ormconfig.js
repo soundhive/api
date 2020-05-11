@@ -9,15 +9,15 @@ module.exports = {
   "username": config.user || "",
   "password": config.password || "",
   "database": config.database || "soundhive",
-  "synchronize": true,
+  "synchronize": false,
   "dropSchema": false,
   "logging": true,
   "entities": ['dist/**/*.entity.js'],
-  "migrations": ["migrations/**/*.ts"],
+  "migrations": ['dist/migration/**/*.js'],
   "subscribers": ["subscriber/**/*.ts", "dist/subscriber/**/.js"],
   "cli": {
     "entitiesDir": "src",
-    "migrationsDir": "migrations",
+    "migrationsDir": "migration",
     "subscribersDir": "subscriber"
   }
 }

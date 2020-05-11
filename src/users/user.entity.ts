@@ -1,15 +1,15 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, VersionColumn, UpdateDateColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
-@Entity()
+@Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column()
-  name: string;
+  fullName: string;
 
-  @Column({ unique: true })
+  @Column()
   username: string;
 
   @Column()
@@ -20,7 +20,7 @@ export class User {
   email: string;
 
   @Column()
-  birthDate: string;
+  birthDate: Date;
 
   @Column({ default: true })
   isActive: boolean;
