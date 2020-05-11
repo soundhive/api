@@ -1,6 +1,5 @@
 {
     "addons": [
         "heroku-postgresql:hobby-dev",
-        "autoidle:hobby"
     ]
 }
