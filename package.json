@@ -23,7 +23,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
     "db:migrate": "npm run typeorm migration:run",
-    "db:drop": "npm run typeorm schema:drop"
+    "db:drop": "npm run typeorm schema:drop",
+    "db:reset": "npm run db:drop && npm run db:migrate"
   },
   "dependencies": {
     "@nestjs/common": "^7.0.9",
