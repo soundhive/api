@@ -2,12 +2,13 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, VersionColumn
 import { Exclude } from 'class-transformer';
 
 @Entity('users')
+@Unique(['username', 'email'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column()
-  fullName: string;
+  name: string;
 
   @Column()
   username: string;
@@ -18,9 +19,6 @@ export class User {
 
   @Column()
   email: string;
-
-  @Column()
-  birthDate: Date;
 
   @Column({ default: true })
   isActive: boolean;
