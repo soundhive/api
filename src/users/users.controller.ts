@@ -4,18 +4,23 @@ import {
   Post,
   Body,
   Param,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
+import { User } from './user.entity';
 
 @Controller('users')
 export class UserController {
   constructor(private usersService: UsersService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
   create(@Body() createUserDTO: CreateUserDTO) {
-    return this.usersService.create(createUserDTO);
+   return this.usersService.create(createUserDTO).then((createUserDTO) => {
+     return new User(createUserDTO);
+   })
   }
 
   // @UseGuards(AuthGuard('jwt'))
