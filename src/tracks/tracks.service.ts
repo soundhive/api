@@ -15,4 +15,8 @@ export class TracksService {
   async getAllTracks(): Promise<Track[]> {
     return await this.trackRepository.find();
   }
+
+  async getTrack(id: string): Promise<Track> {
+    return await this.trackRepository.findOne(id);
+  }
 }

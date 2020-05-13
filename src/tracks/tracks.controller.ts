@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDTO } from './dto/create-track.dto';
 
@@ -14,5 +14,10 @@ export class TracksController {
   @Get()
   getAllTracks() {
     return this.tracksService.getAllTracks();
+  }
+
+  @Get(':id')
+  getTrack(@Param('id') trackId: string) {
+    return this.tracksService.getTrack(trackId);
   }
 }
