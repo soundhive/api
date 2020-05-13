@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -9,10 +9,20 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
-  create(createUserDTO: CreateUserDTO) {
-    return this.usersRepository.save(createUserDTO);
+  async create(createUserDTO: CreateUserDTO) {
+    const duplicateUsers = await this.usersRepository.find({
+      where: [
+        { username: createUserDTO.username },
+      ]
+    });
+
+    if (duplicateUsers.length > 0) {
+      throw new HttpException('Username already taken', HttpStatus.BAD_REQUEST)
+    } else {
+      return this.usersRepository.save(createUserDTO);
+    }
   }
 
   findAll(): Promise<User[]> {

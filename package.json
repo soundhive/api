@@ -37,6 +37,7 @@
     "@nestjs/typeorm": "^7.0.0",
     "class-transformer": "^0.2.3",
     "nestjs-pino": "^1.2.0",
+    "class-validator": "^0.12.2",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
