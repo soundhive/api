@@ -13,14 +13,15 @@ import { User } from './user.entity';
 
 @Controller('users')
 export class UserController {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService) { }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
   create(@Body() createUserDTO: CreateUserDTO) {
-   return this.usersService.create(createUserDTO).then((createUserDTO) => {
-     return new User(createUserDTO);
-   })
+    const user: User = new User(createUserDTO);
+    return this.usersService.create(user).then((user) => {
+      return user;
+    })
   }
 
   // @UseGuards(AuthGuard('jwt'))

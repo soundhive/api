@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, VersionColumn, UpdateDateColumn, Unique } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, VersionColumn, UpdateDateColumn, Unique, BeforeInsert } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import bcrypt = require('bcrypt');
 
 @Entity('users')
 @Unique(['username', 'email'])
@@ -35,4 +36,9 @@ export class User {
 
   @VersionColumn()
   dataVersion: number;
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
 }
