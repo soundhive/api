@@ -1,13 +1,18 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, VersionColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, VersionColumn, UpdateDateColumn, Unique } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
 @Entity('users')
+@Unique(['username', 'email'])
 export class User {
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column()
-  fullName: string;
+  name: string;
 
   @Column()
   username: string;
@@ -18,9 +23,6 @@ export class User {
 
   @Column()
   email: string;
-
-  @Column()
-  birthDate: Date;
 
   @Column({ default: true })
   isActive: boolean;
