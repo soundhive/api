@@ -4,7 +4,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToMany, JoinTable,
+  OneToMany,
 } from 'typeorm';
 import { Track } from '../tracks/track.entity';
 
@@ -21,14 +21,13 @@ export class Album {
 
   @Column()
   filename: string;
-  
+
   @CreateDateColumn()
   createdAt: Date;
-  
+
   @UpdateDateColumn()
   updatedAt: Date;
-  
-  @ManyToMany(type => Track)
-  @JoinTable()
+
+  @OneToMany(type => Track, track => track.album)
   tracks: Track[];
 }
