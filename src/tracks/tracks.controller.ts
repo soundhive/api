@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDTO } from './dto/create-track.dto';
+import { Track } from './track.entity';
 
 @Controller('tracks')
 export class TracksController {
@@ -21,6 +22,12 @@ export class TracksController {
     return this.tracksService.getTrack(trackId);
   }
 
+  @Put(':id')
+  @HttpCode(204)
+  updateTrack(@Param('id') id, @Body() trackData: Track) {
+    return this.tracksService.updateTrack(id, trackData);
+  }
+
   @Delete(':id')
   @HttpCode(200)
   deleteTrack(@Param('id') trackId: string) {
@@ -28,4 +35,6 @@ export class TracksController {
 
     return null;
   }
+
+  // TODO: findTrack() private method to handle track Not Found
 }
