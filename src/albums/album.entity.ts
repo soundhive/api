@@ -30,5 +30,5 @@ export class Album {
   
   @ManyToMany(type => Track)
   @JoinTable()
-  categories: Track[];
+  tracks: Track[];
 }
