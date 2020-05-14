@@ -35,6 +35,4 @@ export class TracksController {
 
     return null;
   }
-
-  // TODO: findTrack() private method to handle track Not Found
 }
