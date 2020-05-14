@@ -7,6 +7,7 @@ import { TracksModule } from './tracks/tracks.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerModule } from 'nestjs-pino';
 import { ConfigModule } from '@nestjs/config';
+import { AlbumsModule } from './albums/albums.module';
 import * as ormconfig from './ormconfig';
 
 
@@ -22,6 +23,7 @@ export function DatabaseOrmModule(): DynamicModule {
     ConfigModule.forRoot(),
     AuthModule,
     UsersModule,
+    AlbumsModule,
     TracksModule,
     TypeOrmModule.forRoot(ormconfig),
     LoggerModule.forRoot({
