@@ -17,11 +17,10 @@ export class UserController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  create(@Body() createUserDTO: CreateUserDTO) {
-    const user: User = new User(createUserDTO);
-    return this.usersService.create(user).then((user) => {
-      return user;
-    })
+  async create(@Body() createUserDTO: CreateUserDTO) {
+    const newUser: User = new User(createUserDTO);
+    const createdUser = await this.usersService.create(newUser);
+    return createdUser;
   }
 
   // @UseGuards(AuthGuard('jwt'))

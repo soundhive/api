@@ -16,10 +16,9 @@ export class AppController {
 
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
-  login(@Body() authUserDTO: AuthUserDTO) {
-    return this.authService.login(new User(authUserDTO)).then((token) => {
-      return token;
-    })
+  async login(@Body() authUserDTO: AuthUserDTO) {
+    const token = await this.authService.login(new User(authUserDTO));
+    return token;
   }
 
   @UseGuards(JwtAuthGuard)

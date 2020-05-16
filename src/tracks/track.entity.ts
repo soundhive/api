@@ -31,6 +31,7 @@ export class Track {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne(type => Album, album => album.tracks)
   album: Album;
 }
