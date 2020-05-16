@@ -11,7 +11,7 @@ import { User } from './user.entity';
 import { FindUserDTO } from './dto/find-user.dto';
 
 @Controller('users')
-export class UserController {
+export class UsersController {
   constructor(private usersService: UsersService) { }
 
   @Post()
