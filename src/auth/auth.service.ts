@@ -31,6 +31,6 @@ export class AuthService {
     hashedPassword: string,
     plainPassword: string
   ): Promise<boolean> {
-    return await argon2.verify(plainPassword, hashedPassword);
+    return await argon2.verify(hashedPassword, plainPassword);
   }
 }
