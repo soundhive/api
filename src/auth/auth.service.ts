@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/user.entity';
-import bcrypt = require('bcrypt');
+import argon2 = require('argon2');
 
 @Injectable()
 export class AuthService {
@@ -31,6 +31,6 @@ export class AuthService {
     hashedPassword: string,
     plainPassword: string
   ): Promise<boolean> {
-    return await bcrypt.compare(plainPassword, hashedPassword);
+    return await argon2.verify(plainPassword, hashedPassword);
   }
 }
