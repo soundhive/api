@@ -2,37 +2,37 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nest
 import { TracksService } from './tracks.service';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { Track } from './track.entity';
+import { FindTrackDTO } from './dto/find-track.dto';
+import { UpdateTrackDTO } from './dto/update-track.dto';
 
 @Controller('tracks')
 export class TracksController {
-  constructor(private readonly tracksService: TracksService) {}
+  constructor(private readonly tracksService: TracksService) { }
 
   @Post()
-  addTrack(@Body() createTrackDTO: CreateTrackDTO) {
-    return this.tracksService.insertTrack(createTrackDTO);
+  async create(@Body() track: CreateTrackDTO): Promise<Track> {
+    return await this.tracksService.create(new Track(track));
   }
 
   @Get()
-  getAllTracks() {
-    return this.tracksService.getAllTracks();
+  async find(): Promise<Track[]> {
+    return this.tracksService.find();
   }
 
   @Get(':id')
-  getTrack(@Param('id') trackId: string) {
-    return this.tracksService.getTrack(trackId);
+  async findOne(@Param() tracl: FindTrackDTO): Promise<Track> {
+    return await this.tracksService.findOne(tracl);
   }
 
   @Put(':id')
-  @HttpCode(204)
-  updateTrack(@Param('id') id, @Body() trackData: Track) {
-    return this.tracksService.updateTrack(id, trackData);
+  async update(@Param() track: FindTrackDTO, @Body() trackData: UpdateTrackDTO): Promise<Track> {
+    await this.tracksService.update(track, trackData);
+    return await this.tracksService.findOne(track);
   }
 
   @Delete(':id')
-  @HttpCode(200)
-  deleteTrack(@Param('id') trackId: string) {
-    this.tracksService.deleteTrack(trackId).then();
-
-    return null;
+  @HttpCode(204)
+  deleteTrack(@Param() track: FindTrackDTO): void {
+    this.tracksService.delete(track);
   }
 }
