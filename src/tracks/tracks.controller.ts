@@ -32,7 +32,7 @@ export class TracksController {
 
   @Delete(':id')
   @HttpCode(204)
-  deleteTrack(@Param() track: FindTrackDTO): void {
+  delete(@Param() track: FindTrackDTO): void {
     this.tracksService.delete(track);
   }
 }
