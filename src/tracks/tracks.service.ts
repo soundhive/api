@@ -13,7 +13,6 @@ export class TracksService {
   constructor(
     @InjectRepository(Track) private trackRepository: Repository<Track>,
     @InjectRepository(Album) private albumRepository: Repository<Album>,
-    private albumsService: AlbumsService,
   ) {}
 
   async create(createTrackDTO: CreateTrackDTO): Promise<Track> {
