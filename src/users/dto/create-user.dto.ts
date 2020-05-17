@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, IsAlphanumeric } from 'class-validator';
-import { Unique } from 'src/unique.validation';
+import { IsUnique } from 'src/validators/unique.validation';
 import { User } from '../user.entity';
 
 export class CreateUserDTO {
@@ -10,12 +10,12 @@ export class CreateUserDTO {
   @IsNotEmpty()
   @IsString()
   @IsAlphanumeric()
-  @Unique(User)
+  @IsUnique(User)
   username: string;
 
   @IsEmail()
   @IsNotEmpty()
-  @Unique(User)
+  @IsUnique(User)
   email: string;
 
   @IsNotEmpty()

@@ -10,6 +10,10 @@ import { Album } from '../albums/album.entity';
 
 @Entity('tracks')
 export class Track {
+  constructor(partial: Partial<Track>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

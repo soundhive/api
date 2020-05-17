@@ -8,12 +8,12 @@ export class UniqueInDatabaseExistConstraint implements ValidatorConstraintInter
         const entity = args.object[`class_entity_${args.property}`];
         return getManager()
             .count(entity, { [args.property]: value })
-            .then((count) => count < 1);
+            .then((count) => count < 1);  // Returns true if no entity is found
     }
 }
 
 // Define decorator wrapper for above validator
-export function Unique(entity: Function, validationOptions?: ValidationOptions) {
+export function IsUnique(entity: Function, validationOptions?: ValidationOptions) {
     validationOptions = { ...{ message: '$property $value already taken' }, ...validationOptions };
 
     return function (object: Record<string, any>, propertyName: string) {
