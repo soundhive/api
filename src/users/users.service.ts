@@ -11,7 +11,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) { }
 
-  async create(createUserDTO: CreateUserDTO) {
+  async create(createUserDTO: CreateUserDTO): Promise<User> {
     return this.usersRepository.save(createUserDTO);
   }
 
@@ -19,7 +19,7 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(username: string): Promise<User> {
+  findOne(username: string): Promise<User | undefined> {
     return this.usersRepository.findOne({ username: username });
   }
 

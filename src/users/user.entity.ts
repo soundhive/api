@@ -28,12 +28,15 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
+  @Exclude()
   @CreateDateColumn()
   createdAt: Date;
 
+  @Exclude()
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Exclude()
   @VersionColumn()
   dataVersion: number;
 
