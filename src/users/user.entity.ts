@@ -1,6 +1,17 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, VersionColumn, UpdateDateColumn, Unique, BeforeInsert } from 'typeorm';
-import { Exclude } from 'class-transformer';
 import argon2 = require('argon2');
+import { Exclude } from 'class-transformer';
+import { Listening } from 'src/listenings/listening.entity';
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+  VersionColumn,
+} from 'typeorm';
 
 @Entity('users')
 @Unique(['username', 'email'])
@@ -24,6 +35,9 @@ export class User {
 
   @Column()
   email: string;
+
+  @OneToMany(type => Listening, listening => listening.user)
+  listenings: Listening[];
 
   @Column({ default: true })
   isActive: boolean;

@@ -1,11 +1,6 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Listening } from 'src/listenings/listening.entity';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
 import { Album } from '../albums/album.entity';
 
 @Entity('tracks')
@@ -28,6 +23,9 @@ export class Track {
 
   @Column()
   filename: string;
+
+  @OneToMany(type => Listening, listening => listening.track)
+  listenings: Listening[];
 
   @CreateDateColumn()
   createdAt: Date;
