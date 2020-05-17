@@ -1,12 +1,22 @@
 import { Listening } from 'src/listenings/listening.entity';
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { User } from 'src/users/user.entity';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 import { Album } from '../albums/album.entity';
-import { User } from 'src/users/user.entity';
 
 @Entity('tracks')
-export class Track {
+export class Track extends BaseEntity {
   constructor(partial: Partial<Track>) {
+    super();
     Object.assign(this, partial);
   }
 

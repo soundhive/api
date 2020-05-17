@@ -1,4 +1,5 @@
 import {
+  BaseEntity,
   Entity,
   Column,
   PrimaryGeneratedColumn,
@@ -9,7 +10,7 @@ import {
 import { Track } from '../tracks/track.entity';
 
 @Entity('albums')
-export class Album {
+export class Album extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -28,6 +29,6 @@ export class Album {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(type => Track, track => track.album)
+  @OneToMany(type => Track, track => track.album, { cascade: true })
   tracks: Track[];
 }

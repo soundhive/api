@@ -16,4 +16,5 @@ export class CreateTrackDTO {
   @IsNotEmpty()
   @IsString()
   filename: string;
+  albumId: string;
 }

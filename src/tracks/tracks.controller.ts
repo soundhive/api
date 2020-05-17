@@ -30,6 +30,11 @@ export class TracksController {
     return await this.tracksService.create(track);
   }
 
+  // @Post('/add-to-album')
+  // addTrackToAlbum(@Body() albumId: string, trackId: string) {
+  //   return this.tracksService.addTrackToAlbum(albumId, trackId);
+  // }
+
   @Get()
   async find(): Promise<Track[]> {
     return this.tracksService.find();
