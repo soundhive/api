@@ -11,6 +11,11 @@ import { Track } from '../tracks/track.entity';
 
 @Entity('albums')
 export class Album extends BaseEntity {
+  constructor(partial: Partial<Track>) {
+    super();
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
