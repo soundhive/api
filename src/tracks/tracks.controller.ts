@@ -30,11 +30,6 @@ export class TracksController {
     return await this.tracksService.create(track);
   }
 
-  // @Post('/add-to-album')
-  // addTrackToAlbum(@Body() albumId: string, trackId: string) {
-  //   return this.tracksService.addTrackToAlbum(albumId, trackId);
-  // }
-
   @Get()
   async find(): Promise<Track[]> {
     return this.tracksService.find();
@@ -74,6 +69,6 @@ export class TracksController {
   @Delete(':id')
   @HttpCode(204)
   delete(@Param() track: FindTrackDTO): void {
-    this.tracksService.delete(track);
+    this.tracksService.delete(track).then();
   }
 }
