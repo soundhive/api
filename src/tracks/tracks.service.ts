@@ -11,7 +11,7 @@ export class TracksService {
   constructor(@InjectRepository(Track) private trackRepository: Repository<Track>) {}
 
   async create(createTrackDTO: CreateTrackDTO): Promise<Track> {
-    return this.trackRepository.create(createTrackDTO);
+    return this.trackRepository.save(createTrackDTO);
   }
 
   async find(): Promise<Track[]> {
