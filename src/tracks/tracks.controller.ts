@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Request, UseGuards, Req, Query } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
@@ -9,6 +9,7 @@ import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
+import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 
 @Controller('tracks')
 export class TracksController {
@@ -30,8 +31,13 @@ export class TracksController {
   }
 
   @Get(':id')
-  async findOne(@Param() tracl: FindTrackDTO): Promise<Track> {
-    return await this.tracksService.findOne(tracl);
+  async findOne(@Param() track: FindTrackDTO): Promise<Track> {
+    return await this.tracksService.findOne(track);
+  }
+
+  @Get(':id/stats')
+  async findStats(@Param() findTrackDTO: FindTrackDTO, @Query() findListeningsDTO: FindListeningsDTO) {
+   return  await this.listeningsService.find(findTrackDTO, findListeningsDTO)
   }
 
   @UseGuards(JwtAuthGuard)
