@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Track } from './track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
@@ -38,15 +38,5 @@ export class TracksService {
 
   async delete(track: FindTrackDTO): Promise<DeleteResult> {
     return await this.trackRepository.delete({ id: track.id });
-  }
-
-  private async findTrackById(id: string): Promise<Album> {
-    const found = await this.albumRepository.findOne(id);
-
-    if (!found) {
-      throw new NotFoundException(`Track with id ${id} not found.`);
-    }
-
-    return found;
   }
 }
