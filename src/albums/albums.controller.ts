@@ -2,37 +2,37 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nest
 import { AlbumsService } from './albums.service';
 import { Album } from './album.entity';
 import { CreateAlbumDTO } from './dto/create-album.dto';
+import { FindAlbumDTO } from './dto/find-album.dto';
+import { UpdateAlbumDTO } from './dto/update-album.dto';
 
 @Controller('albums')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
   @Post()
-  addAlbum(@Body() createAlbumDTO: CreateAlbumDTO) {
-    return this.albumsService.insertAlbum(createAlbumDTO);
+  create(@Body() createAlbumDTO: CreateAlbumDTO) {
+    return this.albumsService.create(createAlbumDTO);
   }
 
   @Get()
-  getAllAlbums() {
-    return this.albumsService.getAllAlbums();
+  async find(): Promise<Album[]> {
+    return this.albumsService.find();
   }
-
+  
   @Get(':id')
-  getAlbum(@Param('id') albumId: string) {
-    return this.albumsService.getAlbum(albumId);
+  async findOne(@Param() album: FindAlbumDTO): Promise<Album> {
+    return await this.albumsService.findOne(album);
   }
 
   @Put(':id')
-  @HttpCode(204)
-  updateAlbum(@Param('id') id, @Body() albumData: Album) {
-    return this.albumsService.updateAlbum(id, albumData);
+  async update(@Param() album: FindAlbumDTO, @Body() albumData: UpdateAlbumDTO): Promise<Album> {
+    await this.albumsService.update(album, albumData);
+    return await this.albumsService.findOne(album);
   }
 
   @Delete(':id')
-  @HttpCode(200)
-  deleteAlbum(@Param('id') albumId: string) {
-    this.albumsService.deleteAlbum(albumId).then();
-
-    return null;
+  @HttpCode(204)
+  delete(@Param() album: FindAlbumDTO) {
+    this.albumsService.delete(album).then();
   }
 }
