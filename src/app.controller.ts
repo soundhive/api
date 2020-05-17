@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
@@ -22,7 +22,6 @@ export class AppController {
     return this.authService.login(new User(authUserDTO));
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
