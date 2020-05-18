@@ -10,6 +10,7 @@ import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
+import { FindLastListengsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
 
 @Controller('tracks')
 export class TracksController {
@@ -37,7 +38,12 @@ export class TracksController {
 
   @Get(':id/stats')
   async findStats(@Param() findTrackDTO: FindTrackDTO, @Query() findListeningsDTO: FindListeningsDTO) {
-   return  await this.listeningsService.find(findTrackDTO, findListeningsDTO)
+    return await this.listeningsService.find(findTrackDTO, findListeningsDTO)
+  }
+
+  @Get(':id/stats/last/:count/:period')
+  async findLastStats(@Param() findLastListengsForTrackDTO: FindLastListengsForTrackDTO) {
+    return await this.listeningsService.findLast(findLastListengsForTrackDTO)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -52,7 +58,7 @@ export class TracksController {
   async listen(@Param() findTrackDTO: FindTrackDTO, @Request() req): Promise<void> {
     const user = await this.usersService.findOne(req.user);
     const track = await this.tracksService.findOne(findTrackDTO);
-    const listening = new Listening({user: user, track: track})
+    const listening = new Listening({ user: user, track: track })
     await this.listeningsService.create(listening);
   }
 

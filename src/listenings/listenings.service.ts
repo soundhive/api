@@ -4,6 +4,7 @@ import { FindTrackDTO } from 'src/tracks/dto/find-track.dto';
 import { Between, Repository } from 'typeorm';
 
 import { CreateListeningDTO } from './dto/create-listening.dto';
+import { FindLastListengsForTrackDTO } from './dto/find-last-listenings-track.dto';
 import { FindListeningsDTO } from './dto/find-listenings.dto';
 import { Listening } from './listening.entity';
 
@@ -13,6 +14,37 @@ export class ListeningsService {
 
   async create(createListeningDTO: CreateListeningDTO): Promise<Listening> {
     return this.listeningRepository.save(createListeningDTO);
+  }
+
+  async findLast(findLastListengsForTrackDTO: FindLastListengsForTrackDTO) {
+    const findTrackDTO = new FindTrackDTO();
+    findTrackDTO.id = findLastListengsForTrackDTO.id;
+
+    const findListeningsDTO = new FindListeningsDTO();
+    findListeningsDTO.period = findLastListengsForTrackDTO.period;
+    findListeningsDTO.after = new Date()
+    findListeningsDTO.before = new Date()
+    for (let i = 0; i < findLastListengsForTrackDTO.count - 1; i++) {
+      switch (findListeningsDTO.period) {
+        case "hour":
+          findListeningsDTO.after.setHours(findListeningsDTO.after.getHours() - 1);
+          break;
+        case "day":
+          findListeningsDTO.after.setDate(findListeningsDTO.after.getDate() - 1);
+          break;
+        case "week":
+          findListeningsDTO.after.setDate(findListeningsDTO.after.getDate() - 7);
+          break;
+        case "month":
+          findListeningsDTO.after.setMonth(findListeningsDTO.after.getMonth() - 1);
+          break;
+        case "year":
+          findListeningsDTO.after.setFullYear(findListeningsDTO.after.getFullYear() - 1);
+          break;
+      }
+    }
+
+    return await this.find(findTrackDTO, findListeningsDTO)
   }
 
   async find(findTrackDTO: FindTrackDTO, findListeningsDTO: FindListeningsDTO) {
