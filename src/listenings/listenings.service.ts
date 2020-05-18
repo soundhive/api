@@ -82,6 +82,7 @@ export class ListeningsService {
     const dates = getDatesBetween(new Date(findListeningsDTO.after), new Date(findListeningsDTO.before));
 
     const stats = []
+    let listeningsCount = 0;
 
     for (const date of dates) {
       const startDate = new Date(date.valueOf());
@@ -113,9 +114,11 @@ export class ListeningsService {
         [findListeningsDTO.period]: date,
         count: listenings.length
       });
+
+      listeningsCount =+ listenings.length;
     }
 
-    return stats;
+    return {listenings: listeningsCount, keyframes: stats};
 
   }
 }
