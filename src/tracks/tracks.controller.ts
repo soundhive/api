@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Request, UseGuards, Req, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Request, UseGuards, Req, Query, Inject, forwardRef } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
@@ -22,8 +22,11 @@ export class TracksController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() track: CreateTrackDTO): Promise<Track> {
-    return await this.tracksService.create(new Track(track));
+  async create(@Request() req, @Body() createTrackDTO: CreateTrackDTO): Promise<Track> {
+    const user = await this.usersService.findOne(req.user);
+    const track = new Track({...createTrackDTO, user: user});
+
+    return await this.tracksService.create(track);
   }
 
   @Get()
