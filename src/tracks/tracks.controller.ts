@@ -1,5 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Request, UseGuards, Req, Query, Inject, forwardRef } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { FindLastListengsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
+import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
 import { UsersService } from 'src/users/users.service';
@@ -9,8 +11,6 @@ import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
-import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
-import { FindLastListengsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
 
 @Controller('tracks')
 export class TracksController {
