@@ -32,6 +32,15 @@ export class ListeningsService {
           case "day":
             currentDate.setDate(currentDate.getDate() + 1);
             break;
+          case "week":
+            currentDate.setDate(currentDate.getDate() + 7);
+            break;
+          case "month":
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            break;
+          case "year":
+            currentDate.setFullYear(currentDate.getFullYear() + 1);
+            break;
         }
       }
 
@@ -51,6 +60,15 @@ export class ListeningsService {
           break;
         case "day":
           startDate.setDate(startDate.getDate() - 1);
+          break;
+        case "week":
+          startDate.setDate(startDate.getDate() - 7);
+          break;
+        case "month":
+          startDate.setMonth(startDate.getMonth() - 1);
+          break;
+        case "year":
+          startDate.setFullYear(startDate.getFullYear() - 1);
           break;
       }
 
