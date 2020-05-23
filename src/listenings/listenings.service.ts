@@ -111,7 +111,7 @@ export class ListeningsService {
         track: findTrackDTO,
       });
 
-      let period;
+      let period: string;
       switch (findListeningsDTO.period) {
         case "hour":
           period = moment(date).format();
