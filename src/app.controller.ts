@@ -26,7 +26,7 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return this.usersService.findOne(req.user.username);
+    return this.usersService.findOne(req.user);
   }
 
   @Get('/')
