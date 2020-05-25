@@ -111,7 +111,7 @@ export class ListeningsService {
       });
 
       stats.push({
-        period: period,
+        period: startDate,
         count: listenings.length
       });
 
