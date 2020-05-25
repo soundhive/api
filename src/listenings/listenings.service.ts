@@ -7,7 +7,6 @@ import { CreateListeningDTO } from './dto/create-listening.dto';
 import { FindLastListengsForTrackDTO } from './dto/find-last-listenings-track.dto';
 import { FindListeningsDTO } from './dto/find-listenings.dto';
 import { Listening } from './listening.entity';
-import moment = require('moment');
 
 @Injectable()
 export class ListeningsService {
@@ -110,25 +109,6 @@ export class ListeningsService {
         listenedAt: Between(startDate, date),
         track: findTrackDTO,
       });
-
-      let period: string;
-      switch (findListeningsDTO.period) {
-        case "hour":
-          period = moment(date).format();
-          break;
-        case "day":
-          period = moment(date).format('L');
-          break;
-        case "week":
-          period = moment(date).format('L');
-          break;
-        case "month":
-          period = moment(date).format('MM/YYYY');
-          break;
-        case "year":
-          period = moment(date).format('YYYY');
-          break;
-      }
 
       stats.push({
         period: period,

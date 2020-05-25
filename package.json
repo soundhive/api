@@ -39,7 +39,6 @@
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
     "dotenv": "^8.2.0",
-    "moment": "^2.25.3",
     "nestjs-pino": "^1.2.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
