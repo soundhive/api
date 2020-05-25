@@ -1,30 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindTrackDTO } from 'src/tracks/dto/find-track.dto';
+import { Track } from 'src/tracks/track.entity';
+import { TracksService } from 'src/tracks/tracks.service';
+import { User } from 'src/users/user.entity';
+import { UsersService } from 'src/users/users.service';
 import { Between, Repository } from 'typeorm';
 
 import { CreateListeningDTO } from './dto/create-listening.dto';
-import { FindLastListengsForTrackDTO } from './dto/find-last-listenings-track.dto';
+import { FindLastListeningsForTrackDTO } from './dto/find-last-listenings-track.dto';
+import { FindLastListeningsForUserDTO } from './dto/find-last-listenings-user.dto';
 import { FindListeningsDTO } from './dto/find-listenings.dto';
+import { TrackListeningsResponseDTO } from './dto/responses/track-listenings-response.dto';
+import { UserListeningsResponseDTO } from './dto/responses/user-listenings-response.dto';
 import { Listening } from './listening.entity';
 
 @Injectable()
 export class ListeningsService {
-  constructor(@InjectRepository(Listening) private listeningRepository: Repository<Listening>) { }
+  constructor(
+    @InjectRepository(Listening)
+    private listeningRepository: Repository<Listening>,
+    private readonly usersService: UsersService,
+    private readonly tracksService: TracksService,
+  ) { }
 
   async create(createListeningDTO: CreateListeningDTO): Promise<Listening> {
     return this.listeningRepository.save(createListeningDTO);
   }
 
-  async findLast(findLastListengsForTrackDTO: FindLastListengsForTrackDTO) {
+  async findLast(findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
     const findTrackDTO = new FindTrackDTO();
-    findTrackDTO.id = findLastListengsForTrackDTO.id;
+    findTrackDTO.id = findLastListeningsForTrackDTO.id;
 
     const findListeningsDTO = new FindListeningsDTO();
-    findListeningsDTO.period = findLastListengsForTrackDTO.period;
+    findListeningsDTO.period = findLastListeningsForTrackDTO.period;
     findListeningsDTO.after = new Date()
     findListeningsDTO.before = new Date()
-    for (let i = 0; i < findLastListengsForTrackDTO.count - 1; i++) {
+    for (let i = 0; i < findLastListeningsForTrackDTO.count - 1; i++) {
       switch (findListeningsDTO.period) {
         case "hour":
           findListeningsDTO.after.setHours(findListeningsDTO.after.getHours() - 1);
@@ -47,7 +59,7 @@ export class ListeningsService {
     return await this.find(findTrackDTO, findListeningsDTO)
   }
 
-  async find(findTrackDTO: FindTrackDTO, findListeningsDTO: FindListeningsDTO) {
+  async find(findTrackDTO: FindTrackDTO, findListeningsDTO: FindListeningsDTO): Promise<TrackListeningsResponseDTO> {
 
     const getDatesBetween = (startDate: Date, endDate: Date): Date[] => {
       const dates = [];
@@ -118,7 +130,39 @@ export class ListeningsService {
       listeningsCount += listenings.length;
     }
 
-    return {listenings: listeningsCount, keyframes: stats};
+    return { listenings: listeningsCount, keyframes: stats };
+  }
 
+  // async findForUser(): Promise<UserListeningsResponseDTO> {
+
+  // }
+
+  async findLastForUser(findLastListeningsForUserDTO: FindLastListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
+    const user: User = await this.usersService.findOne(findLastListeningsForUserDTO);
+    const tracks: Track[] = await this.tracksService.findBy({ user: user })
+
+    const stats: UserListeningsResponseDTO[] = [];
+    for (const track of tracks) {
+      stats.push(await this.findLast({
+        id: track.id,
+        period: findLastListeningsForUserDTO.period,
+        count: findLastListeningsForUserDTO.count,
+      }));
+    };
+
+    const keyframesBuilder: { count: number, period: Date }[][] = [];
+    for (const stat of stats) {
+      keyframesBuilder.push(stat.keyframes);
+    }
+
+    const keyframes: { count: number, period: Date }[] = Object.values([].concat(...keyframesBuilder).reduce((keyframes: { count: number, period: Date }[], { period, count }) => {
+      keyframes[period] = { period, count: (keyframes[period] ? keyframes[period].count : 0) + count };
+      return keyframes;
+    }, {}));
+
+    const listeningStats: { listenings: number }[] = stats;
+    const count: { listenings: number } = listeningStats.reduce((total, trackCount) => ({ listenings: total.listenings + trackCount.listenings }));
+
+    return { ...count, keyframes: keyframes };
   }
 }

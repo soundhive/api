@@ -2,7 +2,7 @@ import { IsIn, IsNotEmpty, IsNumberString, IsString } from 'class-validator';
 import { User } from 'src/users/user.entity';
 import { Exists } from 'src/validators/exists.validation';
 
-export class FindLastListengsForUserDTO {
+export class FindLastListeningsForUserDTO {
     @IsNotEmpty()
     @IsString()
     @Exists(User)

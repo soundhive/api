@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { FindLastListengsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
+import { FindLastListeningsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
@@ -11,6 +11,7 @@ import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
+import { TrackListeningsResponseDTO } from 'src/listenings/dto/responses/track-listenings-response.dto';
 
 @Controller('tracks')
 export class TracksController {
@@ -24,7 +25,7 @@ export class TracksController {
   @Post()
   async create(@Request() req, @Body() createTrackDTO: CreateTrackDTO): Promise<Track> {
     const user = await this.usersService.findOne(req.user);
-    const track = new Track({...createTrackDTO, user: user});
+    const track = new Track({ ...createTrackDTO, user: user });
 
     return await this.tracksService.create(track);
   }
@@ -40,13 +41,13 @@ export class TracksController {
   }
 
   @Get(':id/stats')
-  async findStats(@Param() findTrackDTO: FindTrackDTO, @Query() findListeningsDTO: FindListeningsDTO) {
+  async findStats(@Param() findTrackDTO: FindTrackDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<TrackListeningsResponseDTO> {
     return await this.listeningsService.find(findTrackDTO, findListeningsDTO)
   }
 
   @Get(':id/stats/last/:count/:period')
-  async findLastStats(@Param() findLastListengsForTrackDTO: FindLastListengsForTrackDTO) {
-    return await this.listeningsService.findLast(findLastListengsForTrackDTO)
+  async findLastStats(@Param() findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
+    return await this.listeningsService.findLast(findLastListeningsForTrackDTO)
   }
 
   @UseGuards(JwtAuthGuard)
