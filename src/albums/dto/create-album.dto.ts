@@ -1,8 +1,16 @@
-import { CreateTrackDTO } from '../../tracks/dto/create-track.dto';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateAlbumDTO {
+  @IsNotEmpty()
+  @IsString()
   title: string;
-  description: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsNotEmpty()
+  @IsString()
   coverFilename: string;
-  tasks?: CreateTrackDTO[];
 }
