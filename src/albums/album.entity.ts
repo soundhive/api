@@ -6,13 +6,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Track } from '../tracks/track.entity';
 import { User } from 'src/users/user.entity';
 
 @Entity('albums')
 export class Album extends BaseEntity {
-  constructor(partial: Partial<Track>) {
+  constructor(partial: Partial<Album>) {
     super();
     Object.assign(this, partial);
   }
@@ -35,7 +36,7 @@ export class Album extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(type => Track, track => track.album, { cascade: true })
+  @OneToMany(type => Track, track => track.album)
   tracks: Track[];
 
   @ManyToOne(type => User, user => user.albums)
