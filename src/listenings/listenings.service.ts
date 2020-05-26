@@ -134,16 +134,17 @@ export class ListeningsService {
     })
   }
 
-  async findLastForUser(findLastListeningsForUserDTO: FindLastListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
-    const user: User = await this.usersService.findOne(findLastListeningsForUserDTO);
+  async findForUser(findListeningsForUserDTO: FindListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
+    const user: User = await this.usersService.findOne(findListeningsForUserDTO);
     const tracks: Track[] = await this.tracksService.findBy({ user: user })
 
     const stats: UserListeningsResponseDTO[] = [];
     for (const track of tracks) {
-      stats.push(await this.findLast({
+      stats.push(await this.findForTrack({
         id: track.id,
-        period: findLastListeningsForUserDTO.period,
-        count: findLastListeningsForUserDTO.count,
+        period: findListeningsForUserDTO.period,
+        after: findListeningsForUserDTO.after,
+        before: findListeningsForUserDTO.before,
       }));
     };
 
@@ -161,5 +162,35 @@ export class ListeningsService {
     const count: { listenings: number } = listeningStats.reduce((total, trackCount) => ({ listenings: total.listenings + trackCount.listenings }));
 
     return { ...count, keyframes: keyframes };
+  }
+
+  async findLastForUser(findLastListeningsForUserDTO: FindLastListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
+    const after: Date = new Date()
+
+    for (let i = 0; i < findLastListeningsForUserDTO.count - 1; i++) {
+      switch (findLastListeningsForUserDTO.period) {
+        case "hour":
+          after.setHours(after.getHours() - 1);
+          break;
+        case "day":
+          after.setDate(after.getDate() - 1);
+          break;
+        case "week":
+          after.setDate(after.getDate() - 7);
+          break;
+        case "month":
+          after.setMonth(after.getMonth() - 1);
+          break;
+        case "year":
+          after.setFullYear(after.getFullYear() - 1);
+          break;
+      }
+    }
+
+    return await this.findForUser({
+      ...findLastListeningsForUserDTO,
+      after: after,
+      before: new Date(),
+    })
   }
 }
