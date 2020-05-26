@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindTrackDTO } from 'src/tracks/dto/find-track.dto';
 import { Track } from 'src/tracks/track.entity';
 import { TracksService } from 'src/tracks/tracks.service';
 import { User } from 'src/users/user.entity';
@@ -10,10 +9,11 @@ import { Between, Repository } from 'typeorm';
 import { CreateListeningDTO } from './dto/create-listening.dto';
 import { FindLastListeningsForTrackDTO } from './dto/find-last-listenings-track.dto';
 import { FindLastListeningsForUserDTO } from './dto/find-last-listenings-user.dto';
-import { FindListeningsDTO } from './dto/find-listenings.dto';
 import { TrackListeningsResponseDTO } from './dto/responses/track-listenings-response.dto';
 import { UserListeningsResponseDTO } from './dto/responses/user-listenings-response.dto';
 import { Listening } from './listening.entity';
+import { FindListeningsForTrackDTO } from './dto/find-listenings-track.dto';
+import { FindListeningsForUserDTO } from './dto/find-listenings-user.dto';
 
 @Injectable()
 export class ListeningsService {
@@ -28,48 +28,15 @@ export class ListeningsService {
     return this.listeningRepository.save(createListeningDTO);
   }
 
-  async findLast(findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
-    const findTrackDTO = new FindTrackDTO();
-    findTrackDTO.id = findLastListeningsForTrackDTO.id;
-
-    const findListeningsDTO = new FindListeningsDTO();
-    findListeningsDTO.period = findLastListeningsForTrackDTO.period;
-    findListeningsDTO.after = new Date()
-    findListeningsDTO.before = new Date()
-    for (let i = 0; i < findLastListeningsForTrackDTO.count - 1; i++) {
-      switch (findListeningsDTO.period) {
-        case "hour":
-          findListeningsDTO.after.setHours(findListeningsDTO.after.getHours() - 1);
-          break;
-        case "day":
-          findListeningsDTO.after.setDate(findListeningsDTO.after.getDate() - 1);
-          break;
-        case "week":
-          findListeningsDTO.after.setDate(findListeningsDTO.after.getDate() - 7);
-          break;
-        case "month":
-          findListeningsDTO.after.setMonth(findListeningsDTO.after.getMonth() - 1);
-          break;
-        case "year":
-          findListeningsDTO.after.setFullYear(findListeningsDTO.after.getFullYear() - 1);
-          break;
-      }
-    }
-
-    return await this.find(findTrackDTO, findListeningsDTO)
-  }
-
-  async find(findTrackDTO: FindTrackDTO, findListeningsDTO: FindListeningsDTO): Promise<TrackListeningsResponseDTO> {
-
+  async findForTrack(findListeningsForTrackDTO: FindListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
     const getDatesBetween = (startDate: Date, endDate: Date): Date[] => {
-      const dates = [];
-
+      const dates: Date[] = [];
       const currentDate = new Date(startDate.valueOf())
 
       while (currentDate <= endDate) {
         dates.push(new Date(currentDate.valueOf()));
 
-        switch (findListeningsDTO.period) {
+        switch (findListeningsForTrackDTO.period) {
           case "hour":
             currentDate.setHours(currentDate.getHours() + 1);
             break;
@@ -91,15 +58,19 @@ export class ListeningsService {
       return dates;
     };
 
-    const dates = getDatesBetween(new Date(findListeningsDTO.after), new Date(findListeningsDTO.before));
+    const dates: Date[] = getDatesBetween(new Date(findListeningsForTrackDTO.after), new Date(findListeningsForTrackDTO.before));
 
-    const stats = []
+    const stats: {
+      count: number,
+      period: Date,
+    }[] = [];
+
     let listeningsCount = 0;
 
     for (const date of dates) {
-      const startDate = new Date(date.valueOf());
+      const startDate: Date = new Date(date.valueOf());
 
-      switch (findListeningsDTO.period) {
+      switch (findListeningsForTrackDTO.period) {
         case "hour":
           startDate.setHours(startDate.getHours() - 1);
           break;
@@ -117,9 +88,9 @@ export class ListeningsService {
           break;
       }
 
-      const listenings = await this.listeningRepository.find({
+      const listenings: Listening[] = await this.listeningRepository.find({
         listenedAt: Between(startDate, date),
-        track: findTrackDTO,
+        track: findListeningsForTrackDTO,
       });
 
       stats.push({
@@ -133,9 +104,35 @@ export class ListeningsService {
     return { listenings: listeningsCount, keyframes: stats };
   }
 
-  // async findForUser(): Promise<UserListeningsResponseDTO> {
+  async findLastForTrack(findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
+    const after: Date = new Date()
 
-  // }
+    for (let i = 0; i < findLastListeningsForTrackDTO.count - 1; i++) {
+      switch (findLastListeningsForTrackDTO.period) {
+        case "hour":
+          after.setHours(after.getHours() - 1);
+          break;
+        case "day":
+          after.setDate(after.getDate() - 1);
+          break;
+        case "week":
+          after.setDate(after.getDate() - 7);
+          break;
+        case "month":
+          after.setMonth(after.getMonth() - 1);
+          break;
+        case "year":
+          after.setFullYear(after.getFullYear() - 1);
+          break;
+      }
+    }
+
+    return await this.findForTrack({
+      ...findLastListeningsForTrackDTO,
+      after: after,
+      before: new Date(),
+    })
+  }
 
   async findLastForUser(findLastListeningsForUserDTO: FindLastListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
     const user: User = await this.usersService.findOne(findLastListeningsForUserDTO);

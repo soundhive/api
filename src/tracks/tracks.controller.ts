@@ -42,12 +42,12 @@ export class TracksController {
 
   @Get(':id/stats')
   async findStats(@Param() findTrackDTO: FindTrackDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<TrackListeningsResponseDTO> {
-    return await this.listeningsService.find(findTrackDTO, findListeningsDTO)
+    return await this.listeningsService.findForTrack({...findTrackDTO, ...findListeningsDTO})
   }
 
   @Get(':id/stats/last/:count/:period')
   async findLastStats(@Param() findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
-    return await this.listeningsService.findLast(findLastListeningsForTrackDTO)
+    return await this.listeningsService.findLastForTrack(findLastListeningsForTrackDTO)
   }
 
   @UseGuards(JwtAuthGuard)
