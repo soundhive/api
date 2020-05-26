@@ -35,6 +35,7 @@ export class Track extends BaseEntity {
   @Column()
   filename: string;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Listening, listening => listening.track)
   listenings: Listening[];
 
