@@ -1,14 +1,15 @@
-import { Module, DynamicModule } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { LoggerModule } from 'nestjs-pino';
+
+import { AlbumsModule } from './albums/albums.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { TracksModule } from './tracks/tracks.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { LoggerModule } from 'nestjs-pino';
-import { ConfigModule } from '@nestjs/config';
-import { AlbumsModule } from './albums/albums.module';
 import * as ormconfig from './ormconfig';
+import { TracksModule } from './tracks/tracks.module';
+import { UsersModule } from './users/users.module';
 
 
 export function DatabaseOrmModule(): DynamicModule {

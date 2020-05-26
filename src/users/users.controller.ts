@@ -1,18 +1,20 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { FindLastListeningsForUserDTO } from 'src/listenings/dto/find-last-listenings-user.dto';
+import { ListeningsService } from 'src/listenings/listenings.service';
+
 import { CreateUserDTO } from './dto/create-user.dto';
-import { UsersService } from './users.service';
-import { User } from './user.entity';
 import { FindUserDTO } from './dto/find-user.dto';
+import { User } from './user.entity';
+import { UsersService } from './users.service';
+import { UserListeningsResponseDTO } from 'src/listenings/dto/responses/user-listenings-response.dto';
+import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) { }
+  constructor(
+    private usersService: UsersService,
+    private readonly listeningsService: ListeningsService,
+  ) { }
 
   @Post()
   async create(@Body() createUserDTO: CreateUserDTO): Promise<User> {
@@ -27,5 +29,15 @@ export class UsersController {
   @Get(':username')
   async findOne(@Param() user: FindUserDTO): Promise<User> {
     return await this.usersService.findOne(user);
+  }
+
+  @Get(':username/stats')
+  async findStats(@Param() findUserDTO: FindUserDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<UserListeningsResponseDTO> {
+    return await this.listeningsService.findForUser({ ...findUserDTO, ...findListeningsDTO })
+  }
+
+  @Get(':username/stats/last/:count/:period')
+  async findLastStats(@Param() findLastListeningsForUserDTO: FindLastListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
+    return await this.listeningsService.findLastForUser(findLastListeningsForUserDTO)
   }
 }

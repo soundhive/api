@@ -1,17 +1,33 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
-import { TracksService } from './tracks.service';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { FindLastListeningsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
+import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
+import { Listening } from 'src/listenings/listening.entity';
+import { ListeningsService } from 'src/listenings/listenings.service';
+import { UsersService } from 'src/users/users.service';
+
 import { CreateTrackDTO } from './dto/create-track.dto';
-import { Track } from './track.entity';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
+import { Track } from './track.entity';
+import { TracksService } from './tracks.service';
+import { TrackListeningsResponseDTO } from 'src/listenings/dto/responses/track-listenings-response.dto';
 
 @Controller('tracks')
 export class TracksController {
-  constructor(private readonly tracksService: TracksService) { }
+  constructor(
+    private readonly tracksService: TracksService,
+    private readonly usersService: UsersService,
+    private readonly listeningsService: ListeningsService,
+  ) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() track: CreateTrackDTO): Promise<Track> {
-    return await this.tracksService.create(new Track(track));
+  async create(@Request() req, @Body() createTrackDTO: CreateTrackDTO): Promise<Track> {
+    const user = await this.usersService.findOne(req.user);
+    const track = new Track({ ...createTrackDTO, user: user });
+
+    return await this.tracksService.create(track);
   }
 
   @Get()
@@ -20,14 +36,34 @@ export class TracksController {
   }
 
   @Get(':id')
-  async findOne(@Param() tracl: FindTrackDTO): Promise<Track> {
-    return await this.tracksService.findOne(tracl);
+  async findOne(@Param() track: FindTrackDTO): Promise<Track> {
+    return await this.tracksService.findOne(track);
   }
 
+  @Get(':id/stats')
+  async findStats(@Param() findTrackDTO: FindTrackDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<TrackListeningsResponseDTO> {
+    return await this.listeningsService.findForTrack({...findTrackDTO, ...findListeningsDTO})
+  }
+
+  @Get(':id/stats/last/:count/:period')
+  async findLastStats(@Param() findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
+    return await this.listeningsService.findLastForTrack(findLastListeningsForTrackDTO)
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(@Param() track: FindTrackDTO, @Body() trackData: UpdateTrackDTO): Promise<Track> {
     await this.tracksService.update(track, trackData);
     return await this.tracksService.findOne(track);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/listen')
+  async listen(@Param() findTrackDTO: FindTrackDTO, @Request() req): Promise<void> {
+    const user = await this.usersService.findOne(req.user);
+    const track = await this.tracksService.findOne(findTrackDTO);
+    const listening = new Listening({ user: user, track: track })
+    await this.listeningsService.create(listening);
   }
 
   @Delete(':id')

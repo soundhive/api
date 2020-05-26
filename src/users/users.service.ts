@@ -13,7 +13,7 @@ export class UsersService {
   ) { }
 
   async create(createUserDTO: CreateUserDTO): Promise<User> {
-    return this.usersRepository.create(createUserDTO);
+    return this.usersRepository.save(createUserDTO);
   }
 
   async find(): Promise<User[]> {

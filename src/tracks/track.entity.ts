@@ -1,12 +1,8 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Listening } from 'src/listenings/listening.entity';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
 import { Album } from '../albums/album.entity';
+import { User } from 'src/users/user.entity';
 
 @Entity('tracks')
 export class Track {
@@ -29,6 +25,9 @@ export class Track {
   @Column()
   filename: string;
 
+  @OneToMany(type => Listening, listening => listening.track)
+  listenings: Listening[];
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -38,4 +37,7 @@ export class Track {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne(type => Album, album => album.tracks)
   album: Album;
+
+  @ManyToOne(() => User, user => user.tracks)
+  user: User;
 }
