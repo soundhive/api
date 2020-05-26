@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { Track } from './track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { CreateTrackDTO } from './dto/create-track.dto';
-import { FindTrackDTO } from './dto/find-track.dto';
-import { UpdateTrackDTO } from './dto/update-track.dto';
+
 import { Album } from '../albums/album.entity';
-import { AlbumsService } from '../albums/albums.service';
+import { FindTrackDTO } from './dto/find-track.dto';
+import { InsertTrackDTO } from './dto/insert-track.dto';
+import { UpdateTrackDTO } from './dto/update-track.dto';
+import { Track } from './track.entity';
 
 @Injectable()
 export class TracksService {
   constructor(
     @InjectRepository(Track) private trackRepository: Repository<Track>,
     @InjectRepository(Album) private albumRepository: Repository<Album>,
-  ) {}
+  ) { }
 
-  async create(createTrackDTO: CreateTrackDTO): Promise<Track> {
+  async create(createTrackDTO: InsertTrackDTO): Promise<Track> {
     return this.trackRepository.save(createTrackDTO);
   }
 

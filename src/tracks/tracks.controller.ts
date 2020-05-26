@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Reque
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FindLastListeningsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
+import { TrackListeningsResponseDTO } from 'src/listenings/dto/responses/track-listenings-response.dto';
 import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
 import { UsersService } from 'src/users/users.service';
@@ -11,7 +12,6 @@ import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
-import { TrackListeningsResponseDTO } from 'src/listenings/dto/responses/track-listenings-response.dto';
 
 @Controller('tracks')
 export class TracksController {
@@ -25,9 +25,8 @@ export class TracksController {
   @Post()
   async create(@Request() req, @Body() createTrackDTO: CreateTrackDTO): Promise<Track> {
     const user = await this.usersService.findOne(req.user);
-    const track = new Track({ ...createTrackDTO, user: user });
 
-    return await this.tracksService.create(track);
+    return await this.tracksService.create({ ...createTrackDTO, user: user });
   }
 
   @Get()
@@ -42,7 +41,7 @@ export class TracksController {
 
   @Get(':id/stats')
   async findStats(@Param() findTrackDTO: FindTrackDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<TrackListeningsResponseDTO> {
-    return await this.listeningsService.findForTrack({...findTrackDTO, ...findListeningsDTO})
+    return await this.listeningsService.findForTrack({ ...findTrackDTO, ...findListeningsDTO })
   }
 
   @Get(':id/stats/last/:count/:period')
