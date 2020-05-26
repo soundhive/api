@@ -1,5 +1,6 @@
 import argon2 = require('argon2');
 import { Exclude } from 'class-transformer';
+import { Album } from 'src/albums/album.entity';
 import { Listening } from 'src/listenings/listening.entity';
 import { Track } from 'src/tracks/track.entity';
 import {
@@ -42,6 +43,9 @@ export class User {
 
   @OneToMany(type => Track, track => track.user)
   tracks: Track[];
+
+  @OneToMany(type => Album, album => album.user)
+  albums: Album[];
 
   @Column({ default: true })
   isActive: boolean;

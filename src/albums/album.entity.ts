@@ -8,6 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Track } from '../tracks/track.entity';
+import { User } from 'src/users/user.entity';
 
 @Entity('albums')
 export class Album extends BaseEntity {
@@ -36,4 +37,7 @@ export class Album extends BaseEntity {
 
   @OneToMany(type => Track, track => track.album, { cascade: true })
   tracks: Track[];
+
+  @ManyToOne(type => User, user => user.albums)
+  user: User;
 }
