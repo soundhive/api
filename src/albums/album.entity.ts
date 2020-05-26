@@ -23,8 +23,8 @@ export class Album extends BaseEntity {
   @Column({ type: 'varchar', length: '60' })
   title: string;
 
-  @Column('text')
-  description: string;
+  @Column('text', { default: null, nullable: true })
+  description?: string;
 
   @Column()
   filename: string;
