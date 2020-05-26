@@ -27,7 +27,7 @@ export class Album extends BaseEntity {
   description?: string;
 
   @Column()
-  filename: string;
+  coverFilename: string;
 
   @CreateDateColumn()
   createdAt: Date;
