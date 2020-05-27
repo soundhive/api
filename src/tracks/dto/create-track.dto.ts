@@ -20,5 +20,5 @@ export class CreateTrackDTO {
 
   @IsNotEmpty()
   @IsUUID("all")
-  album: Album;
+  album: string;
 }

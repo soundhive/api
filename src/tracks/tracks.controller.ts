@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Request, UseGuards, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FindLastListeningsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
@@ -12,12 +12,14 @@ import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
+import { AlbumsService } from 'src/albums/albums.service';
 
 @Controller('tracks')
 export class TracksController {
   constructor(
     private readonly tracksService: TracksService,
     private readonly usersService: UsersService,
+    private readonly albumsService: AlbumsService,
     private readonly listeningsService: ListeningsService,
   ) { }
 
@@ -26,7 +28,22 @@ export class TracksController {
   async create(@Request() req, @Body() createTrackDTO: CreateTrackDTO): Promise<Track> {
     const user = await this.usersService.findOne(req.user);
 
-    return await this.tracksService.create({ ...createTrackDTO, user: user });
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+
+    const album = await this.albumsService.findOne({ id: createTrackDTO.album });
+
+    if (!album) {
+      throw new BadRequestException();
+    }
+
+    return new Track(await this.tracksService.create({
+      ...createTrackDTO,
+      user: user,
+      album: album,
+    }));
   }
 
   @Get()
