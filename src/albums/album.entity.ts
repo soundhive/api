@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Track } from '../tracks/track.entity';
 import { User } from 'src/users/user.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('albums')
 export class Album extends BaseEntity {
@@ -42,5 +43,6 @@ export class Album extends BaseEntity {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne(type => User, user => user.albums, { nullable: false })
+  @Exclude()
   user: User;
 }
