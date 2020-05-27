@@ -3,16 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 import { Album } from './album.entity';
-import { CreateAlbumDTO } from './dto/create-album.dto';
 import { FindAlbumDTO } from './dto/find-album.dto';
 import { UpdateAlbumDTO } from './dto/update-album.dto';
+import { InsertAlbumDTO } from './dto/insert-album-dto';
 
 @Injectable()
 export class AlbumsService {
   constructor(@InjectRepository(Album) private albumsRepository: Repository<Album>) { }
 
-  async create(createAlbumDTO: CreateAlbumDTO): Promise<Album> {
-    return await this.albumsRepository.save(createAlbumDTO);
+  async create(insertAlbumDTO: InsertAlbumDTO): Promise<Album> {
+    return await this.albumsRepository.save(insertAlbumDTO);
   }
 
   async find(): Promise<Album[]> {
