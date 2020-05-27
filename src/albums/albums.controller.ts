@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body,Request, Controller, Delete, Get, HttpCode, Param, Post, Put, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 import { Album } from './album.entity';
@@ -6,15 +6,25 @@ import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { FindAlbumDTO } from './dto/find-album.dto';
 import { UpdateAlbumDTO } from './dto/update-album.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('albums')
 export class AlbumsController {
-  constructor(private readonly albumsService: AlbumsService) { }
+  constructor(
+    private readonly albumsService: AlbumsService,
+    private readonly usersService: UsersService
+  ) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() createAlbumDTO: CreateAlbumDTO): Promise<Album> {
-    return this.albumsService.create(createAlbumDTO);
+  async create(@Request() req, @Body() createAlbumDTO: CreateAlbumDTO): Promise<Album> {
+    const user = await this.usersService.findOne(req.user);
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return new Album(await this.albumsService.create({...createAlbumDTO, user: user}));
   }
 
   @Get()
