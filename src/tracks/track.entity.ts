@@ -46,9 +46,9 @@ export class Track extends BaseEntity {
   updatedAt: Date;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne(type => Album, album => album.tracks)
+  @ManyToOne(type => Album, album => album.tracks, { nullable: false })
   album: Album;
 
-  @ManyToOne(() => User, user => user.tracks)
+  @ManyToOne(() => User, user => user.tracks, { nullable: false })
   user: User;
 }
