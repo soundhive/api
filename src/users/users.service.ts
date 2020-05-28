@@ -21,6 +21,6 @@ export class UsersService {
   }
 
   async findOne(user: FindUserDTO): Promise<User> {
-   return this.usersRepository.findOne({ username: user.username })
+    return this.usersRepository.findOne({ username: user.username })
   }
 }

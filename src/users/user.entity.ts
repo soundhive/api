@@ -65,6 +65,7 @@ export class User {
   @VersionColumn()
   dataVersion: number;
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   @BeforeInsert()
   async hashPassword() {
     this.password = await argon2.hash(this.password);

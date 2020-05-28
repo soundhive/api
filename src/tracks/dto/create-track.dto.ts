@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
-import { Album } from 'src/albums/album.entity';
 
 export class CreateTrackDTO {
   @IsNotEmpty()

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
-import { Album } from '../albums/album.entity';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { InsertTrackDTO } from './dto/insert-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
@@ -12,7 +11,6 @@ import { Track } from './track.entity';
 export class TracksService {
   constructor(
     @InjectRepository(Track) private trackRepository: Repository<Track>,
-    @InjectRepository(Album) private albumRepository: Repository<Album>,
   ) { }
 
   async create(createTrackDTO: InsertTrackDTO): Promise<Track> {
@@ -23,7 +21,7 @@ export class TracksService {
     return await this.trackRepository.find();
   }
 
-  async findBy(params): Promise<Track[]> {
+  async findBy(params: {}): Promise<Track[]> {
     return await this.trackRepository.find(params);
   }
 

@@ -13,6 +13,7 @@ import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
 import { AlbumsService } from 'src/albums/albums.service';
+import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 
 @Controller('tracks')
 export class TracksController {
@@ -25,7 +26,7 @@ export class TracksController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Request() req, @Body() createTrackDTO: CreateTrackDTO): Promise<Track> {
+  async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createTrackDTO: CreateTrackDTO): Promise<Track> {
     const user = await this.usersService.findOne(req.user);
 
     if (!user) {
@@ -75,7 +76,7 @@ export class TracksController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/listen')
-  async listen(@Param() findTrackDTO: FindTrackDTO, @Request() req): Promise<void> {
+  async listen(@Param() findTrackDTO: FindTrackDTO, @Request() req: { user: AuthenticatedUserDTO }): Promise<void> {
     const user = await this.usersService.findOne(req.user);
     const track = await this.tracksService.findOne(findTrackDTO);
     const listening = new Listening({ user: user, track: track })
