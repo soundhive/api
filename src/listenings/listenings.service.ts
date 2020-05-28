@@ -38,21 +38,21 @@ export class ListeningsService {
         dates.push(new Date(currentDate.valueOf()));
 
         switch (findListeningsForTrackDTO.period) {
-          case "hour":
-            currentDate.setHours(currentDate.getHours() + 1);
-            break;
-          case "day":
-            currentDate.setDate(currentDate.getDate() + 1);
-            break;
-          case "week":
-            currentDate.setDate(currentDate.getDate() + 7);
-            break;
-          case "month":
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            break;
-          case "year":
-            currentDate.setFullYear(currentDate.getFullYear() + 1);
-            break;
+        case "hour":
+          currentDate.setHours(currentDate.getHours() + 1);
+          break;
+        case "day":
+          currentDate.setDate(currentDate.getDate() + 1);
+          break;
+        case "week":
+          currentDate.setDate(currentDate.getDate() + 7);
+          break;
+        case "month":
+          currentDate.setMonth(currentDate.getMonth() + 1);
+          break;
+        case "year":
+          currentDate.setFullYear(currentDate.getFullYear() + 1);
+          break;
         }
       }
 
@@ -72,21 +72,21 @@ export class ListeningsService {
       const startDate: Date = new Date(date.valueOf());
 
       switch (findListeningsForTrackDTO.period) {
-        case "hour":
-          startDate.setHours(startDate.getHours() - 1);
-          break;
-        case "day":
-          startDate.setDate(startDate.getDate() - 1);
-          break;
-        case "week":
-          startDate.setDate(startDate.getDate() - 7);
-          break;
-        case "month":
-          startDate.setMonth(startDate.getMonth() - 1);
-          break;
-        case "year":
-          startDate.setFullYear(startDate.getFullYear() - 1);
-          break;
+      case "hour":
+        startDate.setHours(startDate.getHours() - 1);
+        break;
+      case "day":
+        startDate.setDate(startDate.getDate() - 1);
+        break;
+      case "week":
+        startDate.setDate(startDate.getDate() - 7);
+        break;
+      case "month":
+        startDate.setMonth(startDate.getMonth() - 1);
+        break;
+      case "year":
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        break;
       }
 
       const listenings: Listening[] = await this.listeningRepository.find({
@@ -110,21 +110,21 @@ export class ListeningsService {
 
     for (let i = 0; i < findLastListeningsForTrackDTO.count - 1; i++) {
       switch (findLastListeningsForTrackDTO.period) {
-        case "hour":
-          after.setHours(after.getHours() - 1);
-          break;
-        case "day":
-          after.setDate(after.getDate() - 1);
-          break;
-        case "week":
-          after.setDate(after.getDate() - 7);
-          break;
-        case "month":
-          after.setMonth(after.getMonth() - 1);
-          break;
-        case "year":
-          after.setFullYear(after.getFullYear() - 1);
-          break;
+      case "hour":
+        after.setHours(after.getHours() - 1);
+        break;
+      case "day":
+        after.setDate(after.getDate() - 1);
+        break;
+      case "week":
+        after.setDate(after.getDate() - 7);
+        break;
+      case "month":
+        after.setMonth(after.getMonth() - 1);
+        break;
+      case "year":
+        after.setFullYear(after.getFullYear() - 1);
+        break;
       }
     }
 
@@ -175,21 +175,21 @@ export class ListeningsService {
 
     for (let i = 0; i < findLastListeningsForUserDTO.count - 1; i++) {
       switch (findLastListeningsForUserDTO.period) {
-        case "hour":
-          after.setHours(after.getHours() - 1);
-          break;
-        case "day":
-          after.setDate(after.getDate() - 1);
-          break;
-        case "week":
-          after.setDate(after.getDate() - 7);
-          break;
-        case "month":
-          after.setMonth(after.getMonth() - 1);
-          break;
-        case "year":
-          after.setFullYear(after.getFullYear() - 1);
-          break;
+      case "hour":
+        after.setHours(after.getHours() - 1);
+        break;
+      case "day":
+        after.setDate(after.getDate() - 1);
+        break;
+      case "week":
+        after.setDate(after.getDate() - 7);
+        break;
+      case "month":
+        after.setMonth(after.getMonth() - 1);
+        break;
+      case "year":
+        after.setFullYear(after.getFullYear() - 1);
+        break;
       }
     }
 
