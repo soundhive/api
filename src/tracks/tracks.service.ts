@@ -25,7 +25,7 @@ export class TracksService {
     return await this.trackRepository.find(params);
   }
 
-  async findOne(track: FindTrackDTO): Promise<Track> {
+  async findOne(track: FindTrackDTO): Promise<Track | undefined> {
     return await this.trackRepository.findOne({ id: track.id });
   }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Post, Request, UseGuards } from '@nestjs/common';
 
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
@@ -25,8 +25,13 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req: { user: AuthenticatedUserDTO }): Promise<User> {
-    return this.usersService.findOne(req.user);
+  async getProfile(@Request() req: { user: AuthenticatedUserDTO }): Promise<User> {
+    const user: User | undefined = await this.usersService.findOne(req.user);
+
+    if (!user) {
+      throw NotFoundException;
+    }
+    return user;
   }
 
   @Get('/')

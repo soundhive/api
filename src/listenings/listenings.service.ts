@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Track } from 'src/tracks/track.entity';
 import { TracksService } from 'src/tracks/tracks.service';
@@ -9,11 +10,11 @@ import { Between, Repository } from 'typeorm';
 import { CreateListeningDTO } from './dto/create-listening.dto';
 import { FindLastListeningsForTrackDTO } from './dto/find-last-listenings-track.dto';
 import { FindLastListeningsForUserDTO } from './dto/find-last-listenings-user.dto';
+import { FindListeningsForTrackDTO } from './dto/find-listenings-track.dto';
+import { FindListeningsForUserDTO } from './dto/find-listenings-user.dto';
 import { TrackListeningsResponseDTO } from './dto/responses/track-listenings-response.dto';
 import { UserListeningsResponseDTO } from './dto/responses/user-listenings-response.dto';
 import { Listening } from './listening.entity';
-import { FindListeningsForTrackDTO } from './dto/find-listenings-track.dto';
-import { FindListeningsForUserDTO } from './dto/find-listenings-user.dto';
 
 @Injectable()
 export class ListeningsService {
@@ -135,7 +136,10 @@ export class ListeningsService {
   }
 
   async findForUser(findListeningsForUserDTO: FindListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
-    const user: User = await this.usersService.findOne(findListeningsForUserDTO);
+    const user: User | undefined = await this.usersService.findOne(findListeningsForUserDTO);
+    if (!user) {
+      throw BadRequestException;
+    }
     const tracks: Track[] = await this.tracksService.findBy({ user: user })
 
     const stats: UserListeningsResponseDTO[] = [];
@@ -153,9 +157,11 @@ export class ListeningsService {
       keyframesBuilder.push(stat.keyframes);
     }
 
-    const keyframes: { count: number, period: Date }[] = Object.values([].concat(...keyframesBuilder).reduce((keyframes: { count: number, period: Date }[], { period, count }) => {
+    // @ts-ignore
+    const keyframes: { count: number, period: Date }[] = Object.values(([] as { count: number, period: Date }[][]).concat(...keyframesBuilder).reduce((keyframes: { count: number, period: Date }[], { period, count }) => {
       keyframes[period] = { period, count: (keyframes[period] ? keyframes[period].count : 0) + count };
       return keyframes;
+      // @ts-ignore
     }, {}));
 
     const listeningStats: { listenings: number }[] = stats;

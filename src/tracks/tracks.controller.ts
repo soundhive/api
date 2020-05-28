@@ -1,4 +1,21 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Request, UseGuards, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Query,
+  Request,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { AlbumsService } from 'src/albums/albums.service';
+import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FindLastListeningsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
@@ -12,8 +29,7 @@ import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
-import { AlbumsService } from 'src/albums/albums.service';
-import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
+import { UpdateResult } from 'typeorm';
 
 @Controller('tracks')
 export class TracksController {
@@ -53,8 +69,14 @@ export class TracksController {
   }
 
   @Get(':id')
-  async findOne(@Param() track: FindTrackDTO): Promise<Track> {
-    return await this.tracksService.findOne(track);
+  async findOne(@Param() findTrackDTO: FindTrackDTO): Promise<Track> {
+    const track: Track | undefined = await this.tracksService.findOne(findTrackDTO);
+
+    if (!track) {
+      throw NotFoundException;
+    }
+
+    return track;
   }
 
   @Get(':id/stats')
@@ -69,9 +91,20 @@ export class TracksController {
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
-  async update(@Param() track: FindTrackDTO, @Body() trackData: UpdateTrackDTO): Promise<Track> {
-    await this.tracksService.update(track, trackData);
-    return await this.tracksService.findOne(track);
+  async update(@Param() findTrackDTO: FindTrackDTO, @Body() trackData: UpdateTrackDTO): Promise<Track> {
+    const result: UpdateResult = await this.tracksService.update(findTrackDTO, trackData);
+
+    if (!result.affected || result.affected === 0) {
+      throw BadRequestException;
+    }
+
+    const track: Track | undefined = await this.tracksService.findOne(findTrackDTO);
+
+    if (!track) {
+      throw BadRequestException;
+    }
+
+    return track;
   }
 
   @UseGuards(JwtAuthGuard)
