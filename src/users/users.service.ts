@@ -20,7 +20,7 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findOne(user: FindUserDTO): Promise<User> {
-   return this.usersRepository.findOne({ username: user.username })
+  async findOne(user: FindUserDTO): Promise<User | undefined> {
+    return this.usersRepository.findOne({ username: user.username })
   }
 }

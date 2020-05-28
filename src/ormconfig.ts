@@ -1,6 +1,6 @@
 import { ConnectionOptions } from 'typeorm';
 
-const { parse } = require('pg-connection-string');
+import { parse } from 'pg-connection-string';
 require('dotenv').config()
 
 const config = parse(process.env.DATABASE_URL || "postgres://:@localhost:5432/");
@@ -8,7 +8,7 @@ const config = parse(process.env.DATABASE_URL || "postgres://:@localhost:5432/")
 const ormConfig: ConnectionOptions = {
   type: "postgres",
   host: config.host || "localhost",
-  port: config.port || 5432,
+  port: Number(config.port) || 5432,
   username: config.user || "",
   password: config.password || "",
   database: config.database || "soundhive",

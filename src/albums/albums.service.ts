@@ -4,8 +4,8 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 import { Album } from './album.entity';
 import { FindAlbumDTO } from './dto/find-album.dto';
-import { UpdateAlbumDTO } from './dto/update-album.dto';
 import { InsertAlbumDTO } from './dto/insert-album-dto';
+import { UpdateAlbumDTO } from './dto/update-album.dto';
 
 @Injectable()
 export class AlbumsService {
@@ -19,7 +19,7 @@ export class AlbumsService {
     return await this.albumsRepository.find();
   }
 
-  async findOne(album: FindAlbumDTO): Promise<Album> {
+  async findOne(album: FindAlbumDTO): Promise<Album | undefined> {
     return await this.albumsRepository.findOne({ id: album.id });
   }
 
