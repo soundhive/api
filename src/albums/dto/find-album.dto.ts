@@ -1,9 +1,9 @@
 import { IsUUID } from 'class-validator';
 import { Exists } from '../../validators/exists.validation';
-import { Track } from '../track.entity';
+import { Album } from '../album.entity';
 
-export class FindTrackDTO {
+export class FindAlbumDTO {
   @IsUUID('all')
-  @Exists(Track)
+  @Exists(Album)
   id: string;
 }

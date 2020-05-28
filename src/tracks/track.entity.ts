@@ -1,12 +1,23 @@
 import { Listening } from 'src/listenings/listening.entity';
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { User } from 'src/users/user.entity';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 import { Album } from '../albums/album.entity';
-import { User } from 'src/users/user.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('tracks')
-export class Track {
+export class Track extends BaseEntity {
   constructor(partial: Partial<Track>) {
+    super();
     Object.assign(this, partial);
   }
 
@@ -25,6 +36,7 @@ export class Track {
   @Column()
   filename: string;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Listening, listening => listening.track)
   listenings: Listening[];
 
@@ -35,9 +47,10 @@ export class Track {
   updatedAt: Date;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne(type => Album, album => album.tracks)
+  @ManyToOne(type => Album, album => album.tracks, { nullable: false })
   album: Album;
 
-  @ManyToOne(() => User, user => user.tracks)
+  @ManyToOne(() => User, user => user.tracks, { nullable: false })
+  @Exclude()
   user: User;
 }

@@ -1,38 +1,52 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
-import { AlbumsService } from './albums.service';
+import { Body,Request, Controller, Delete, Get, HttpCode, Param, Post, Put, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+
 import { Album } from './album.entity';
+import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
+import { FindAlbumDTO } from './dto/find-album.dto';
+import { UpdateAlbumDTO } from './dto/update-album.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('albums')
 export class AlbumsController {
-  constructor(private readonly albumsService: AlbumsService) {}
+  constructor(
+    private readonly albumsService: AlbumsService,
+    private readonly usersService: UsersService
+  ) { }
 
   @Post()
-  addAlbum(@Body() createAlbumDTO: CreateAlbumDTO) {
-    return this.albumsService.insertAlbum(createAlbumDTO);
+  @UseGuards(JwtAuthGuard)
+  async create(@Request() req, @Body() createAlbumDTO: CreateAlbumDTO): Promise<Album> {
+    const user = await this.usersService.findOne(req.user);
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return new Album(await this.albumsService.create({...createAlbumDTO, user: user}));
   }
 
   @Get()
-  getAllAlbums() {
-    return this.albumsService.getAllAlbums();
+  async find(): Promise<Album[]> {
+    return this.albumsService.find();
   }
 
   @Get(':id')
-  getAlbum(@Param('id') albumId: string) {
-    return this.albumsService.getAlbum(albumId);
+  async findOne(@Param() album: FindAlbumDTO): Promise<Album> {
+    return await this.albumsService.findOne(album);
   }
 
   @Put(':id')
-  @HttpCode(204)
-  updateAlbum(@Param('id') id, @Body() albumData: Album) {
-    return this.albumsService.updateAlbum(id, albumData);
+  async update(@Param() album: FindAlbumDTO, @Body() albumData: UpdateAlbumDTO): Promise<Album> {
+    await this.albumsService.update(album, albumData);
+    return await this.albumsService.findOne(album);
   }
 
   @Delete(':id')
-  @HttpCode(200)
-  deleteAlbum(@Param('id') albumId: string) {
-    this.albumsService.deleteAlbum(albumId).then();
-
-    return null;
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
+  delete(@Param() album: FindAlbumDTO): void {
+    this.albumsService.delete(album).then();
   }
 }

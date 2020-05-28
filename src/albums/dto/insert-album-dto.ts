@@ -1,6 +1,8 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Exists } from 'src/validators/exists.validation';
+import { User } from 'src/users/user.entity';
 
-export class CreateAlbumDTO {
+export class InsertAlbumDTO {
   @IsNotEmpty()
   @IsString()
   title: string;
@@ -13,4 +15,8 @@ export class CreateAlbumDTO {
   @IsNotEmpty()
   @IsString()
   coverFilename: string;
+
+  @IsNotEmpty()
+  @Exists(User)
+  user: User;
 }

@@ -14,9 +14,9 @@ export class Listening {
   @CreateDateColumn()
   listenedAt: Date;
 
-  @ManyToOne(() => User, user => user.listenings)
+  @ManyToOne(() => User, user => user.listenings, { nullable: false })
   user: User;
 
-  @ManyToOne(() => Track, track => track.listenings)
+  @ManyToOne(() => Track, track => track.listenings, { nullable: false })
   track: Track;
 }

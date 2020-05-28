@@ -1,26 +1,35 @@
 import {
+  BaseEntity,
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Track } from '../tracks/track.entity';
+import { User } from 'src/users/user.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('albums')
-export class Album {
+export class Album extends BaseEntity {
+  constructor(partial: Partial<Album>) {
+    super();
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', length: '60' })
   title: string;
 
-  @Column('text')
-  description: string;
+  @Column('text', { default: null, nullable: true })
+  description?: string;
 
   @Column()
-  filename: string;
+  coverFilename: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -28,6 +37,12 @@ export class Album {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Track, track => track.album)
   tracks: Track[];
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @ManyToOne(type => User, user => user.albums, { nullable: false })
+  @Exclude()
+  user: User;
 }
