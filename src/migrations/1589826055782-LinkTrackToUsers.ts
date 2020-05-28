@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import {MigrationInterface, QueryRunner} from "typeorm";
 
 export class LinkTrackToUsers1589826055782 implements MigrationInterface {

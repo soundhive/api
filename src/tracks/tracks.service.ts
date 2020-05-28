@@ -18,22 +18,22 @@ export class TracksService {
   }
 
   async find(): Promise<Track[]> {
-    return await this.trackRepository.find();
+    return this.trackRepository.find();
   }
 
   async findBy(params: {}): Promise<Track[]> {
-    return await this.trackRepository.find(params);
+    return this.trackRepository.find(params);
   }
 
   async findOne(track: FindTrackDTO): Promise<Track | undefined> {
-    return await this.trackRepository.findOne({ id: track.id });
+    return this.trackRepository.findOne({ id: track.id });
   }
 
   async update(track: FindTrackDTO, trackData: UpdateTrackDTO): Promise<UpdateResult> {
-    return await this.trackRepository.update({ id: track.id }, trackData);
+    return this.trackRepository.update({ id: track.id }, trackData);
   }
 
   async delete(track: FindTrackDTO): Promise<DeleteResult> {
-    return await this.trackRepository.delete({ id: track.id });
+    return this.trackRepository.delete({ id: track.id });
   }
 }

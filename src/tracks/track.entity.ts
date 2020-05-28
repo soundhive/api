@@ -11,8 +11,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Album } from '../albums/album.entity';
 import { Exclude } from 'class-transformer';
+import { Album } from '../albums/album.entity';
 
 @Entity('tracks')
 export class Track extends BaseEntity {

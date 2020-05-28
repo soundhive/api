@@ -53,6 +53,8 @@ export class ListeningsService {
         case "year":
           currentDate.setFullYear(currentDate.getFullYear() + 1);
           break;
+        default:
+          break;
         }
       }
 
@@ -62,8 +64,8 @@ export class ListeningsService {
     const dates: Date[] = getDatesBetween(new Date(findListeningsForTrackDTO.after), new Date(findListeningsForTrackDTO.before));
 
     const stats: {
-      count: number,
-      period: Date,
+      count: number;
+      period: Date;
     }[] = [];
 
     let listeningsCount = 0;
@@ -87,6 +89,8 @@ export class ListeningsService {
       case "year":
         startDate.setFullYear(startDate.getFullYear() - 1);
         break;
+      default:
+        break;
       }
 
       const listenings: Listening[] = await this.listeningRepository.find({
@@ -108,7 +112,7 @@ export class ListeningsService {
   async findLastForTrack(findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
     const after: Date = new Date()
 
-    for (let i = 0; i < findLastListeningsForTrackDTO.count - 1; i++) {
+    for (let i = 0; i < findLastListeningsForTrackDTO.count - 1; i += 1) {
       switch (findLastListeningsForTrackDTO.period) {
       case "hour":
         after.setHours(after.getHours() - 1);
@@ -125,12 +129,14 @@ export class ListeningsService {
       case "year":
         after.setFullYear(after.getFullYear() - 1);
         break;
+      default:
+        break;
       }
     }
 
-    return await this.findForTrack({
+    return this.findForTrack({
       ...findLastListeningsForTrackDTO,
-      after: after,
+      after,
       before: new Date(),
     })
   }
@@ -140,7 +146,7 @@ export class ListeningsService {
     if (!user) {
       throw BadRequestException;
     }
-    const tracks: Track[] = await this.tracksService.findBy({ user: user })
+    const tracks: Track[] = await this.tracksService.findBy({ user })
 
     const stats: UserListeningsResponseDTO[] = [];
     for (const track of tracks) {
@@ -152,13 +158,15 @@ export class ListeningsService {
       }));
     };
 
-    const keyframesBuilder: { count: number, period: Date }[][] = [];
+    const keyframesBuilder: { count: number; period: Date }[][] = [];
     for (const stat of stats) {
       keyframesBuilder.push(stat.keyframes);
     }
 
     // @ts-ignore
-    const keyframes: { count: number, period: Date }[] = Object.values(([] as { count: number, period: Date }[][]).concat(...keyframesBuilder).reduce((keyframes: { count: number, period: Date }[], { period, count }) => {
+    // eslint-disable-next-line no-shadow
+    const keyframes: { count: number; period: Date }[] = Object.values(([] as { count: number; period: Date }[][]).concat(...keyframesBuilder).reduce((keyframes: { count: number; period: Date }[], { period, count }) => {
+      // eslint-disable-next-line no-param-reassign
       keyframes[period] = { period, count: (keyframes[period] ? keyframes[period].count : 0) + count };
       return keyframes;
       // @ts-ignore
@@ -167,13 +175,13 @@ export class ListeningsService {
     const listeningStats: { listenings: number }[] = stats;
     const count: { listenings: number } = listeningStats.reduce((total, trackCount) => ({ listenings: total.listenings + trackCount.listenings }));
 
-    return { ...count, keyframes: keyframes };
+    return { ...count, keyframes };
   }
 
   async findLastForUser(findLastListeningsForUserDTO: FindLastListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
     const after: Date = new Date()
 
-    for (let i = 0; i < findLastListeningsForUserDTO.count - 1; i++) {
+    for (let i = 0; i < findLastListeningsForUserDTO.count - 1; i += 1) {
       switch (findLastListeningsForUserDTO.period) {
       case "hour":
         after.setHours(after.getHours() - 1);
@@ -190,12 +198,14 @@ export class ListeningsService {
       case "year":
         after.setFullYear(after.getFullYear() - 1);
         break;
+      default:
+        break;
       }
     }
 
-    return await this.findForUser({
+    return this.findForUser({
       ...findLastListeningsForUserDTO,
-      after: after,
+      after,
       before: new Date(),
     })
   }

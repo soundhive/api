@@ -1,9 +1,9 @@
 import { Module, forwardRef } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from 'src/users/users.module';
 import { AlbumsController } from './albums.controller';
 import { AlbumsService } from './albums.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Album } from './album.entity';
-import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [

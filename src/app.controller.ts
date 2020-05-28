@@ -13,13 +13,12 @@ import { UsersService } from './users/users.service';
 export class AppController {
   constructor(
     private authService: AuthService,
-    private appService: AppService,
     private usersService: UsersService,
   ) { }
 
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
-  login(@Body() authUserDTO: AuthUserDTO): Promise<{ access_token: string }> {
+  login(@Body() authUserDTO: AuthUserDTO): { access_token: string } {
     return this.authService.login(new User(authUserDTO));
   }
 
@@ -35,7 +34,7 @@ export class AppController {
   }
 
   @Get('/')
-  getRoot(): { message: string } {
-    return this.appService.getHello();
+  static getRoot(): { message: string } {
+    return AppService.getHello();
   }
 }

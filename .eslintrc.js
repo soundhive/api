@@ -8,8 +8,11 @@ module.exports = {
   extends: [
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'airbnb-typescript/base',
     'prettier',
     'prettier/@typescript-eslint',
+
   ],
   root: true,
   env: {
@@ -20,6 +23,9 @@ module.exports = {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/no-explicit-any': 'error',
-    'indent': [2, 2]
+    'import/prefer-default-export': 'off',
+    'import/no-cycle': 'off',
+    'no-restricted-syntax': 'off',
+    'no-await-in-loop': 'off'
   },
 };

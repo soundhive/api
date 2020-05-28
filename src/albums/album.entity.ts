@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import {
   BaseEntity,
   Entity,
@@ -8,9 +9,9 @@ import {
   OneToMany,
   ManyToOne,
 } from 'typeorm';
-import { Track } from '../tracks/track.entity';
 import { User } from 'src/users/user.entity';
 import { Exclude } from 'class-transformer';
+import { Track } from '../tracks/track.entity';
 
 @Entity('albums')
 export class Album extends BaseEntity {
