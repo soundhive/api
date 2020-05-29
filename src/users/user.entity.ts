@@ -1,4 +1,3 @@
-import argon2 = require('argon2');
 import { Exclude } from 'class-transformer';
 import { Album } from 'src/albums/album.entity';
 import { Listening } from 'src/listenings/listening.entity';
@@ -14,6 +13,8 @@ import {
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
+
+import argon2 = require('argon2');
 
 @Entity('users')
 @Unique(['username', 'email'])

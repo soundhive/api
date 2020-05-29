@@ -1,3 +1,6 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable func-names */
+/* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { registerDecorator, ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
@@ -22,7 +25,7 @@ export function Exists(entity: Function, validationOptions?: ValidationOptions) 
     object[`class_entity_${propertyName}`] = entity;
     registerDecorator({
       target: object.constructor,
-      propertyName: propertyName,
+      propertyName,
       options: validationOptions,
       constraints: [],
       validator: ExistsInDatabaseExistConstraint,

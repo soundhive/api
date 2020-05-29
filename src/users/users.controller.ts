@@ -18,7 +18,7 @@ export class UsersController {
 
   @Post()
   async create(@Body() createUserDTO: CreateUserDTO): Promise<User> {
-    return await this.usersService.create(new User(createUserDTO));
+    return this.usersService.create(new User(createUserDTO));
   }
 
   @Get()
@@ -39,11 +39,11 @@ export class UsersController {
 
   @Get(':username/stats')
   async findStats(@Param() findUserDTO: FindUserDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<UserListeningsResponseDTO> {
-    return await this.listeningsService.findForUser({ ...findUserDTO, ...findListeningsDTO })
+    return this.listeningsService.findForUser({ ...findUserDTO, ...findListeningsDTO })
   }
 
   @Get(':username/stats/last/:count/:period')
   async findLastStats(@Param() findLastListeningsForUserDTO: FindLastListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
-    return await this.listeningsService.findLastForUser(findLastListeningsForUserDTO)
+    return this.listeningsService.findLastForUser(findLastListeningsForUserDTO)
   }
 }

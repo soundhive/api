@@ -17,12 +17,12 @@ import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
 
+import { UpdateResult } from 'typeorm';
 import { Album } from './album.entity';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { FindAlbumDTO } from './dto/find-album.dto';
 import { UpdateAlbumDTO } from './dto/update-album.dto';
-import { UpdateResult } from 'typeorm';
 
 @Controller('albums')
 export class AlbumsController {
@@ -40,7 +40,7 @@ export class AlbumsController {
       throw new UnauthorizedException();
     }
 
-    return new Album(await this.albumsService.create({ ...createAlbumDTO, user: user }));
+    return new Album(await this.albumsService.create({ ...createAlbumDTO, user }));
   }
 
   @Get()

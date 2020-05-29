@@ -12,22 +12,22 @@ export class AlbumsService {
   constructor(@InjectRepository(Album) private albumsRepository: Repository<Album>) { }
 
   async create(insertAlbumDTO: InsertAlbumDTO): Promise<Album> {
-    return await this.albumsRepository.save(insertAlbumDTO);
+    return this.albumsRepository.save(insertAlbumDTO);
   }
 
   async find(): Promise<Album[]> {
-    return await this.albumsRepository.find();
+    return this.albumsRepository.find();
   }
 
   async findOne(album: FindAlbumDTO): Promise<Album | undefined> {
-    return await this.albumsRepository.findOne({ id: album.id });
+    return this.albumsRepository.findOne({ id: album.id });
   }
 
   async update(album: FindAlbumDTO, albumData: UpdateAlbumDTO): Promise<UpdateResult> {
-    return await this.albumsRepository.update({ id: album.id }, albumData);
+    return this.albumsRepository.update({ id: album.id }, albumData);
   }
 
   async delete(album: FindAlbumDTO): Promise<DeleteResult> {
-    return await this.albumsRepository.delete(album);
+    return this.albumsRepository.delete(album);
   }
 }

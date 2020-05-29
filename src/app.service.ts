@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): { message: string } {
+  static getHello(): { message: string } {
     return {
       message: 'Soundhive API',
     };

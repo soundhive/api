@@ -24,12 +24,12 @@ import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
 import { UsersService } from 'src/users/users.service';
 
+import { UpdateResult } from 'typeorm';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
-import { UpdateResult } from 'typeorm';
 
 @Controller('tracks')
 export class TracksController {
@@ -58,8 +58,8 @@ export class TracksController {
 
     return new Track(await this.tracksService.create({
       ...createTrackDTO,
-      user: user,
-      album: album,
+      user,
+      album,
     }));
   }
 
@@ -81,12 +81,12 @@ export class TracksController {
 
   @Get(':id/stats')
   async findStats(@Param() findTrackDTO: FindTrackDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<TrackListeningsResponseDTO> {
-    return await this.listeningsService.findForTrack({ ...findTrackDTO, ...findListeningsDTO })
+    return this.listeningsService.findForTrack({ ...findTrackDTO, ...findListeningsDTO })
   }
 
   @Get(':id/stats/last/:count/:period')
   async findLastStats(@Param() findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
-    return await this.listeningsService.findLastForTrack(findLastListeningsForTrackDTO)
+    return this.listeningsService.findLastForTrack(findLastListeningsForTrackDTO)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -112,7 +112,7 @@ export class TracksController {
   async listen(@Param() findTrackDTO: FindTrackDTO, @Request() req: { user: AuthenticatedUserDTO }): Promise<void> {
     const user = await this.usersService.findOne(req.user);
     const track = await this.tracksService.findOne(findTrackDTO);
-    const listening = new Listening({ user: user, track: track })
+    const listening = new Listening({ user, track })
     await this.listeningsService.create(listening);
   }
 

@@ -7,3 +7,4 @@ export class FindUserDTO {
     @Exists(User)
     username: string
 }
+export default FindUserDTO;
