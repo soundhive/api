@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TracksModule } from 'src/tracks/tracks.module';
 import { ListeningsModule } from 'src/listenings/listenings.module';
+import { SupportsModule } from 'src/supports/supports.module'
 import { User } from './user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -11,7 +12,8 @@ import { UsersService } from './users.service';
   imports: [
     TypeOrmModule.forFeature([User]),
     forwardRef(() => TracksModule),
-    forwardRef(() => ListeningsModule)
+    forwardRef(() => ListeningsModule),
+    forwardRef(() => SupportsModule)
   ],
   providers: [UsersService],
   controllers: [UsersController],

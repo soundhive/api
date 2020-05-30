@@ -1,9 +1,11 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards, Request, NotFoundException } from '@nestjs/common';
 import { FindLastListeningsForUserDTO } from 'src/listenings/dto/find-last-listenings-user.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 import { UserListeningsResponseDTO } from 'src/listenings/dto/responses/user-listenings-response.dto';
 import { ListeningsService } from 'src/listenings/listenings.service';
-
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Support } from 'src/supports/support.entity'
+import { SupportsService } from 'src/supports/supports.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
@@ -14,6 +16,7 @@ export class UsersController {
   constructor(
     private usersService: UsersService,
     private readonly listeningsService: ListeningsService,
+    private readonly supportsService: SupportsService,
   ) { }
 
   @Post()
@@ -46,4 +49,17 @@ export class UsersController {
   async findLastStats(@Param() findLastListeningsForUserDTO: FindLastListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
     return this.listeningsService.findLastForUser(findLastListeningsForUserDTO)
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':username/support')
+  async support(@Param() findUserDTO: FindUserDTO, @Request() req): Promise<void> {
+    const emitor = await this.usersService.findOne(req.user);
+    console.log(emitor)
+    const target = await this.usersService.findOne(findUserDTO)
+    console.log(target)
+    const support = new Support({from: emitor, to: target})
+    await this.supportsService.create(new Support(support));
+  }
+
+
 }
