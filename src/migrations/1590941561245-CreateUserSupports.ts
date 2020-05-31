@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import {MigrationInterface, QueryRunner} from "typeorm";
 
 export class CreateUserSupports1590941561245 implements MigrationInterface {

@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BaseEntity,
   Entity,
@@ -38,11 +39,9 @@ export class Album extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Track, track => track.album)
   tracks: Track[];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne(type => User, user => user.albums, { nullable: false })
   @Exclude()
   user: User;

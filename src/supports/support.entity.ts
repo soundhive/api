@@ -1,6 +1,6 @@
-import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { User } from 'src/users/user.entity';
+import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('supports')
 export class Support {
@@ -13,7 +13,6 @@ export class Support {
 
     @CreateDateColumn()
     supportedAt: Date;
-
 
     @ManyToOne(type => User, user => user.supporters)
     to: User;

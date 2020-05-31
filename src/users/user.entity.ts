@@ -41,15 +41,12 @@ export class User {
   @Column()
   email: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Listening, listening => listening.user)
   listenings: Listening[];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Track, track => track.user)
   tracks: Track[];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Album, album => album.user)
   albums: Album[];
 
