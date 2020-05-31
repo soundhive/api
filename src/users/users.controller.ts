@@ -54,9 +54,7 @@ export class UsersController {
   @Post(':username/support')
   async support(@Param() findUserDTO: FindUserDTO, @Request() req): Promise<void> {
     const emitor = await this.usersService.findOne(req.user);
-    console.log(emitor)
     const target = await this.usersService.findOne(findUserDTO)
-    console.log(target)
     const support = new Support({from: emitor, to: target})
     await this.supportsService.create(new Support(support));
   }

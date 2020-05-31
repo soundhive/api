@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Exclude } from 'class-transformer';
 import { Album } from 'src/albums/album.entity';
 import { Listening } from 'src/listenings/listening.entity';
-import { Support } from 'src/supports/support.entity'
+import { Support } from 'src/supports/support.entity';
 import { Track } from 'src/tracks/track.entity';
 import {
   BeforeInsert,
@@ -14,7 +15,6 @@ import {
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
-import { Subscription } from 'rxjs';
 
 import argon2 = require('argon2');
 
@@ -54,10 +54,10 @@ export class User {
   albums: Album[];
 
   @OneToMany(type => Support, support => support.to)
-  supporters: Subscription[];
+  supporters: Support[];
 
   @OneToMany(type => Support, support => support.from)
-  supporting: Subscription[];
+  supporting: Support[];
 
   @Column({ default: true })
   isActive: boolean;
