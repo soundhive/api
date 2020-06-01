@@ -6,13 +6,13 @@ import { ListeningsService } from 'src/listenings/listenings.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Support } from 'src/supports/support.entity'
 import { SupportsService } from 'src/supports/supports.service';
+import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto'
+import { DeleteResult } from 'typeorm';
+import { UserSupportsResponseDTO } from 'src/supports/dto/responses/user-supports-response.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
-import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto'
-import { DeleteResult } from 'typeorm';
-import { UserSupportsResponseDTO } from 'src/supports/dto/responses/user-supports-response.dto';
 @Controller('users')
 export class UsersController {
   constructor(
@@ -53,33 +53,29 @@ export class UsersController {
   }
 
   @Get(':username/supports')
-  async findSupports(@Param() findUserDTO : FindUserDTO) : Promise<UserSupportsResponseDTO> {
+  async findSupports(@Param() findUserDTO: FindUserDTO): Promise<UserSupportsResponseDTO> {
     return this.supportsService.findUserSupported(findUserDTO);
   }
 
   @Get(':username/supporters')
-  async findSupporters(@Param() findUserDTO : FindUserDTO) : Promise<UserSupportsResponseDTO> {
+  async findSupporters(@Param() findUserDTO: FindUserDTO): Promise<UserSupportsResponseDTO> {
     return this.supportsService.findUserSupporters(findUserDTO);
   }
 
   @Delete(':username/unsupport')
-  async unSupportUser(@Param() findUserDTO: FindUserDTO, @Request() req: {user: AuthenticatedUserDTO}) : Promise<DeleteResult> {
+  async unSupportUser(@Param() findUserDTO: FindUserDTO, @Request() req: { user: AuthenticatedUserDTO }): Promise<DeleteResult> {
     const emitor = await this.usersService.findOne(req.user);
     const target = await this.usersService.findOne(findUserDTO)
-    const support = new Support({from: emitor, to: target})
+    const support = new Support({ from: emitor, to: target })
     return this.supportsService.delete(support);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post(':username/support')
-  async support(@Request() req: { user: AuthenticatedUserDTO },@Param() findUserDTO: FindUserDTO): Promise<Support> {
+  async support(@Request() req: { user: AuthenticatedUserDTO }, @Param() findUserDTO: FindUserDTO): Promise<Support> {
     const emitor = await this.usersService.findOne(req.user);
     const target = await this.usersService.findOne(findUserDTO)
-    const support = new Support({from: emitor, to: target})
-    return await this.supportsService.create(support);
+    const support = new Support({ from: emitor, to: target })
+    return this.supportsService.create(support);
   }
-
-
-
-
 }
