@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards, Request, NotFoundException } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards, Request, NotFoundException, Delete } from '@nestjs/common';
 import { FindLastListeningsForUserDTO } from 'src/listenings/dto/find-last-listenings-user.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 import { UserListeningsResponseDTO } from 'src/listenings/dto/responses/user-listenings-response.dto';
@@ -10,7 +10,9 @@ import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
-
+import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto'
+import { DeleteResult } from 'typeorm';
+import { UserSupportsResponseDTO } from 'src/supports/dto/responses/user-supports-response.dto';
 @Controller('users')
 export class UsersController {
   constructor(
@@ -50,14 +52,34 @@ export class UsersController {
     return this.listeningsService.findLastForUser(findLastListeningsForUserDTO)
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post(':username/support')
-  async support(@Param() findUserDTO: FindUserDTO, @Request() req): Promise<void> {
+  @Get(':username/supports')
+  async findSupports(@Param() findUserDTO : FindUserDTO) : Promise<UserSupportsResponseDTO> {
+    return this.supportsService.findUserSupported(findUserDTO);
+  }
+
+  @Get(':username/supporters')
+  async findSupporters(@Param() findUserDTO : FindUserDTO) : Promise<UserSupportsResponseDTO> {
+    return this.supportsService.findUserSupporters(findUserDTO);
+  }
+
+  @Delete(':username/unsupport')
+  async unSupportUser(@Param() findUserDTO: FindUserDTO, @Request() req: {user: AuthenticatedUserDTO}) : Promise<DeleteResult> {
     const emitor = await this.usersService.findOne(req.user);
     const target = await this.usersService.findOne(findUserDTO)
     const support = new Support({from: emitor, to: target})
-    await this.supportsService.create(new Support(support));
+    return this.supportsService.delete(support);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':username/support')
+  async support(@Request() req: { user: AuthenticatedUserDTO },@Param() findUserDTO: FindUserDTO): Promise<Support> {
+    const emitor = await this.usersService.findOne(req.user);
+    const target = await this.usersService.findOne(findUserDTO)
+    const support = new Support({from: emitor, to: target})
+    return await this.supportsService.create(support);
+  }
+
+
 
 
 }
