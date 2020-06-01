@@ -16,13 +16,12 @@ export class SupportsService {
         ) {}
 
     async create(createSupportDTO: CreateSupportDTO): Promise<Support> {
-        if (!this.supportRepository.findOne({from: createSupportDTO.from, to: createSupportDTO.to})) {
+        const existingSupport: Support | undefined = await this.supportRepository.findOne({ from: createSupportDTO.from, to: createSupportDTO.to });
+        if (!existingSupport) {
             return this.supportRepository.save(createSupportDTO)
         }
-        else {
-            throw ConflictException;
-        }
-        
+
+        return existingSupport
     }
 
     async delete(deleteSupportDTO: DeleteSupportDTO): Promise<DeleteResult> {
