@@ -27,7 +27,7 @@
     "db:reset": "npm run db:drop && npm run db:migrate"
   },
   "dependencies": {
-    "@nestjs/common": "^7.1.0",
+    "@nestjs/common": "^7.1.2",
     "@nestjs/config": "^0.5.0",
     "@nestjs/core": "^7.1.2",
     "@nestjs/jwt": "^7.0.0",
