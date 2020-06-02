@@ -5,7 +5,6 @@ import { Support } from 'src/supports/support.entity'
 import { User } from "src/users/user.entity";
 import { CreateSupportDTO } from "./dto/create-support-dto";
 import { DeleteSupportDTO } from "./dto/delete-support.dto"
-import { UserSupportsResponseDTO } from "./dto/responses/user-supports-response.dto"
 import { FindSupportsUserDTO } from "./dto/find-supports.user.dto"
 
 @Injectable()
@@ -28,18 +27,15 @@ export class SupportsService {
         return this.supportRepository.delete(deleteSupportDTO)
     }
 
-    async findUserSupported(findSupportsUserDTO: FindSupportsUserDTO): Promise<UserSupportsResponseDTO> {
+    async findUserSupported(findSupportsUserDTO: FindSupportsUserDTO): Promise<User[]> {
         const supports: Support[] = await this.supportRepository.find({ from: findSupportsUserDTO })
-        const users: User[] = supports.map(e => e.to)
-        return { number: users.length, users }
 
+        return supports.map(e => e.to)
     }
 
-    async findUserSupporters(findSupportsUserDTO: FindSupportsUserDTO): Promise<UserSupportsResponseDTO> {
+    async findUserSupporters(findSupportsUserDTO: FindSupportsUserDTO): Promise<User[]> {
         const supports: Support[] = await this.supportRepository.find({ to: findSupportsUserDTO })
-        const users: User[] = supports.map(e => e.from)
-        return { number: users.length, users }
-    }
 
-    // async findUserSupporteds
+        return supports.map(e => e.from);
+    }
 }

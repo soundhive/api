@@ -8,7 +8,6 @@ import { Support } from 'src/supports/support.entity'
 import { SupportsService } from 'src/supports/supports.service';
 import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto'
 import { DeleteResult } from 'typeorm';
-import { UserSupportsResponseDTO } from 'src/supports/dto/responses/user-supports-response.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
@@ -21,6 +20,7 @@ export class UsersController {
     private readonly supportsService: SupportsService,
   ) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createUserDTO: CreateUserDTO): Promise<User> {
     return this.usersService.create(new User(createUserDTO));
@@ -53,15 +53,16 @@ export class UsersController {
   }
 
   @Get(':username/supports')
-  async findSupports(@Param() findUserDTO: FindUserDTO): Promise<UserSupportsResponseDTO> {
+  async findSupports(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
     return this.supportsService.findUserSupported(findUserDTO);
   }
 
   @Get(':username/supporters')
-  async findSupporters(@Param() findUserDTO: FindUserDTO): Promise<UserSupportsResponseDTO> {
+  async findSupporters(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
     return this.supportsService.findUserSupporters(findUserDTO);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':username/unsupport')
   async unSupportUser(@Param() findUserDTO: FindUserDTO, @Request() req: { user: AuthenticatedUserDTO }): Promise<DeleteResult> {
     const emitor = await this.usersService.findOne(req.user);
