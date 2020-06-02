@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Exclude } from 'class-transformer';
 import { Listening } from 'src/listenings/listening.entity';
 import { User } from 'src/users/user.entity';
 import {
@@ -11,7 +13,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Exclude } from 'class-transformer';
 import { Album } from '../albums/album.entity';
 
 @Entity('tracks')
@@ -36,7 +37,6 @@ export class Track extends BaseEntity {
   @Column()
   filename: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Listening, listening => listening.track)
   listenings: Listening[];
 
@@ -46,7 +46,6 @@ export class Track extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne(type => Album, album => album.tracks, { nullable: false })
   album: Album;
 

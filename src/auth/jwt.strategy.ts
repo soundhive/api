@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
@@ -14,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  static validate(payload: { sub: string; username: string }): AuthenticatedUserDTO {
+  validate(payload: { sub: string; username: string }): AuthenticatedUserDTO {
     return { userId: payload.sub, username: payload.username };
   }
 }

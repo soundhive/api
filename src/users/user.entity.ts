@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Exclude } from 'class-transformer';
 import { Album } from 'src/albums/album.entity';
 import { Listening } from 'src/listenings/listening.entity';
+import { Support } from 'src/supports/support.entity';
 import { Track } from 'src/tracks/track.entity';
 import {
   BeforeInsert,
@@ -39,17 +41,20 @@ export class User {
   @Column()
   email: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Listening, listening => listening.user)
   listenings: Listening[];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Track, track => track.user)
   tracks: Track[];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany(type => Album, album => album.user)
   albums: Album[];
+
+  @OneToMany(type => Support, support => support.to)
+  supporters: Support[];
+
+  @OneToMany(type => Support, support => support.from)
+  supporting: Support[];
 
   @Column({ default: true })
   isActive: boolean;
