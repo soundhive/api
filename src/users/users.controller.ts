@@ -32,11 +32,11 @@ export class UsersController {
   }
 
   @Get(':username')
-  async findOne(@Param() findUserDTO: FindUserDTO): Promise<User> {
-    const user: User | undefined = await this.usersService.findOne(findUserDTO);
+  async findOne(@Param() userReq: { username: string }): Promise<User> {
+    const user: User | undefined = await this.usersService.findOne(userReq);
 
     if (!user) {
-      throw NotFoundException;
+      throw new NotFoundException("User not found");
     }
 
     return user;
@@ -76,6 +76,7 @@ export class UsersController {
     const emitor = await this.usersService.findOne(req.user);
     const target = await this.usersService.findOne(findUserDTO)
     const support = new Support({ from: emitor, to: target })
+
     return this.supportsService.create(support);
   }
 }
