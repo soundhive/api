@@ -15,10 +15,13 @@ export class AppController {
     private usersService: UsersService,
   ) { }
 
-  @UseGuards(JwtAuthGuard)
   @Post('auth/login')
-  login(@Body() authUserDTO: AuthUserDTO): { access_token: string } {
-    return this.authService.login(new User(authUserDTO));
+  async login(@Body() authUserDTO: AuthUserDTO): Promise<{ access_token: string }> {
+      const user : User | undefined = await this.usersService.findOne({username : authUserDTO.username })
+      if (!user){
+        throw new NotFoundException("No such user : " + authUserDTO.username)
+      }
+      return this.authService.login(user);
   }
 
   @UseGuards(JwtAuthGuard)
