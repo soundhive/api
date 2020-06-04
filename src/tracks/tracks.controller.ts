@@ -30,6 +30,7 @@ import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
+import { Album } from 'src/albums/album.entity';
 
 @Controller('tracks')
 export class TracksController {
@@ -49,18 +50,24 @@ export class TracksController {
       throw new UnauthorizedException();
     }
 
-
-    const album = await this.albumsService.findOne({ id: createTrackDTO.album });
-
-    if (!album) {
-      throw new BadRequestException();
+    let album : Album | undefined = undefined;
+    if (createTrackDTO.album) {
+      album = await this.albumsService.findOne({ id: createTrackDTO.album });
+      if (!album) {
+        throw new BadRequestException();
+      }
     }
+    
 
+    
+    
     return new Track(await this.tracksService.create({
       ...createTrackDTO,
       user,
       album,
     }));
+    
+  
   }
 
   @Get()

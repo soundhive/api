@@ -20,7 +20,7 @@ export class UsersController {
     private readonly supportsService: SupportsService,
   ) { }
 
-  @UseGuards(JwtAuthGuard)
+
   @Post()
   async create(@Body() createUserDTO: CreateUserDTO): Promise<User> {
     return this.usersService.create(new User(createUserDTO));

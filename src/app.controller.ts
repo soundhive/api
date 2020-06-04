@@ -5,7 +5,6 @@ import { AuthService } from './auth/auth.service';
 import { AuthUserDTO } from './auth/dto/auth-user.dto';
 import { AuthenticatedUserDTO } from './auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { LocalAuthGuard } from './auth/local-auth.guard';
 import { User } from './users/user.entity';
 import { UsersService } from './users/users.service';
 
@@ -16,7 +15,7 @@ export class AppController {
     private usersService: UsersService,
   ) { }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('auth/login')
   login(@Body() authUserDTO: AuthUserDTO): { access_token: string } {
     return this.authService.login(new User(authUserDTO));
