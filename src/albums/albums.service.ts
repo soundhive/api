@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
+import { MinioClientService } from 'src/minio-client/minio-client.service';
+import { BufferedFile } from 'src/minio-client/file.model';
 import { Album } from './album.entity';
 import { FindAlbumDTO } from './dto/find-album.dto';
 import { InsertAlbumDTO } from './dto/insert-album-dto';
@@ -9,7 +11,11 @@ import { UpdateAlbumDTO } from './dto/update-album.dto';
 
 @Injectable()
 export class AlbumsService {
-  constructor(@InjectRepository(Album) private albumsRepository: Repository<Album>) { }
+  constructor(
+    @InjectRepository(Album)
+    private albumsRepository: Repository<Album>,
+    private minioClientService: MinioClientService,
+  ) { }
 
   async create(insertAlbumDTO: InsertAlbumDTO): Promise<Album> {
     return this.albumsRepository.save(insertAlbumDTO);
@@ -33,5 +39,12 @@ export class AlbumsService {
 
   async delete(album: FindAlbumDTO): Promise<DeleteResult> {
     return this.albumsRepository.delete(album);
+  }
+
+  async uploadFileCover(image: BufferedFile): Promise<string> {
+
+    const uploadedImage = await this.minioClientService.upload(image)
+
+    return uploadedImage.url
   }
 }

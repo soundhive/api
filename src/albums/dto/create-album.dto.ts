@@ -9,8 +9,4 @@ export class CreateAlbumDTO {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @IsNotEmpty()
-  @IsString()
-  coverFilename: string;
 }

@@ -12,14 +12,17 @@ import {
   UnauthorizedException,
   UseGuards,
   BadRequestException,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
-
+import { FileInterceptor } from '@nestjs/platform-express'
 import { UpdateResult } from 'typeorm';
 import { TracksService } from 'src/tracks/tracks.service';
 import { Track } from 'src/tracks/track.entity';
+import { BufferedFile } from 'src/minio-client/file.model';
 import { Album } from './album.entity';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
@@ -36,14 +39,17 @@ export class AlbumsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createAlbumDTO: CreateAlbumDTO): Promise<Album> {
+  @UseInterceptors(FileInterceptor('file'))
+  async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createAlbumDTO: CreateAlbumDTO, @UploadedFile() file: BufferedFile): Promise<Album> {
     const user = await this.usersService.findOne(req.user);
+
+    const albumCover: string = await this.albumsService.uploadFileCover(file)
 
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    return new Album(await this.albumsService.create({ ...createAlbumDTO, user }));
+    return new Album(await this.albumsService.create({ ...createAlbumDTO, user, coverFilename: albumCover }));
   }
 
   @Get()
