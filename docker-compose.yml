@@ -1,13 +1,13 @@
 version: '2.2'
 
 volumes:
-  feedbin_minio:
+  soundhive_minio:
 
 services:
   minio:
     image: minio/minio
     volumes:
-    - feedbin_minio:/data
+    - soundhive_minio:/data
     environment:
       MINIO_ACCESS_KEY: miniokey
       MINIO_SECRET_KEY: miniosecret
