@@ -41,10 +41,9 @@ export class AlbumsService {
     return this.albumsRepository.delete(album);
   }
 
-  async uploadFileCover(image: BufferedFile): Promise<string> {
+  async uploadFileCover(image: BufferedFile, subFolder: string): Promise<string> {
+    const uploadedImage = await this.minioClientService.upload(image, subFolder)
 
-    const uploadedImage = await this.minioClientService.upload(image)
-
-    return uploadedImage.url
+    return uploadedImage.path
   }
 }

@@ -17,27 +17,28 @@ export class MinioClientService {
         return this.minioService.client;
     }
 
-    public async upload(file: BufferedFile, baseBucket: string = this.baseBucket): Promise<{ url: string }> {
+    public async upload(file: BufferedFile, subFolder: string): Promise<{ path: string }> {
         if (!(file.mimetype.includes('jpeg') || file.mimetype.includes('png'))) {
-            throw new HttpException('Error uploading file', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Invalid file type', HttpStatus.BAD_REQUEST)
         }
-        const tmpFilename = Date.now().toString()
-        const hashedFileName = crypto.createHash('md5').update(tmpFilename).digest("hex");
+
+        const hashedFileName = crypto.createHash('md5').update(Date.now().toString()).digest("hex");
         const ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
+        const fileName = hashedFileName + ext;
+        const filePath = `${subFolder}/${fileName}`;
+
         const metaData = {
             'Content-Type': file.mimetype,
         };
-        const filename = hashedFileName + ext
-        const fileName = `${filename}`;
-        const fileBuffer = file.buffer;
+
         try {
-            await this.client.putObject(baseBucket, fileName, fileBuffer, metaData)
+            await this.client.putObject(this.baseBucket, filePath, file.buffer, metaData)
         } catch {
-            throw new HttpException('Error uploading file', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Error uploading file', HttpStatus.INTERNAL_SERVER_ERROR)
         }
 
         return {
-            url: `${config.MINIO_ENDPOINT}:${config.MINIO_PORT}/${config.MINIO_BUCKET}/${filename}`
+            path: filePath
         }
     }
 

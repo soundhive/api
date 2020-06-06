@@ -39,11 +39,11 @@ export class AlbumsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('coverFile'))
   async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createAlbumDTO: CreateAlbumDTO, @UploadedFile() file: BufferedFile): Promise<Album> {
     const user = await this.usersService.findOne(req.user);
 
-    const albumCover: string = await this.albumsService.uploadFileCover(file)
+    const albumCover: string = await this.albumsService.uploadFileCover(file, 'albums')
 
     if (!user) {
       throw new UnauthorizedException();
