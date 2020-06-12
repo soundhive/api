@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
+import { AudioFile } from 'src/minio-client/file.model';
+import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { InsertTrackDTO } from './dto/insert-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
@@ -11,6 +13,7 @@ import { Track } from './track.entity';
 export class TracksService {
   constructor(
     @InjectRepository(Track) private trackRepository: Repository<Track>,
+    private minioClientService: MinioClientService,
   ) { }
 
   async create(createTrackDTO: InsertTrackDTO): Promise<Track> {
@@ -35,5 +38,11 @@ export class TracksService {
 
   async delete(track: FindTrackDTO): Promise<DeleteResult> {
     return this.trackRepository.delete({ id: track.id });
+  }
+
+  async uploadTrackFile(track: AudioFile, subFolder: string): Promise<string> {
+    const uploadTrackFile = await this.minioClientService.upload(track, subFolder)
+
+    return uploadTrackFile.path
   }
 }
