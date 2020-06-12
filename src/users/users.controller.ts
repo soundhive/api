@@ -8,6 +8,8 @@ import { Support } from 'src/supports/support.entity'
 import { SupportsService } from 'src/supports/supports.service';
 import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto'
 import { DeleteResult } from 'typeorm';
+import { Album } from 'src/albums/album.entity';
+import { AlbumsService } from 'src/albums/albums.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
@@ -17,6 +19,7 @@ export class UsersController {
   constructor(
     private usersService: UsersService,
     private readonly listeningsService: ListeningsService,
+    private readonly albumsService: AlbumsService,
     private readonly supportsService: SupportsService,
   ) { }
 
@@ -39,6 +42,13 @@ export class UsersController {
     }
 
     return user;
+  }
+
+  @Get(':username/albums')
+  async findAlbums(@Param() findUserDTO: FindUserDTO): Promise<Album[]> {
+    const user: User | undefined = await this.usersService.findOne(findUserDTO);
+
+    return this.albumsService.findBy({ user })
   }
 
   @Get(':username/stats')

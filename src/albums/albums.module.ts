@@ -11,6 +11,7 @@ import { Album } from './album.entity';
     forwardRef(() => UsersModule),
   ],
   controllers: [AlbumsController],
-  providers: [AlbumsService]
+  providers: [AlbumsService],
+  exports: [AlbumsService]
 })
 export class AlbumsModule {}
