@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 import { MinioClientService } from 'src/minio-client/minio-client.service';
-import { BufferedFile } from 'src/minio-client/file.model';
+import { ImageFile } from 'src/minio-client/file.model';
 import { Album } from './album.entity';
 import { FindAlbumDTO } from './dto/find-album.dto';
 import { InsertAlbumDTO } from './dto/insert-album-dto';
@@ -41,7 +41,7 @@ export class AlbumsService {
     return this.albumsRepository.delete(album);
   }
 
-  async uploadFileCover(image: BufferedFile, subFolder: string): Promise<string> {
+  async uploadFileCover(image: ImageFile, subFolder: string): Promise<string> {
     const uploadedImage = await this.minioClientService.upload(image, subFolder)
 
     return uploadedImage.path

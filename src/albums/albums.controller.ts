@@ -14,13 +14,15 @@ import {
   BadRequestException,
   UploadedFile,
   InternalServerErrorException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
 import { TracksService } from 'src/tracks/tracks.service';
 import { Track } from 'src/tracks/track.entity';
-import { BufferedFile } from 'src/minio-client/file.model';
+import { FileInterceptor } from '@nestjs/platform-express'
+import { ImageFile } from 'src/minio-client/file.model';
 import { Album } from './album.entity';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
@@ -37,25 +39,24 @@ export class AlbumsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createAlbumDTO: CreateAlbumDTO, @UploadedFile() file: BufferedFile): Promise<Album> {
+  @UseInterceptors(FileInterceptor('coverFile'))
+  async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createAlbumDTO: CreateAlbumDTO, @UploadedFile() file: ImageFile): Promise<Album> {
     if (!file) {
       throw new BadRequestException("Missing coverFile")
     }
 
     const user = await this.usersService.findOne(req.user);
-
-    try {
-    const albumCover: string = await this.albumsService.uploadFileCover(file, 'albums')
-
     if (!user) {
       throw new UnauthorizedException();
     }
+
+    try {
+    const albumCover: string = await this.albumsService.uploadFileCover(file, 'albums')
 
     return new Album(await this.albumsService.create({ ...createAlbumDTO, user, coverFilename: albumCover }));
     } catch(e) {
       throw new InternalServerErrorException("Something when wrong when processing the cover file.")
     }
-
   }
 
   @Get()
