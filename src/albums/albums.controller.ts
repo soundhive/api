@@ -18,6 +18,8 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
 
 import { UpdateResult } from 'typeorm';
+import { TracksService } from 'src/tracks/tracks.service';
+import { Track } from 'src/tracks/track.entity';
 import { Album } from './album.entity';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
@@ -28,7 +30,8 @@ import { UpdateAlbumDTO } from './dto/update-album.dto';
 export class AlbumsController {
   constructor(
     private readonly albumsService: AlbumsService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly tracksService: TracksService
   ) { }
 
   @Post()
@@ -57,6 +60,18 @@ export class AlbumsController {
     }
 
     return album;
+  }
+
+
+  @Get(':id/tracks')
+  async findTracks(@Param() findAlbumDTO: FindAlbumDTO): Promise<Track[]> {
+    const album: Album | undefined = await this.albumsService.findOne(findAlbumDTO);
+
+    if (!album) {
+      throw NotFoundException;
+    }
+
+    return this.tracksService.findBy({ album })
   }
 
   @Put(':id')
