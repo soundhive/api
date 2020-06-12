@@ -12,14 +12,12 @@ import {
   UnauthorizedException,
   UseGuards,
   BadRequestException,
-  UseInterceptors,
   UploadedFile,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
-import { FileInterceptor } from '@nestjs/platform-express'
-import { UpdateResult } from 'typeorm';
 import { TracksService } from 'src/tracks/tracks.service';
 import { Track } from 'src/tracks/track.entity';
 import { BufferedFile } from 'src/minio-client/file.model';
@@ -39,10 +37,14 @@ export class AlbumsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('coverFile'))
   async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createAlbumDTO: CreateAlbumDTO, @UploadedFile() file: BufferedFile): Promise<Album> {
+    if (!file) {
+      throw new BadRequestException("Missing coverFile")
+    }
+
     const user = await this.usersService.findOne(req.user);
 
+    try {
     const albumCover: string = await this.albumsService.uploadFileCover(file, 'albums')
 
     if (!user) {
@@ -50,6 +52,10 @@ export class AlbumsController {
     }
 
     return new Album(await this.albumsService.create({ ...createAlbumDTO, user, coverFilename: albumCover }));
+    } catch(e) {
+      throw new InternalServerErrorException("Something when wrong when processing the cover file.")
+    }
+
   }
 
   @Get()
@@ -83,16 +89,16 @@ export class AlbumsController {
   @Put(':id')
   async update(@Param() findAlbumDTO: FindAlbumDTO, @Body() albumData: UpdateAlbumDTO): Promise<Album> {
 
-    const result: UpdateResult = await this.albumsService.update(findAlbumDTO, albumData);
+  await this.albumsService.update(findAlbumDTO, albumData);
 
-    if (!result.affected || result.affected === 0) {
-      throw BadRequestException;
-    }
+    // if (!result.affected || result.affected === 0) {
+    //   // return 304?
+    // }
 
     const album: Album | undefined = await this.albumsService.findOne(findAlbumDTO);
 
     if (!album) {
-      throw BadRequestException;
+      throw new BadRequestException();
     }
 
     return album;
