@@ -23,6 +23,10 @@ export class AlbumsService {
     return this.albumsRepository.findOne({ id: album.id });
   }
 
+  async findBy(params: {}): Promise<Album[]> {
+    return this.albumsRepository.find(params);
+  }
+
   async update(album: FindAlbumDTO, albumData: UpdateAlbumDTO): Promise<UpdateResult> {
     return this.albumsRepository.update({ id: album.id }, albumData);
   }
