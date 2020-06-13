@@ -27,8 +27,8 @@ import { ListeningsService } from 'src/listenings/listenings.service';
 import { UsersService } from 'src/users/users.service';
 
 import { UpdateResult } from 'typeorm';
-import { AudioFile } from 'src/minio-client/file.model';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { BufferedFile } from 'src/minio-client/file.model';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
@@ -47,9 +47,17 @@ export class TracksController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('trackFile'))
-  async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createTrackDTO: CreateTrackDTO, @UploadedFile() file: AudioFile): Promise<Track> {
+  async create(
+    @Request() req: { user: AuthenticatedUserDTO },
+    @Body() createTrackDTO: CreateTrackDTO,
+    @UploadedFile() file: BufferedFile
+  ): Promise<Track> {
     if (!file) {
       throw new BadRequestException("Missing track file")
+    }
+
+    if (!(['audio/flac', 'audio/mpeg', 'audio/ogg', 'audio/wav'].includes(file.mimetype))) {
+      throw new BadRequestException(`Invalid track file media type: ${file.mimetype}`)
     }
 
     const user = await this.usersService.findOne(req.user);
