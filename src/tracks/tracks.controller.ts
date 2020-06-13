@@ -13,6 +13,8 @@ import {
   Request,
   UnauthorizedException,
   UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AlbumsService } from 'src/albums/albums.service';
 import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
@@ -25,6 +27,8 @@ import { ListeningsService } from 'src/listenings/listenings.service';
 import { UsersService } from 'src/users/users.service';
 
 import { UpdateResult } from 'typeorm';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { BufferedFile } from 'src/minio-client/file.model';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
@@ -40,26 +44,41 @@ export class TracksController {
     private readonly listeningsService: ListeningsService,
   ) { }
 
-  @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createTrackDTO: CreateTrackDTO): Promise<Track> {
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('trackFile'))
+  async create(
+    @Request() req: { user: AuthenticatedUserDTO },
+    @Body() createTrackDTO: CreateTrackDTO,
+    @UploadedFile() file: BufferedFile
+  ): Promise<Track> {
+    if (!file) {
+      throw new BadRequestException("Missing track file")
+    }
+
+    if (!(['audio/flac', 'audio/mpeg', 'audio/ogg', 'audio/wav'].includes(file.mimetype))) {
+      throw new BadRequestException(`Invalid track file media type: ${file.mimetype}`)
+    }
+
     const user = await this.usersService.findOne(req.user);
 
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("Invalid user");
     }
-
 
     const album = await this.albumsService.findOne({ id: createTrackDTO.album });
 
     if (!album) {
-      throw new BadRequestException();
+      throw new BadRequestException("Invalid album");
     }
+
+    const filename: string = await this.tracksService.uploadTrackFile(file, 'tracks')
 
     return new Track(await this.tracksService.create({
       ...createTrackDTO,
       user,
       album,
+      filename
     }));
   }
 

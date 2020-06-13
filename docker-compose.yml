@@ -1,0 +1,21 @@
+version: '2.2'
+
+volumes:
+  soundhive_minio:
+
+services:
+  minio:
+    image: minio/minio
+    volumes:
+    - soundhive_minio:/data
+    environment:
+      MINIO_ACCESS_KEY: miniokey
+      MINIO_SECRET_KEY: miniosecret
+    command: server /data
+    ports:
+      - 127.0.0.1:9000:9000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    restart: always
+
+

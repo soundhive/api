@@ -14,10 +14,6 @@ export class CreateTrackDTO {
   genre: string;
 
   @IsNotEmpty()
-  @IsString()
-  filename: string;
-
-  @IsNotEmpty()
   @IsUUID("all")
   album: string;
 }
