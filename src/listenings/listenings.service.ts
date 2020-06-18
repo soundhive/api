@@ -173,7 +173,7 @@ export class ListeningsService {
     }, {}));
 
     const listeningStats: { listenings: number }[] = stats;
-    const count: { listenings: number } = listeningStats.reduce((total, trackCount) => ({ listenings: total.listenings + trackCount.listenings }));
+    const count: { listenings: number } = listeningStats.reduce((total, trackCount) => ({ listenings: total.listenings + trackCount.listenings }), { listenings: 0 });
 
     return { ...count, keyframes };
   }
