@@ -20,6 +20,35 @@ npm install
 npm run db:reset
 ```
 
+## Minio setup
+
+```sh
+docker-compose up -d
+```
+
+Install the [Minio client](https://github.com/minio/mc/blob/master/docs/minio-client-complete-guide.md#policy).
+
+On macOS:
+
+```sh
+brew install minio/stable/mc
+```
+
+Configure a local host:
+
+```sh
+mc config host add local http://127.0.0.1:9000 miniokey miniosecret --api S3v4
+```
+
+Create a bucket and make it publicly readable:
+
+```sh
+➜  ~ mc mb local/soundhive
+Bucket created successfully `local/soundhive`.
+➜  ~ mc policy set public local/soundhive
+Access permission for `local/soundhive` is set to `public`
+```
+
 ## Running the app
 
 ```bash
