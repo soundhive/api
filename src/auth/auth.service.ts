@@ -1,10 +1,8 @@
+import * as argon2 from "argon2";
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/user.entity';
-
 import { UsersService } from '../users/users.service';
-
-import argon2 = require('argon2');
 
 @Injectable()
 export class AuthService {
