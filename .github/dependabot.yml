@@ -1,17 +1,21 @@
 version: 2
+
 updates:
 - package-ecosystem: npm
   directory: "/"
   schedule:
     interval: daily
+  open-pull-requests-limit: 99
   assignees:
     - "angristan"
   reviewers:
     - "angristan"
+
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
     interval: "daily"
+  open-pull-requests-limit: 99
   assignees:
     - "angristan"
   reviewers:
