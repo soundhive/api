@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class UpdateTrackDTO {
     @IsOptional()
@@ -20,4 +20,13 @@ export class UpdateTrackDTO {
     @IsNotEmpty()
     @IsString()
     filename: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    license: string;
+
+    @IsOptional()
+    @IsBoolean()
+    downloadable: string;
 }
