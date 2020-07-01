@@ -4,6 +4,7 @@ import { Album } from 'src/albums/album.entity';
 import { Listening } from 'src/listenings/listening.entity';
 import { Support } from 'src/supports/support.entity';
 import { Track } from 'src/tracks/track.entity';
+import { Sample } from 'src/samples/samples.entity';
 import {
   BeforeInsert,
   Column,
@@ -49,6 +50,9 @@ export class User {
 
   @OneToMany(type => Album, album => album.user)
   albums: Album[];
+
+  @OneToMany(type => Sample, sample => sample.user)
+  samples: Sample[];
 
   @OneToMany(type => Support, support => support.to)
   supporters: Support[];

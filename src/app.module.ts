@@ -11,6 +11,7 @@ import * as ormconfig from './ormconfig';
 import { TracksModule } from './tracks/tracks.module';
 import { UsersModule } from './users/users.module';
 import { MinioClientModule } from './minio-client/minio-client.module';
+import { SampleModule } from './samples/samples.module';
 
 
 export function DatabaseOrmModule(): DynamicModule {
@@ -34,7 +35,8 @@ export function DatabaseOrmModule(): DynamicModule {
         prettyPrint: process.env.NODE_ENV !== 'production',
       },
     }),
-    MinioClientModule
+    MinioClientModule,
+    SampleModule
   ],
   controllers: [AppController],
   providers: [AppService],
