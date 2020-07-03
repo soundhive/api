@@ -19,7 +19,7 @@ export class CreateTrackDTO {
 
   @IsNotEmpty()
   @IsBoolean()
-  downloadable: string;
+  downloadable: boolean;
 
   @IsNotEmpty()
   @IsUUID("all")

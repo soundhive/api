@@ -26,7 +26,7 @@ export class InsertTrackDTO {
 
   @IsNotEmpty()
   @IsBoolean()
-  downloadable: string;
+  downloadable: boolean;
 
   @IsNotEmpty()
   @Exists(Album)

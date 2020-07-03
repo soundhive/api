@@ -28,5 +28,5 @@ export class UpdateTrackDTO {
 
     @IsOptional()
     @IsBoolean()
-    downloadable: string;
+    downloadable: boolean;
 }
