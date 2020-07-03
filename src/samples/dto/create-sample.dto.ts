@@ -15,6 +15,6 @@ export class CreateSampleDTO {
 
     @IsOptional()
     @IsString()
-    @IsIn(["public", "followers"])
+    @IsIn(['public', 'followers'])
     visibility: string;
 }

@@ -35,7 +35,7 @@ export class Sample extends BaseEntity {
     @Column()
     filename: string;
 
-    @OneToMany(type => Listening, listening => listening.sample)
+    @OneToMany((type) => Listening, (listening) => listening.sample)
     listenings: Listening[];
 
     @CreateDateColumn()
@@ -44,7 +44,10 @@ export class Sample extends BaseEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => User, user => user.samples, { nullable: false, eager: true })
+    @ManyToOne(() => User, (user) => user.samples, {
+        nullable: false,
+        eager: true,
+    })
     @Exclude()
     user: User;
 

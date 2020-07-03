@@ -16,10 +16,10 @@ import { SamplesController } from './samples.controller';
         forwardRef(() => ListeningsModule),
         forwardRef(() => AlbumsModule),
         MinioClientModule,
-        forwardRef(() => SupportsModule)
+        forwardRef(() => SupportsModule),
     ],
     controllers: [SamplesController],
     providers: [SamplesService],
     exports: [SamplesService],
 })
-export class SamplesModule { }
+export class SamplesModule {}

@@ -36,39 +36,52 @@ export class SamplesController {
         private readonly samplesService: SamplesService,
         private readonly usersService: UsersService,
         private readonly listeningsService: ListeningsService,
-    ) { }
+    ) {}
 
     @Post()
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('sampleFile'))
-    async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createSampleDTO: CreateSampleDTO, @UploadedFile() file: BufferedFile): Promise<Sample> {
+    async create(
+        @Request() req: { user: AuthenticatedUserDTO },
+        @Body() createSampleDTO: CreateSampleDTO,
+        @UploadedFile() file: BufferedFile,
+    ): Promise<Sample> {
         if (!file) {
-            throw new BadRequestException("Missing sample file")
+            throw new BadRequestException('Missing sample file');
         }
 
-        if (!([
-            'audio/flac',
-            'audio/mpeg',
-            'audio/ogg',
-            'audio/wav',
-            'audio/wave',
-        ].includes(file.mimetype))) {
-            throw new BadRequestException(`Invalid sample file media type: ${file.mimetype}`)
+        if (
+            ![
+                'audio/flac',
+                'audio/mpeg',
+                'audio/ogg',
+                'audio/wav',
+                'audio/wave',
+            ].includes(file.mimetype)
+        ) {
+            throw new BadRequestException(
+                `Invalid sample file media type: ${file.mimetype}`,
+            );
         }
 
         const user = await this.usersService.findOne(req.user);
 
         if (!user) {
-            throw new UnauthorizedException("Invalid user");
+            throw new UnauthorizedException('Invalid user');
         }
 
-        const filename: string = await this.samplesService.uploadSampleFile(file, 'samples');
+        const filename: string = await this.samplesService.uploadSampleFile(
+            file,
+            'samples',
+        );
 
-        return new Sample(await this.samplesService.create({
-            ...createSampleDTO,
-            user,
-            filename
-        }));
+        return new Sample(
+            await this.samplesService.create({
+                ...createSampleDTO,
+                user,
+                filename,
+            }),
+        );
     }
 
     @Get()
@@ -78,8 +91,13 @@ export class SamplesController {
 
     @UseGuards(JwtAuthGuard)
     @Get(':id')
-    async findOne(@Param() findSampleDTO: FindSampleDTO, @Request() req: { user: AuthenticatedUserDTO }): Promise<Sample> {
-        const sample: Sample | undefined = await this.samplesService.findOne(findSampleDTO);
+    async findOne(
+        @Param() findSampleDTO: FindSampleDTO,
+        @Request() req: { user: AuthenticatedUserDTO },
+    ): Promise<Sample> {
+        const sample: Sample | undefined = await this.samplesService.findOne(
+            findSampleDTO,
+        );
 
         if (!sample) {
             throw new NotFoundException();
@@ -108,14 +126,22 @@ export class SamplesController {
 
     @UseGuards(JwtAuthGuard)
     @Put(':id')
-    async update(@Param() findSampleDTO: FindSampleDTO, @Body() sampleData: UpdateSampleDTO): Promise<Sample> {
-        const result: UpdateResult = await this.samplesService.update(findSampleDTO, sampleData);
+    async update(
+        @Param() findSampleDTO: FindSampleDTO,
+        @Body() sampleData: UpdateSampleDTO,
+    ): Promise<Sample> {
+        const result: UpdateResult = await this.samplesService.update(
+            findSampleDTO,
+            sampleData,
+        );
 
         if (!result.affected || result.affected === 0) {
             throw BadRequestException;
         }
 
-        const sample: Sample | undefined = await this.samplesService.findOne(findSampleDTO);
+        const sample: Sample | undefined = await this.samplesService.findOne(
+            findSampleDTO,
+        );
 
         if (!sample) {
             throw BadRequestException;
@@ -126,10 +152,13 @@ export class SamplesController {
 
     @UseGuards(JwtAuthGuard)
     @Post(':id/listen')
-    async listen(@Param() findSampleDTO: FindSampleDTO, @Request() req: { user: AuthenticatedUserDTO }): Promise<void> {
+    async listen(
+        @Param() findSampleDTO: FindSampleDTO,
+        @Request() req: { user: AuthenticatedUserDTO },
+    ): Promise<void> {
         const user = await this.usersService.findOne(req.user);
         const sample = await this.samplesService.findOne(findSampleDTO);
-        const listening = new Listening({ user, sample })
+        const listening = new Listening({ user, sample });
         await this.listeningsService.create(listening);
     }
 

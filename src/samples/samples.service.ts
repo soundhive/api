@@ -17,7 +17,7 @@ export class SamplesService {
         @InjectRepository(Sample) private sampleRepository: Repository<Sample>,
         private minioClientService: MinioClientService,
         private supportsService: SupportsService,
-    ) { }
+    ) {}
 
     async create(createSampleDTO: InsertSampleDTO): Promise<Sample> {
         return this.sampleRepository.save(createSampleDTO);
@@ -35,7 +35,10 @@ export class SamplesService {
         return this.sampleRepository.findOne({ id: sample.id });
     }
 
-    async update(sample: FindSampleDTO, sampleData: UpdateSampleDTO): Promise<UpdateResult> {
+    async update(
+        sample: FindSampleDTO,
+        sampleData: UpdateSampleDTO,
+    ): Promise<UpdateResult> {
         return this.sampleRepository.update({ id: sample.id }, sampleData);
     }
 
@@ -43,10 +46,16 @@ export class SamplesService {
         return this.sampleRepository.delete({ id: sample.id });
     }
 
-    async uploadSampleFile(sample: BufferedFile, subFolder: string): Promise<string> {
-        const uploadSampleFile = await this.minioClientService.upload(sample, subFolder)
+    async uploadSampleFile(
+        sample: BufferedFile,
+        subFolder: string,
+    ): Promise<string> {
+        const uploadSampleFile = await this.minioClientService.upload(
+            sample,
+            subFolder,
+        );
 
-        return uploadSampleFile.path
+        return uploadSampleFile.path;
     }
 
     async isVisibleByUser(sample: Sample, user: User): Promise<boolean> {
@@ -56,7 +65,7 @@ export class SamplesService {
         }
 
         const followings = await this.supportsService.findUserSupported(user);
-        if (followings.some(following => following.id === sample.user.id)) {
+        if (followings.some((following) => following.id === sample.user.id)) {
             // user's followings contains the sample's author -> can access the sample
             return true;
         }
