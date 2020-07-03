@@ -27,7 +27,7 @@ export class Album extends BaseEntity {
   @Column({ type: 'varchar', length: '60' })
   title: string;
 
-  @Column('text', { default: null, nullable: true })
+  @Column('text', { nullable: true })
   description?: string;
 
   @Column()
