@@ -53,4 +53,10 @@ export class Sample extends BaseEntity {
 
     @Column()
     visibility: string;
+
+    @Column()
+    license: string;
+
+    @Column()
+    downloadable: boolean;
 }

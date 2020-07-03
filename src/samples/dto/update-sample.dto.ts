@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsIn } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsIn, IsBoolean } from 'class-validator';
 
 export class UpdateSampleDTO {
     @IsOptional()
@@ -25,4 +25,14 @@ export class UpdateSampleDTO {
     @IsString()
     @IsIn(['public', 'followers'])
     visibility: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    license: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsBoolean()
+    downloadable: boolean;
 }

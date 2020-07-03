@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsIn } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsIn, IsBoolean } from 'class-validator';
 import { User } from 'src/users/user.entity';
 import { Exists } from 'src/validators/exists.validation';
 
@@ -27,4 +27,12 @@ export class InsertSampleDTO {
     @IsString()
     @IsIn(['public', 'followers'])
     visibility: string;
+
+    @IsNotEmpty()
+    @IsString()
+    license: string;
+
+    @IsNotEmpty()
+    @IsBoolean()
+    downloadable: boolean;
 }
