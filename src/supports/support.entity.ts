@@ -14,10 +14,10 @@ export class Support {
     @CreateDateColumn()
     supportedAt: Date;
 
-    @ManyToOne(type => User, user => user.supporters)
+    @ManyToOne(type => User, user => user.supporters, {eager: true})
     to: User;
 
-    @ManyToOne(type => User, user => user.supporting)
+    @ManyToOne(type => User, user => user.supporting, {eager: true})
     from: User;
 
 }
