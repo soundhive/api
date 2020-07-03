@@ -1,4 +1,10 @@
-import { IsDateString, IsIn, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import {
+    IsDateString,
+    IsIn,
+    IsNotEmpty,
+    IsString,
+    IsUUID,
+} from 'class-validator';
 import { Track } from 'src/tracks/track.entity';
 import { Exists } from 'src/validators/exists.validation';
 
@@ -15,6 +21,6 @@ export class FindListeningsForTrackDTO {
 
     @IsNotEmpty()
     @IsString()
-    @IsIn(["hour", "day", "week", "month", "year"])
+    @IsIn(['hour', 'day', 'week', 'month', 'year'])
     period: string;
 }

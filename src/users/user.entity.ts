@@ -6,15 +6,15 @@ import { Support } from 'src/supports/support.entity';
 import { Track } from 'src/tracks/track.entity';
 import { Sample } from 'src/samples/samples.entity';
 import {
-  BeforeInsert,
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  Unique,
-  UpdateDateColumn,
-  VersionColumn,
+    BeforeInsert,
+    Column,
+    CreateDateColumn,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    Unique,
+    UpdateDateColumn,
+    VersionColumn,
 } from 'typeorm';
 
 import argon2 = require('argon2');
@@ -22,62 +22,62 @@ import argon2 = require('argon2');
 @Entity('users')
 @Unique(['username', 'email'])
 export class User {
-  constructor(partial: Partial<User>) {
-    Object.assign(this, partial);
-  }
+    constructor(partial: Partial<User>) {
+        Object.assign(this, partial);
+    }
 
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @Column()
-  name: string;
+    @Column()
+    name: string;
 
-  @Column()
-  username: string;
+    @Column()
+    username: string;
 
-  @Column()
-  @Exclude()
-  password: string;
+    @Column()
+    @Exclude()
+    password: string;
 
-  @Column()
-  email: string;
+    @Column()
+    email: string;
 
-  @OneToMany(type => Listening, listening => listening.user)
-  listenings: Listening[];
+    @OneToMany((type) => Listening, (listening) => listening.user)
+    listenings: Listening[];
 
-  @OneToMany(type => Track, track => track.user)
-  tracks: Track[];
+    @OneToMany((type) => Track, (track) => track.user)
+    tracks: Track[];
 
-  @OneToMany(type => Album, album => album.user)
-  albums: Album[];
+    @OneToMany((type) => Album, (album) => album.user)
+    albums: Album[];
 
-  @OneToMany(type => Sample, sample => sample.user)
-  samples: Sample[];
+    @OneToMany((type) => Sample, (sample) => sample.user)
+    samples: Sample[];
 
-  @OneToMany(type => Support, support => support.to)
-  supporters: Support[];
+    @OneToMany((type) => Support, (support) => support.to)
+    supporters: Support[];
 
-  @OneToMany(type => Support, support => support.from)
-  supporting: Support[];
+    @OneToMany((type) => Support, (support) => support.from)
+    supporting: Support[];
 
-  @Column({ default: true })
-  isActive: boolean;
+    @Column({ default: true })
+    isActive: boolean;
 
-  @Exclude()
-  @CreateDateColumn()
-  createdAt: Date;
+    @Exclude()
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @Exclude()
-  @UpdateDateColumn()
-  updatedAt: Date;
+    @Exclude()
+    @UpdateDateColumn()
+    updatedAt: Date;
 
-  @Exclude()
-  @VersionColumn()
-  dataVersion: number;
+    @Exclude()
+    @VersionColumn()
+    dataVersion: number;
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  @BeforeInsert()
-  async hashPassword() {
-    this.password = await argon2.hash(this.password);
-  }
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    @BeforeInsert()
+    async hashPassword() {
+        this.password = await argon2.hash(this.password);
+    }
 }

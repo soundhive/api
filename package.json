@@ -16,6 +16,8 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "prettier": "prettier --check src/",
+    "prettier:fix": "prettier --write src/",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

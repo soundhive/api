@@ -1,8 +1,8 @@
 export class SampleListeningsResponseDTO {
-    listenings: number
+    listenings: number;
 
     keyframes: {
         count: number;
         period: Date;
-    }[]
+    }[];
 }

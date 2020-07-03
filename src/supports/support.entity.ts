@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { User } from 'src/users/user.entity';
-import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    CreateDateColumn,
+    Entity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('supports')
 export class Support {
     constructor(partial: Partial<Support>) {
-        Object.assign(this, partial)
+        Object.assign(this, partial);
     }
 
     @PrimaryGeneratedColumn('uuid')
@@ -14,11 +19,9 @@ export class Support {
     @CreateDateColumn()
     supportedAt: Date;
 
-    @ManyToOne(type => User, user => user.supporters, {eager: true})
+    @ManyToOne((type) => User, (user) => user.supporters, { eager: true })
     to: User;
 
-    @ManyToOne(type => User, user => user.supporting, {eager: true})
+    @ManyToOne((type) => User, (user) => user.supporting, { eager: true })
     from: User;
-
 }
-

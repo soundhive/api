@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, IsOptional, IsIn, IsBoolean } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsString,
+    IsOptional,
+    IsIn,
+    IsBoolean,
+} from 'class-validator';
 
 export class CreateSampleDTO {
     @IsNotEmpty()

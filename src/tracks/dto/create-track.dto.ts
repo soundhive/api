@@ -1,27 +1,27 @@
 import { IsNotEmpty, IsString, IsUUID, IsBoolean } from 'class-validator';
 
 export class CreateTrackDTO {
-  @IsNotEmpty()
-  @IsString()
-  title: string;
+    @IsNotEmpty()
+    @IsString()
+    title: string;
 
-  @IsNotEmpty()
-  @IsString()
-  description: string;
+    @IsNotEmpty()
+    @IsString()
+    description: string;
 
-  @IsNotEmpty()
-  @IsString()
-  genre: string;
+    @IsNotEmpty()
+    @IsString()
+    genre: string;
 
-  @IsNotEmpty()
-  @IsString()
-  license: string;
+    @IsNotEmpty()
+    @IsString()
+    license: string;
 
-  @IsNotEmpty()
-  @IsBoolean()
-  downloadable: boolean;
+    @IsNotEmpty()
+    @IsBoolean()
+    downloadable: boolean;
 
-  @IsNotEmpty()
-  @IsUUID("all")
-  album: string;
+    @IsNotEmpty()
+    @IsUUID('all')
+    album: string;
 }

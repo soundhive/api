@@ -3,21 +3,21 @@ import { IsUnique } from 'src/validators/unique.validation';
 import { User } from '../user.entity';
 
 export class CreateUserDTO {
-  @IsNotEmpty()
-  @IsString()
-  name: string;
+    @IsNotEmpty()
+    @IsString()
+    name: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @IsAlphanumeric()
-  @IsUnique(User)
-  username: string;
+    @IsNotEmpty()
+    @IsString()
+    @IsAlphanumeric()
+    @IsUnique(User)
+    username: string;
 
-  @IsEmail()
-  @IsNotEmpty()
-  @IsUnique(User)
-  email: string;
+    @IsEmail()
+    @IsNotEmpty()
+    @IsUnique(User)
+    email: string;
 
-  @IsNotEmpty()
-  password: string;
+    @IsNotEmpty()
+    password: string;
 }

@@ -1,13 +1,13 @@
 export interface BufferedFile {
-  fieldname: string;
+    fieldname: string;
 
-  originalname: string;
+    originalname: string;
 
-  encoding: string;
+    encoding: string;
 
-  size: number;
+    size: number;
 
-  buffer: Buffer | string;
+    buffer: Buffer | string;
 
-  mimetype: string;
+    mimetype: string;
 }
