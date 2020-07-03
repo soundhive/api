@@ -41,11 +41,7 @@ import {
     @Post()
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('sampleFile'))
-    async create(
-      @Request() req: { user: AuthenticatedUserDTO },
-      @Body() createSampleDTO: CreateSampleDTO,
-      @UploadedFile() file: BufferedFile
-    ): Promise<Sample> {
+    async create(@Request() req: { user: AuthenticatedUserDTO }, @Body() createSampleDTO: CreateSampleDTO, @UploadedFile() file: BufferedFile): Promise<Sample> {
       if (!file) {
         throw new BadRequestException("Missing sample file")
       }
@@ -66,7 +62,7 @@ import {
         throw new UnauthorizedException("Invalid user");
       }
 
-      const filename: string = await this.samplesService.uploadSampleFile(file, 'samples')
+      const filename: string = await this.samplesService.uploadSampleFile(file, 'samples');
 
       return new Sample(await this.samplesService.create({
         ...createSampleDTO,
@@ -80,15 +76,24 @@ import {
       return this.samplesService.find();
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get(':id')
-    async findOne(@Param() findSampleDTO: FindSampleDTO): Promise<Sample> {
+    async findOne(@Param() findSampleDTO: FindSampleDTO, @Request() req: { user: AuthenticatedUserDTO }): Promise<Sample> {
       const sample: Sample | undefined = await this.samplesService.findOne(findSampleDTO);
 
       if (!sample) {
-        throw NotFoundException;
+        throw new NotFoundException();
       }
 
-      return sample;
+      const user = await this.usersService.findOne(req.user);
+      if (!user) {
+        throw new BadRequestException();
+      }
+      if (await this.samplesService.isVisibleByUser(sample, user)) {
+        return sample;
+      }
+
+      throw new UnauthorizedException();
     }
 
     // @Get(':id/stats')

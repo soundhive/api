@@ -44,7 +44,10 @@ export class Sample extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, user => user.samples, { nullable: false })
+  @ManyToOne(() => User, user => user.samples, { nullable: false, eager: true })
   @Exclude()
   user: User;
+
+  @Column()
+  visibility: string;
 }

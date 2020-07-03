@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsIn } from 'class-validator';
 import { User } from 'src/users/user.entity';
 import { Exists } from 'src/validators/exists.validation';
 
@@ -22,4 +22,9 @@ export class InsertSampleDTO {
   @IsNotEmpty()
   @Exists(User)
   user: User;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(["public", "followers"])
+  visibility: string;
 }

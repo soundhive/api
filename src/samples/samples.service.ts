@@ -4,6 +4,8 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { SupportsService } from 'src/supports/supports.service';
+import { User } from 'src/users/user.entity';
 import { FindSampleDTO } from './dto/find-sample.dto';
 import { InsertSampleDTO } from './dto/insert-sample.dto';
 import { UpdateSampleDTO } from './dto/update-sample.dto';
@@ -14,6 +16,7 @@ export class SamplesService {
   constructor(
     @InjectRepository(Sample) private sampleRepository: Repository<Sample>,
     private minioClientService: MinioClientService,
+    private supportsService: SupportsService,
   ) { }
 
   async create(createSampleDTO: InsertSampleDTO): Promise<Sample> {
@@ -44,5 +47,21 @@ export class SamplesService {
     const uploadSampleFile = await this.minioClientService.upload(sample, subFolder)
 
     return uploadSampleFile.path
+  }
+
+  async isVisibleByUser(sample: Sample, user: User):Promise<boolean> {
+
+    if (sample.user.id === user.id) {
+      // user owns the sample
+      return true;
+    }
+
+    const followings = await this.supportsService.findUserSupported(user);
+    if (followings.some(following => following.id === sample.user.id)) {
+      // user's followings contains the sample's author -> can access the sample
+      return true;
+    }
+
+    return false;
   }
 }

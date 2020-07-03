@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsIn } from 'class-validator';
 
 export class CreateSampleDTO {
   @IsNotEmpty()
@@ -12,4 +12,9 @@ export class CreateSampleDTO {
   @IsNotEmpty()
   @IsString()
   genre: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(["public", "followers"])
+  visibility: string;
 }
