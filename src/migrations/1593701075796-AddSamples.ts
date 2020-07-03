@@ -1,4 +1,5 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+/* eslint-disable class-methods-use-this */
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddSamples1593701075796 implements MigrationInterface {
     name = 'AddSamples1593701075796'

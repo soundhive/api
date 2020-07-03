@@ -10,16 +10,16 @@ import { Sample } from './samples.entity';
 import { SamplesController } from './samples.controller';
 
 @Module({
-  imports: [
-      TypeOrmModule.forFeature([Sample]),
-      forwardRef(() => UsersModule),
-      forwardRef(() => ListeningsModule),
-      forwardRef(() => AlbumsModule),
-      MinioClientModule,
-      forwardRef(() => SupportsModule)
-  ],
-  controllers: [SamplesController],
-  providers: [SamplesService],
-  exports: [SamplesService],
+    imports: [
+        TypeOrmModule.forFeature([Sample]),
+        forwardRef(() => UsersModule),
+        forwardRef(() => ListeningsModule),
+        forwardRef(() => AlbumsModule),
+        MinioClientModule,
+        forwardRef(() => SupportsModule)
+    ],
+    controllers: [SamplesController],
+    providers: [SamplesService],
+    exports: [SamplesService],
 })
 export class SamplesModule { }
