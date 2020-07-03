@@ -37,6 +37,12 @@ export class Track extends BaseEntity {
   @Column()
   filename: string;
 
+  @Column()
+  license: string;
+
+  @Column()
+  downloadable: boolean;
+
   @OneToMany(type => Listening, listening => listening.track)
   listenings: Listening[];
 
