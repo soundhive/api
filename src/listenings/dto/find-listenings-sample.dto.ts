@@ -1,4 +1,10 @@
-import { IsDateString, IsIn, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import {
+    IsDateString,
+    IsIn,
+    IsNotEmpty,
+    IsString,
+    IsUUID,
+} from 'class-validator';
 import { Exists } from 'src/validators/exists.validation';
 import { Sample } from 'src/samples/samples.entity';
 
@@ -15,6 +21,6 @@ export class FindListeningsForSampleDTO {
 
     @IsNotEmpty()
     @IsString()
-    @IsIn(["hour", "day", "week", "month", "year"])
+    @IsIn(['hour', 'day', 'week', 'month', 'year'])
     period: string;
 }

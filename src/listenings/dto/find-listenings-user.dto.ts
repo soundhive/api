@@ -16,6 +16,6 @@ export class FindListeningsForUserDTO {
 
     @IsNotEmpty()
     @IsString()
-    @IsIn(["hour", "day", "week", "month", "year"])
+    @IsIn(['hour', 'day', 'week', 'month', 'year'])
     period: string;
 }

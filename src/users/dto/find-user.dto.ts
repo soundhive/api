@@ -1,10 +1,10 @@
-import { IsString } from "class-validator";
-import { Exists } from "../../validators/exists.validation"
-import { User } from "../user.entity";
+import { IsString } from 'class-validator';
+import { Exists } from '../../validators/exists.validation';
+import { User } from '../user.entity';
 
 export class FindUserDTO {
     @IsString()
     @Exists(User)
-    username: string
+    username: string;
 }
 export default FindUserDTO;

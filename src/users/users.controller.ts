@@ -1,12 +1,23 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards, Request, NotFoundException, Delete } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    Post,
+    Query,
+    UseGuards,
+    Request,
+    NotFoundException,
+    Delete,
+} from '@nestjs/common';
 import { FindLastListeningsForUserDTO } from 'src/listenings/dto/find-last-listenings-user.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 import { UserListeningsResponseDTO } from 'src/listenings/dto/responses/user-listenings-response.dto';
 import { ListeningsService } from 'src/listenings/listenings.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Support } from 'src/supports/support.entity'
+import { Support } from 'src/supports/support.entity';
 import { SupportsService } from 'src/supports/supports.service';
-import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto'
+import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { DeleteResult } from 'typeorm';
 import { Album } from 'src/albums/album.entity';
 import { AlbumsService } from 'src/albums/albums.service';
@@ -18,85 +29,105 @@ import { User } from './user.entity';
 import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
-  constructor(
-    private usersService: UsersService,
-    private readonly listeningsService: ListeningsService,
-    private readonly albumsService: AlbumsService,
-    private readonly tracksService: TracksService,
-    private readonly supportsService: SupportsService,
-  ) { }
+    constructor(
+        private usersService: UsersService,
+        private readonly listeningsService: ListeningsService,
+        private readonly albumsService: AlbumsService,
+        private readonly tracksService: TracksService,
+        private readonly supportsService: SupportsService,
+    ) {}
 
-  @Post()
-  async create(@Body() createUserDTO: CreateUserDTO): Promise<User> {
-    return this.usersService.create(new User(createUserDTO));
-  }
-
-  @Get()
-  async find(): Promise<User[]> {
-    return this.usersService.find();
-  }
-
-  @Get(':username')
-  async findOne(@Param() userReq: { username: string }): Promise<User> {
-    const user: User | undefined = await this.usersService.findOne(userReq);
-
-    if (!user) {
-      throw new NotFoundException("User not found");
+    @Post()
+    async create(@Body() createUserDTO: CreateUserDTO): Promise<User> {
+        return this.usersService.create(new User(createUserDTO));
     }
 
-    return user;
-  }
+    @Get()
+    async find(): Promise<User[]> {
+        return this.usersService.find();
+    }
 
-  @Get(':username/tracks')
-  async findTracks(@Param() findUserDTO: FindUserDTO): Promise<Track[]> {
-    const user: User | undefined = await this.usersService.findOne(findUserDTO);
+    @Get(':username')
+    async findOne(@Param() userReq: { username: string }): Promise<User> {
+        const user: User | undefined = await this.usersService.findOne(userReq);
 
-    return this.tracksService.findBy({ user })
-  }
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
 
-  @Get(':username/albums')
-  async findAlbums(@Param() findUserDTO: FindUserDTO): Promise<Album[]> {
-    const user: User | undefined = await this.usersService.findOne(findUserDTO);
+        return user;
+    }
 
-    return this.albumsService.findBy({ user })
-  }
+    @Get(':username/tracks')
+    async findTracks(@Param() findUserDTO: FindUserDTO): Promise<Track[]> {
+        const user: User | undefined = await this.usersService.findOne(
+            findUserDTO,
+        );
 
-  @Get(':username/stats')
-  async findStats(@Param() findUserDTO: FindUserDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<UserListeningsResponseDTO> {
-    return this.listeningsService.findForUser({ ...findUserDTO, ...findListeningsDTO })
-  }
+        return this.tracksService.findBy({ user });
+    }
 
-  @Get(':username/stats/last/:count/:period')
-  async findLastStats(@Param() findLastListeningsForUserDTO: FindLastListeningsForUserDTO): Promise<UserListeningsResponseDTO> {
-    return this.listeningsService.findLastForUser(findLastListeningsForUserDTO)
-  }
+    @Get(':username/albums')
+    async findAlbums(@Param() findUserDTO: FindUserDTO): Promise<Album[]> {
+        const user: User | undefined = await this.usersService.findOne(
+            findUserDTO,
+        );
 
-  @Get(':username/supports')
-  async findSupports(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
-    return this.supportsService.findUserSupported(findUserDTO);
-  }
+        return this.albumsService.findBy({ user });
+    }
 
-  @Get(':username/supporters')
-  async findSupporters(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
-    return this.supportsService.findUserSupporters(findUserDTO);
-  }
+    @Get(':username/stats')
+    async findStats(
+        @Param() findUserDTO: FindUserDTO,
+        @Query() findListeningsDTO: FindListeningsDTO,
+    ): Promise<UserListeningsResponseDTO> {
+        return this.listeningsService.findForUser({
+            ...findUserDTO,
+            ...findListeningsDTO,
+        });
+    }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete(':username/unsupport')
-  async unSupportUser(@Param() findUserDTO: FindUserDTO, @Request() req: { user: AuthenticatedUserDTO }): Promise<DeleteResult> {
-    const emitor = await this.usersService.findOne(req.user);
-    const target = await this.usersService.findOne(findUserDTO)
-    const support = new Support({ from: emitor, to: target })
-    return this.supportsService.delete(support);
-  }
+    @Get(':username/stats/last/:count/:period')
+    async findLastStats(
+        @Param() findLastListeningsForUserDTO: FindLastListeningsForUserDTO,
+    ): Promise<UserListeningsResponseDTO> {
+        return this.listeningsService.findLastForUser(
+            findLastListeningsForUserDTO,
+        );
+    }
 
-  @UseGuards(JwtAuthGuard)
-  @Post(':username/support')
-  async support(@Request() req: { user: AuthenticatedUserDTO }, @Param() findUserDTO: FindUserDTO): Promise<Support> {
-    const emitor = await this.usersService.findOne(req.user);
-    const target = await this.usersService.findOne(findUserDTO)
-    const support = new Support({ from: emitor, to: target })
+    @Get(':username/supports')
+    async findSupports(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
+        return this.supportsService.findUserSupported(findUserDTO);
+    }
 
-    return this.supportsService.create(support);
-  }
+    @Get(':username/supporters')
+    async findSupporters(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
+        return this.supportsService.findUserSupporters(findUserDTO);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete(':username/unsupport')
+    async unSupportUser(
+        @Param() findUserDTO: FindUserDTO,
+        @Request() req: { user: AuthenticatedUserDTO },
+    ): Promise<DeleteResult> {
+        const emitor = await this.usersService.findOne(req.user);
+        const target = await this.usersService.findOne(findUserDTO);
+        const support = new Support({ from: emitor, to: target });
+        return this.supportsService.delete(support);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':username/support')
+    async support(
+        @Request() req: { user: AuthenticatedUserDTO },
+        @Param() findUserDTO: FindUserDTO,
+    ): Promise<Support> {
+        const emitor = await this.usersService.findOne(req.user);
+        const target = await this.usersService.findOne(findUserDTO);
+        const support = new Support({ from: emitor, to: target });
+
+        return this.supportsService.create(support);
+    }
 }

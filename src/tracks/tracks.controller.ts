@@ -1,20 +1,20 @@
 import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
-  Query,
-  Request,
-  UnauthorizedException,
-  UseGuards,
-  UploadedFile,
-  UseInterceptors,
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    NotFoundException,
+    Param,
+    Post,
+    Put,
+    Query,
+    Request,
+    UnauthorizedException,
+    UseGuards,
+    UploadedFile,
+    UseInterceptors,
 } from '@nestjs/common';
 import { AlbumsService } from 'src/albums/albums.service';
 import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
@@ -37,113 +37,147 @@ import { TracksService } from './tracks.service';
 
 @Controller('tracks')
 export class TracksController {
-  constructor(
-    private readonly tracksService: TracksService,
-    private readonly usersService: UsersService,
-    private readonly albumsService: AlbumsService,
-    private readonly listeningsService: ListeningsService,
-  ) { }
+    constructor(
+        private readonly tracksService: TracksService,
+        private readonly usersService: UsersService,
+        private readonly albumsService: AlbumsService,
+        private readonly listeningsService: ListeningsService,
+    ) {}
 
-  @Post()
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('trackFile'))
-  async create(
-    @Request() req: { user: AuthenticatedUserDTO },
-    @Body() createTrackDTO: CreateTrackDTO,
-    @UploadedFile() file: BufferedFile
-  ): Promise<Track> {
-    if (!file) {
-      throw new BadRequestException("Missing track file")
+    @Post()
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor('trackFile'))
+    async create(
+        @Request() req: { user: AuthenticatedUserDTO },
+        @Body() createTrackDTO: CreateTrackDTO,
+        @UploadedFile() file: BufferedFile,
+    ): Promise<Track> {
+        if (!file) {
+            throw new BadRequestException('Missing track file');
+        }
+
+        if (
+            ![
+                'audio/flac',
+                'audio/mpeg',
+                'audio/ogg',
+                'audio/wav',
+                'audio/wave',
+            ].includes(file.mimetype)
+        ) {
+            throw new BadRequestException(
+                `Invalid track file media type: ${file.mimetype}`,
+            );
+        }
+
+        const user = await this.usersService.findOne(req.user);
+
+        if (!user) {
+            throw new UnauthorizedException('Invalid user');
+        }
+
+        const album = await this.albumsService.findOne({
+            id: createTrackDTO.album,
+        });
+
+        if (!album) {
+            throw new BadRequestException('Invalid album');
+        }
+
+        const filename: string = await this.tracksService.uploadTrackFile(
+            file,
+            'tracks',
+        );
+
+        return new Track(
+            await this.tracksService.create({
+                ...createTrackDTO,
+                user,
+                album,
+                filename,
+            }),
+        );
     }
 
-    if (!([
-      'audio/flac',
-      'audio/mpeg',
-      'audio/ogg',
-      'audio/wav',
-      'audio/wave',
-    ].includes(file.mimetype))) {
-      throw new BadRequestException(`Invalid track file media type: ${file.mimetype}`)
+    @Get()
+    async find(): Promise<Track[]> {
+        return this.tracksService.find();
     }
 
-    const user = await this.usersService.findOne(req.user);
+    @Get(':id')
+    async findOne(@Param() findTrackDTO: FindTrackDTO): Promise<Track> {
+        const track: Track | undefined = await this.tracksService.findOne(
+            findTrackDTO,
+        );
 
-    if (!user) {
-      throw new UnauthorizedException("Invalid user");
+        if (!track) {
+            throw NotFoundException;
+        }
+
+        return track;
     }
 
-    const album = await this.albumsService.findOne({ id: createTrackDTO.album });
-
-    if (!album) {
-      throw new BadRequestException("Invalid album");
+    @Get(':id/stats')
+    async findStats(
+        @Param() findTrackDTO: FindTrackDTO,
+        @Query() findListeningsDTO: FindListeningsDTO,
+    ): Promise<TrackListeningsResponseDTO> {
+        return this.listeningsService.findForTrack({
+            ...findTrackDTO,
+            ...findListeningsDTO,
+        });
     }
 
-    const filename: string = await this.tracksService.uploadTrackFile(file, 'tracks')
-
-    return new Track(await this.tracksService.create({
-      ...createTrackDTO,
-      user,
-      album,
-      filename
-    }));
-  }
-
-  @Get()
-  async find(): Promise<Track[]> {
-    return this.tracksService.find();
-  }
-
-  @Get(':id')
-  async findOne(@Param() findTrackDTO: FindTrackDTO): Promise<Track> {
-    const track: Track | undefined = await this.tracksService.findOne(findTrackDTO);
-
-    if (!track) {
-      throw NotFoundException;
+    @Get(':id/stats/last/:count/:period')
+    async findLastStats(
+        @Param() findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO,
+    ): Promise<TrackListeningsResponseDTO> {
+        return this.listeningsService.findLastForTrack(
+            findLastListeningsForTrackDTO,
+        );
     }
 
-    return track;
-  }
+    @UseGuards(JwtAuthGuard)
+    @Put(':id')
+    async update(
+        @Param() findTrackDTO: FindTrackDTO,
+        @Body() trackData: UpdateTrackDTO,
+    ): Promise<Track> {
+        const result: UpdateResult = await this.tracksService.update(
+            findTrackDTO,
+            trackData,
+        );
 
-  @Get(':id/stats')
-  async findStats(@Param() findTrackDTO: FindTrackDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<TrackListeningsResponseDTO> {
-    return this.listeningsService.findForTrack({ ...findTrackDTO, ...findListeningsDTO })
-  }
+        if (!result.affected || result.affected === 0) {
+            throw BadRequestException;
+        }
 
-  @Get(':id/stats/last/:count/:period')
-  async findLastStats(@Param() findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO): Promise<TrackListeningsResponseDTO> {
-    return this.listeningsService.findLastForTrack(findLastListeningsForTrackDTO)
-  }
+        const track: Track | undefined = await this.tracksService.findOne(
+            findTrackDTO,
+        );
 
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  async update(@Param() findTrackDTO: FindTrackDTO, @Body() trackData: UpdateTrackDTO): Promise<Track> {
-    const result: UpdateResult = await this.tracksService.update(findTrackDTO, trackData);
+        if (!track) {
+            throw BadRequestException;
+        }
 
-    if (!result.affected || result.affected === 0) {
-      throw BadRequestException;
+        return track;
     }
 
-    const track: Track | undefined = await this.tracksService.findOne(findTrackDTO);
-
-    if (!track) {
-      throw BadRequestException;
+    @UseGuards(JwtAuthGuard)
+    @Post(':id/listen')
+    async listen(
+        @Param() findTrackDTO: FindTrackDTO,
+        @Request() req: { user: AuthenticatedUserDTO },
+    ): Promise<void> {
+        const user = await this.usersService.findOne(req.user);
+        const track = await this.tracksService.findOne(findTrackDTO);
+        const listening = new Listening({ user, track });
+        await this.listeningsService.create(listening);
     }
 
-    return track;
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post(':id/listen')
-  async listen(@Param() findTrackDTO: FindTrackDTO, @Request() req: { user: AuthenticatedUserDTO }): Promise<void> {
-    const user = await this.usersService.findOne(req.user);
-    const track = await this.tracksService.findOne(findTrackDTO);
-    const listening = new Listening({ user, track })
-    await this.listeningsService.create(listening);
-  }
-
-  @Delete(':id')
-  @HttpCode(204)
-  delete(@Param() track: FindTrackDTO): void {
-    this.tracksService.delete(track).then();
-  }
+    @Delete(':id')
+    @HttpCode(204)
+    delete(@Param() track: FindTrackDTO): void {
+        this.tracksService.delete(track).then();
+    }
 }
