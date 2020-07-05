@@ -164,7 +164,7 @@ export class SamplesController {
 
     @Delete(':id')
     @HttpCode(204)
-    delete(@Param() sample: FindSampleDTO): void {
-        this.samplesService.delete(sample).then();
+    async delete(@Param() sample: FindSampleDTO): Promise<void> {
+        await this.samplesService.delete(sample);
     }
 }

@@ -58,12 +58,13 @@ export class MinioClientService {
     }
 
     delete(objetName: string, baseBucket: string = this.baseBucket): void {
-        this.client.removeObject(baseBucket, objetName, (err: Error) => {
-            if (err)
-                throw new HttpException(
-                    'Oops Something wrong happend',
-                    HttpStatus.BAD_REQUEST,
-                );
-        });
+        try {
+            this.client.removeObject(baseBucket, objetName);
+        } catch {
+            throw new HttpException(
+                'Error deleting file',
+                HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+        }
     }
 }

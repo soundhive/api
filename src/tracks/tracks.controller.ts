@@ -177,7 +177,7 @@ export class TracksController {
 
     @Delete(':id')
     @HttpCode(204)
-    delete(@Param() track: FindTrackDTO): void {
-        this.tracksService.delete(track).then();
+    async delete(@Param() track: FindTrackDTO): Promise<void> {
+        await this.tracksService.delete(track);
     }
 }

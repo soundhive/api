@@ -129,7 +129,7 @@ export class AlbumsController {
     @Delete(':id')
     @UseGuards(JwtAuthGuard)
     @HttpCode(204)
-    delete(@Param() album: FindAlbumDTO): void {
-        this.albumsService.delete(album).then();
+    async delete(@Param() album: FindAlbumDTO): Promise<void> {
+        await this.albumsService.delete(album);
     }
 }
