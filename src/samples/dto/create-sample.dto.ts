@@ -3,7 +3,7 @@ import {
     IsString,
     IsOptional,
     IsIn,
-    IsBoolean,
+    // IsBoolean,
 } from 'class-validator';
 
 export class CreateSampleDTO {
@@ -28,7 +28,7 @@ export class CreateSampleDTO {
     @IsString()
     license: string;
 
-    @IsNotEmpty()
-    @IsBoolean()
+    // @IsNotEmpty()
+    // @IsBoolean()
     downloadable: boolean;
 }

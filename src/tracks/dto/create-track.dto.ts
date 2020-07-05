@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUUID, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateTrackDTO {
     @IsNotEmpty()
@@ -17,8 +17,8 @@ export class CreateTrackDTO {
     @IsString()
     license: string;
 
-    @IsNotEmpty()
-    @IsBoolean()
+    // @IsNotEmpty()
+    // @IsBoolean()
     downloadable: boolean;
 
     @IsNotEmpty()

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
@@ -40,8 +40,15 @@ export class AlbumsService {
         return this.albumsRepository.update({ id: album.id }, albumData);
     }
 
-    async delete(album: FindAlbumDTO): Promise<DeleteResult> {
-        return this.albumsRepository.delete(album);
+    async delete(albumDTO: FindAlbumDTO): Promise<DeleteResult> {
+        const album = await this.albumsRepository.findOne(albumDTO);
+
+        if (!album) {
+            throw new BadRequestException();
+        }
+
+        this.minioClientService.delete(album.coverFilename);
+        return this.albumsRepository.delete(album.id);
     }
 
     async uploadFileCover(

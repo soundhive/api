@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
@@ -39,8 +39,15 @@ export class TracksService {
         return this.trackRepository.update({ id: track.id }, trackData);
     }
 
-    async delete(track: FindTrackDTO): Promise<DeleteResult> {
-        return this.trackRepository.delete({ id: track.id });
+    async delete(trackDTO: FindTrackDTO): Promise<DeleteResult> {
+        const track = await this.trackRepository.findOne(trackDTO);
+
+        if (!track) {
+            throw new BadRequestException();
+        }
+
+        this.minioClientService.delete(track.filename);
+        return this.trackRepository.delete(track.id);
     }
 
     async uploadTrackFile(
