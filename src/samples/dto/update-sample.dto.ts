@@ -20,11 +20,6 @@ export class UpdateSampleDTO {
     @IsOptional()
     @IsNotEmpty()
     @IsString()
-    genre: string;
-
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
     filename: string;
 
     @IsOptional()

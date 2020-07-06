@@ -15,10 +15,6 @@ export class CreateSampleDTO {
     @IsString()
     description: string;
 
-    @IsNotEmpty()
-    @IsString()
-    genre: string;
-
     @IsOptional()
     @IsString()
     @IsIn(['public', 'followers'])

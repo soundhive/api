@@ -19,10 +19,6 @@ export class InsertSampleDTO {
 
     @IsNotEmpty()
     @IsString()
-    genre: string;
-
-    @IsNotEmpty()
-    @IsString()
     filename: string;
 
     @IsNotEmpty()
