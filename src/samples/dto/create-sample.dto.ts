@@ -24,7 +24,8 @@ export class CreateSampleDTO {
     @IsString()
     license: string;
 
-    // @IsNotEmpty()
-    // @IsBoolean()
-    downloadable: boolean;
+    @IsNotEmpty()
+    @IsString()
+    @IsIn(["true", "false"])
+    downloadable: string;
 }
