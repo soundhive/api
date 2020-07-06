@@ -26,6 +26,6 @@ export class CreateSampleDTO {
 
     @IsNotEmpty()
     @IsString()
-    @IsIn(["true", "false"])
+    @IsIn(['true', 'false'])
     downloadable: string;
 }

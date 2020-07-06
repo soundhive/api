@@ -36,7 +36,7 @@ export class SamplesController {
         private readonly samplesService: SamplesService,
         private readonly usersService: UsersService,
         private readonly listeningsService: ListeningsService,
-    ) { }
+    ) {}
 
     @Post()
     @UseGuards(JwtAuthGuard)
@@ -78,7 +78,7 @@ export class SamplesController {
         return new Sample(
             await this.samplesService.create({
                 ...createSampleDTO,
-                downloadable: createSampleDTO.downloadable === "true",
+                downloadable: createSampleDTO.downloadable === 'true',
                 user,
                 filename,
             }),

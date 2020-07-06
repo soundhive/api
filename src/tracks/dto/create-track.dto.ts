@@ -19,7 +19,7 @@ export class CreateTrackDTO {
 
     @IsNotEmpty()
     @IsString()
-    @IsIn(["true", "false"])
+    @IsIn(['true', 'false'])
     downloadable: string;
 
     @IsNotEmpty()

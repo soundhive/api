@@ -42,7 +42,7 @@ export class TracksController {
         private readonly usersService: UsersService,
         private readonly albumsService: AlbumsService,
         private readonly listeningsService: ListeningsService,
-    ) { }
+    ) {}
 
     @Post()
     @UseGuards(JwtAuthGuard)
@@ -92,7 +92,7 @@ export class TracksController {
         return new Track(
             await this.tracksService.create({
                 ...createTrackDTO,
-                downloadable: createTrackDTO.downloadable === "true",
+                downloadable: createTrackDTO.downloadable === 'true',
                 user,
                 album,
                 filename,
