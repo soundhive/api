@@ -92,6 +92,7 @@ export class TracksController {
         return new Track(
             await this.tracksService.create({
                 ...createTrackDTO,
+                downloadable: createTrackDTO.downloadable === 'true',
                 user,
                 album,
                 filename,

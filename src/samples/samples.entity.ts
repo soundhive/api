@@ -30,9 +30,6 @@ export class Sample extends BaseEntity {
     description: string;
 
     @Column()
-    genre: string;
-
-    @Column()
     filename: string;
 
     @OneToMany((type) => Listening, (listening) => listening.sample)

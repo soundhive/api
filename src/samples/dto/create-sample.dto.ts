@@ -15,10 +15,6 @@ export class CreateSampleDTO {
     @IsString()
     description: string;
 
-    @IsNotEmpty()
-    @IsString()
-    genre: string;
-
     @IsOptional()
     @IsString()
     @IsIn(['public', 'followers'])
@@ -28,7 +24,8 @@ export class CreateSampleDTO {
     @IsString()
     license: string;
 
-    // @IsNotEmpty()
-    // @IsBoolean()
-    downloadable: boolean;
+    @IsNotEmpty()
+    @IsString()
+    @IsIn(['true', 'false'])
+    downloadable: string;
 }

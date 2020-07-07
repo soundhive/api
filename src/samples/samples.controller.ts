@@ -78,6 +78,7 @@ export class SamplesController {
         return new Sample(
             await this.samplesService.create({
                 ...createSampleDTO,
+                downloadable: createSampleDTO.downloadable === 'true',
                 user,
                 filename,
             }),
