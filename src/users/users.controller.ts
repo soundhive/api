@@ -19,11 +19,11 @@ import { ListeningsService } from 'src/listenings/listenings.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Follow } from 'src/follows/follow.entity';
 import { FollowsService } from 'src/follows/follows.service';
-import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { Album } from 'src/albums/album.entity';
 import { AlbumsService } from 'src/albums/albums.service';
 import { TracksService } from 'src/tracks/tracks.service';
 import { Track } from 'src/tracks/track.entity';
+import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
@@ -112,12 +112,9 @@ export class UsersController {
     @Delete(':username/follow')
     async unfollowUser(
         @Param() findUserDTO: FindUserDTO,
-        @Request() req: { user: AuthenticatedUserDTO },
+        @Request() req: ValidatedJWTReq,
     ): Promise<void> {
-        const emitor = await this.usersService.findOne(req.user);
-        if (!emitor) {
-            throw new BadRequestException('Invalid user.');
-        }
+        const emitor = req.user;
         const target = await this.usersService.findOne(findUserDTO);
         if (!target) {
             throw new BadRequestException('Could not find user.');
@@ -139,19 +136,15 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Post(':username/follow')
     async follow(
-        @Request() req: { user: AuthenticatedUserDTO },
+        @Request() req: ValidatedJWTReq,
         @Param() findUserDTO: FindUserDTO,
     ): Promise<Follow> {
-        const emitor = await this.usersService.findOne(req.user);
-        if (!emitor) {
-            throw new BadRequestException('Invalid user.');
-        }
         const target = await this.usersService.findOne(findUserDTO);
         if (!target) {
             throw new BadRequestException('Could not find user.');
         }
         const existingFollow = await this.followsService.findOne({
-            from: emitor,
+            from: req.user,
             to: target,
         });
         if (existingFollow) {
@@ -160,6 +153,6 @@ export class UsersController {
             );
         }
 
-        return this.followsService.create({ from: emitor, to: target });
+        return this.followsService.create({ from: req.user, to: target });
     }
 }

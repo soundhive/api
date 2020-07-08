@@ -11,24 +11,22 @@ import {
     Put,
     Query,
     Request,
-    UnauthorizedException,
     UseGuards,
     UploadedFile,
     UseInterceptors,
 } from '@nestjs/common';
 import { AlbumsService } from 'src/albums/albums.service';
-import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FindLastListeningsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 import { TrackListeningsResponseDTO } from 'src/listenings/dto/responses/track-listenings-response.dto';
 import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
-import { UsersService } from 'src/users/users.service';
 
 import { UpdateResult } from 'typeorm';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
@@ -39,7 +37,6 @@ import { TracksService } from './tracks.service';
 export class TracksController {
     constructor(
         private readonly tracksService: TracksService,
-        private readonly usersService: UsersService,
         private readonly albumsService: AlbumsService,
         private readonly listeningsService: ListeningsService,
     ) {}
@@ -48,7 +45,7 @@ export class TracksController {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('trackFile'))
     async create(
-        @Request() req: { user: AuthenticatedUserDTO },
+        @Request() req: ValidatedJWTReq,
         @Body() createTrackDTO: CreateTrackDTO,
         @UploadedFile() file: BufferedFile,
     ): Promise<Track> {
@@ -70,12 +67,6 @@ export class TracksController {
             );
         }
 
-        const user = await this.usersService.findOne(req.user);
-
-        if (!user) {
-            throw new UnauthorizedException('Invalid user');
-        }
-
         const album = await this.albumsService.findOne({
             id: createTrackDTO.album,
         });
@@ -93,7 +84,7 @@ export class TracksController {
             await this.tracksService.create({
                 ...createTrackDTO,
                 downloadable: createTrackDTO.downloadable === 'true',
-                user,
+                user: req.user,
                 album,
                 filename,
             }),
@@ -168,11 +159,10 @@ export class TracksController {
     @Post(':id/listen')
     async listen(
         @Param() findTrackDTO: FindTrackDTO,
-        @Request() req: { user: AuthenticatedUserDTO },
+        @Request() req: ValidatedJWTReq,
     ): Promise<void> {
-        const user = await this.usersService.findOne(req.user);
         const track = await this.tracksService.findOne(findTrackDTO);
-        const listening = new Listening({ user, track });
+        const listening = new Listening({ user: req.user, track });
         await this.listeningsService.create(listening);
     }
 
