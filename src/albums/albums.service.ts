@@ -52,13 +52,16 @@ export class AlbumsService {
   }
 
   async uploadFileCover(
-    image: BufferedFile,
+    file: BufferedFile,
     subFolder: string,
   ): Promise<string> {
-    const uploadedImage = await this.minioClientService.upload(
-      image,
-      subFolder,
-    );
+    if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
+      throw new BadRequestException(
+        `Invalid cover file media type: ${file.mimetype}`,
+      );
+    }
+
+    const uploadedImage = await this.minioClientService.upload(file, subFolder);
 
     return uploadedImage.path;
   }

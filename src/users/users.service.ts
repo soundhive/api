@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
@@ -31,6 +31,12 @@ export class UsersService {
     file: BufferedFile,
     subFolder: string,
   ): Promise<string> {
+    if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
+      throw new BadRequestException(
+        `Invalid profile picture image format: ${file.mimetype}`,
+      );
+    }
+
     const uploadedProfilePicture = await this.minioClientService.upload(
       file,
       subFolder,

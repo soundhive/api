@@ -45,12 +45,6 @@ export class AlbumsController {
       throw new BadRequestException('Missing coverFile');
     }
 
-    if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
-      throw new BadRequestException(
-        `Invalid cover file media type: ${file.mimetype}`,
-      );
-    }
-
     const albumCover: string = await this.albumsService.uploadFileCover(
       file,
       'albums',

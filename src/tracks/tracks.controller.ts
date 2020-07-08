@@ -53,20 +53,6 @@ export class TracksController {
       throw new BadRequestException('Missing track file');
     }
 
-    if (
-      ![
-        'audio/flac',
-        'audio/mpeg',
-        'audio/ogg',
-        'audio/wav',
-        'audio/wave',
-      ].includes(file.mimetype)
-    ) {
-      throw new BadRequestException(
-        `Invalid track file media type: ${file.mimetype}`,
-      );
-    }
-
     const album = await this.albumsService.findOne({
       id: createTrackDTO.album,
     });

@@ -52,12 +52,6 @@ export class UsersController {
       throw new BadRequestException('Missing profile picture file');
     }
 
-    if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
-      throw new BadRequestException(
-        `Invalid profile picture image format: ${file.mimetype}`,
-      );
-    }
-
     const filename: string = await this.usersService.uploadProfilePicture(
       file,
       'users/avatars',
