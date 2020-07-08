@@ -12,15 +12,15 @@ import { Album } from '../albums/album.entity';
 import { AlbumsService } from '../albums/albums.service';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Track, Album]),
-        forwardRef(() => UsersModule),
-        forwardRef(() => ListeningsModule),
-        forwardRef(() => AlbumsModule),
-        MinioClientModule,
-    ],
-    controllers: [TracksController],
-    providers: [TracksService, AlbumsService],
-    exports: [TracksService],
+  imports: [
+    TypeOrmModule.forFeature([Track, Album]),
+    forwardRef(() => UsersModule),
+    forwardRef(() => ListeningsModule),
+    forwardRef(() => AlbumsModule),
+    MinioClientModule,
+  ],
+  controllers: [TracksController],
+  providers: [TracksService, AlbumsService],
+  exports: [TracksService],
 })
 export class TracksModule {}

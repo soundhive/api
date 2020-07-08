@@ -1,5 +1,5 @@
 export class AuthUserDTO {
-    username: string;
+  username: string;
 
-    password: string;
+  password: string;
 }

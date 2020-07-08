@@ -3,8 +3,8 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { Exists } from 'src/validators/exists.validation';
 
 export class FindFollowsUserDTO {
-    @IsNotEmpty()
-    @IsString()
-    @Exists(User)
-    username: string;
+  @IsNotEmpty()
+  @IsString()
+  @Exists(User)
+  username: string;
 }

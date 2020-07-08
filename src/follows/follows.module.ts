@@ -5,11 +5,8 @@ import { FollowsService } from './follows.service';
 import { Follow } from './follow.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Follow]),
-        forwardRef(() => UsersModule),
-    ],
-    providers: [FollowsService],
-    exports: [FollowsService],
+  imports: [TypeOrmModule.forFeature([Follow]), forwardRef(() => UsersModule)],
+  providers: [FollowsService],
+  exports: [FollowsService],
 })
 export class FollowsModule {}

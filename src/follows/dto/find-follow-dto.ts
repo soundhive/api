@@ -2,7 +2,7 @@
 import { User } from 'src/users/user.entity';
 
 export class FindFollowDTO {
-    from: User;
+  from: User;
 
-    to: User;
+  to: User;
 }

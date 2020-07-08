@@ -11,55 +11,55 @@ import { UpdateAlbumDTO } from './dto/update-album.dto';
 
 @Injectable()
 export class AlbumsService {
-    constructor(
-        @InjectRepository(Album)
-        private albumsRepository: Repository<Album>,
-        private minioClientService: MinioClientService,
-    ) {}
+  constructor(
+    @InjectRepository(Album)
+    private albumsRepository: Repository<Album>,
+    private minioClientService: MinioClientService,
+  ) {}
 
-    async create(insertAlbumDTO: InsertAlbumDTO): Promise<Album> {
-        return this.albumsRepository.save(insertAlbumDTO);
+  async create(insertAlbumDTO: InsertAlbumDTO): Promise<Album> {
+    return this.albumsRepository.save(insertAlbumDTO);
+  }
+
+  async find(): Promise<Album[]> {
+    return this.albumsRepository.find();
+  }
+
+  async findOne(album: FindAlbumDTO): Promise<Album | undefined> {
+    return this.albumsRepository.findOne({ id: album.id });
+  }
+
+  async findBy(params: {}): Promise<Album[]> {
+    return this.albumsRepository.find(params);
+  }
+
+  async update(
+    album: FindAlbumDTO,
+    albumData: UpdateAlbumDTO,
+  ): Promise<UpdateResult> {
+    return this.albumsRepository.update({ id: album.id }, albumData);
+  }
+
+  async delete(albumDTO: FindAlbumDTO): Promise<DeleteResult> {
+    const album = await this.albumsRepository.findOne(albumDTO);
+
+    if (!album) {
+      throw new BadRequestException();
     }
 
-    async find(): Promise<Album[]> {
-        return this.albumsRepository.find();
-    }
+    this.minioClientService.delete(album.coverFilename);
+    return this.albumsRepository.delete(album.id);
+  }
 
-    async findOne(album: FindAlbumDTO): Promise<Album | undefined> {
-        return this.albumsRepository.findOne({ id: album.id });
-    }
+  async uploadFileCover(
+    image: BufferedFile,
+    subFolder: string,
+  ): Promise<string> {
+    const uploadedImage = await this.minioClientService.upload(
+      image,
+      subFolder,
+    );
 
-    async findBy(params: {}): Promise<Album[]> {
-        return this.albumsRepository.find(params);
-    }
-
-    async update(
-        album: FindAlbumDTO,
-        albumData: UpdateAlbumDTO,
-    ): Promise<UpdateResult> {
-        return this.albumsRepository.update({ id: album.id }, albumData);
-    }
-
-    async delete(albumDTO: FindAlbumDTO): Promise<DeleteResult> {
-        const album = await this.albumsRepository.findOne(albumDTO);
-
-        if (!album) {
-            throw new BadRequestException();
-        }
-
-        this.minioClientService.delete(album.coverFilename);
-        return this.albumsRepository.delete(album.id);
-    }
-
-    async uploadFileCover(
-        image: BufferedFile,
-        subFolder: string,
-    ): Promise<string> {
-        const uploadedImage = await this.minioClientService.upload(
-            image,
-            subFolder,
-        );
-
-        return uploadedImage.path;
-    }
+    return uploadedImage.path;
+  }
 }

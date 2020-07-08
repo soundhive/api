@@ -1,19 +1,19 @@
 import {
-    BadRequestException,
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpCode,
-    NotFoundException,
-    Param,
-    Post,
-    Put,
-    Request,
-    UnauthorizedException,
-    UseGuards,
-    UploadedFile,
-    UseInterceptors,
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Request,
+  UnauthorizedException,
+  UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Listening } from 'src/listenings/listening.entity';
@@ -31,128 +31,128 @@ import { SamplesService } from './samples.service';
 
 @Controller('samples')
 export class SamplesController {
-    constructor(
-        private readonly samplesService: SamplesService,
-        private readonly listeningsService: ListeningsService,
-    ) {}
+  constructor(
+    private readonly samplesService: SamplesService,
+    private readonly listeningsService: ListeningsService,
+  ) {}
 
-    @Post()
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(FileInterceptor('sampleFile'))
-    async create(
-        @Request() req: ValidatedJWTReq,
-        @Body() createSampleDTO: CreateSampleDTO,
-        @UploadedFile() file: BufferedFile,
-    ): Promise<Sample> {
-        if (!file) {
-            throw new BadRequestException('Missing sample file');
-        }
-
-        if (
-            ![
-                'audio/flac',
-                'audio/mpeg',
-                'audio/ogg',
-                'audio/wav',
-                'audio/wave',
-            ].includes(file.mimetype)
-        ) {
-            throw new BadRequestException(
-                `Invalid sample file media type: ${file.mimetype}`,
-            );
-        }
-
-        const filename: string = await this.samplesService.uploadSampleFile(
-            file,
-            'samples',
-        );
-
-        return new Sample(
-            await this.samplesService.create({
-                ...createSampleDTO,
-                downloadable: createSampleDTO.downloadable === 'true',
-                user: req.user,
-                filename,
-            }),
-        );
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('sampleFile'))
+  async create(
+    @Request() req: ValidatedJWTReq,
+    @Body() createSampleDTO: CreateSampleDTO,
+    @UploadedFile() file: BufferedFile,
+  ): Promise<Sample> {
+    if (!file) {
+      throw new BadRequestException('Missing sample file');
     }
 
-    @Get()
-    async find(): Promise<Sample[]> {
-        return this.samplesService.find();
+    if (
+      ![
+        'audio/flac',
+        'audio/mpeg',
+        'audio/ogg',
+        'audio/wav',
+        'audio/wave',
+      ].includes(file.mimetype)
+    ) {
+      throw new BadRequestException(
+        `Invalid sample file media type: ${file.mimetype}`,
+      );
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Get(':id')
-    async findOne(
-        @Param() findSampleDTO: FindSampleDTO,
-        @Request() req: ValidatedJWTReq,
-    ): Promise<Sample> {
-        const sample: Sample | undefined = await this.samplesService.findOne(
-            findSampleDTO,
-        );
+    const filename: string = await this.samplesService.uploadSampleFile(
+      file,
+      'samples',
+    );
 
-        if (!sample) {
-            throw new NotFoundException();
-        }
+    return new Sample(
+      await this.samplesService.create({
+        ...createSampleDTO,
+        downloadable: createSampleDTO.downloadable === 'true',
+        user: req.user,
+        filename,
+      }),
+    );
+  }
 
-        if (await this.samplesService.isVisibleByUser(sample, req.user)) {
-            return sample;
-        }
+  @Get()
+  async find(): Promise<Sample[]> {
+    return this.samplesService.find();
+  }
 
-        throw new UnauthorizedException();
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async findOne(
+    @Param() findSampleDTO: FindSampleDTO,
+    @Request() req: ValidatedJWTReq,
+  ): Promise<Sample> {
+    const sample: Sample | undefined = await this.samplesService.findOne(
+      findSampleDTO,
+    );
+
+    if (!sample) {
+      throw new NotFoundException();
     }
 
-    // @Get(':id/stats')
-    // async findStats(@Param() findSampleDTO: FindSampleDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<SampleListeningsResponseDTO> {
-    //   return this.listeningsService.findForSample({ ...findSampleDTO, ...findListeningsDTO })
-    // }
-
-    // @Get(':id/stats/last/:count/:period')
-    // async findLastStats(@Param() findLastListeningsForSampleDTO: FindLastListeningsForSampleDTO): Promise<SampleListeningsResponseDTO> {
-    //   return this.listeningsService.findLastForSample(findLastListeningsForSampleDTO)
-    // }
-
-    @UseGuards(JwtAuthGuard)
-    @Put(':id')
-    async update(
-        @Param() findSampleDTO: FindSampleDTO,
-        @Body() sampleData: UpdateSampleDTO,
-    ): Promise<Sample> {
-        const result: UpdateResult = await this.samplesService.update(
-            findSampleDTO,
-            sampleData,
-        );
-
-        if (!result.affected || result.affected === 0) {
-            throw BadRequestException;
-        }
-
-        const sample: Sample | undefined = await this.samplesService.findOne(
-            findSampleDTO,
-        );
-
-        if (!sample) {
-            throw BadRequestException;
-        }
-
-        return sample;
+    if (await this.samplesService.isVisibleByUser(sample, req.user)) {
+      return sample;
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Post(':id/listen')
-    async listen(
-        @Param() findSampleDTO: FindSampleDTO,
-        @Request() req: ValidatedJWTReq,
-    ): Promise<void> {
-        const sample = await this.samplesService.findOne(findSampleDTO);
-        const listening = new Listening({ user: req.user, sample });
-        await this.listeningsService.create(listening);
+    throw new UnauthorizedException();
+  }
+
+  // @Get(':id/stats')
+  // async findStats(@Param() findSampleDTO: FindSampleDTO, @Query() findListeningsDTO: FindListeningsDTO): Promise<SampleListeningsResponseDTO> {
+  //   return this.listeningsService.findForSample({ ...findSampleDTO, ...findListeningsDTO })
+  // }
+
+  // @Get(':id/stats/last/:count/:period')
+  // async findLastStats(@Param() findLastListeningsForSampleDTO: FindLastListeningsForSampleDTO): Promise<SampleListeningsResponseDTO> {
+  //   return this.listeningsService.findLastForSample(findLastListeningsForSampleDTO)
+  // }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(
+    @Param() findSampleDTO: FindSampleDTO,
+    @Body() sampleData: UpdateSampleDTO,
+  ): Promise<Sample> {
+    const result: UpdateResult = await this.samplesService.update(
+      findSampleDTO,
+      sampleData,
+    );
+
+    if (!result.affected || result.affected === 0) {
+      throw BadRequestException;
     }
 
-    @Delete(':id')
-    @HttpCode(204)
-    async delete(@Param() sample: FindSampleDTO): Promise<void> {
-        await this.samplesService.delete(sample);
+    const sample: Sample | undefined = await this.samplesService.findOne(
+      findSampleDTO,
+    );
+
+    if (!sample) {
+      throw BadRequestException;
     }
+
+    return sample;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/listen')
+  async listen(
+    @Param() findSampleDTO: FindSampleDTO,
+    @Request() req: ValidatedJWTReq,
+  ): Promise<void> {
+    const sample = await this.samplesService.findOne(findSampleDTO);
+    const listening = new Listening({ user: req.user, sample });
+    await this.listeningsService.create(listening);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(@Param() sample: FindSampleDTO): Promise<void> {
+    await this.samplesService.delete(sample);
+  }
 }

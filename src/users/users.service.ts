@@ -7,20 +7,20 @@ import { FindUserDTO } from './dto/find-user.dto';
 
 @Injectable()
 export class UsersService {
-    constructor(
-        @InjectRepository(User)
-        private usersRepository: Repository<User>,
-    ) {}
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-    async create(createUserDTO: CreateUserDTO): Promise<User> {
-        return this.usersRepository.save(createUserDTO);
-    }
+  async create(createUserDTO: CreateUserDTO): Promise<User> {
+    return this.usersRepository.save(createUserDTO);
+  }
 
-    async find(): Promise<User[]> {
-        return this.usersRepository.find();
-    }
+  async find(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
 
-    async findOne(user: FindUserDTO): Promise<User | undefined> {
-        return this.usersRepository.findOne({ username: user.username });
-    }
+  async findOne(user: FindUserDTO): Promise<User | undefined> {
+    return this.usersRepository.findOne({ username: user.username });
+  }
 }

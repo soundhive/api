@@ -8,14 +8,14 @@ import { AlbumsService } from './albums.service';
 import { Album } from './album.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Album]),
-        forwardRef(() => UsersModule),
-        forwardRef(() => TracksModule),
-        MinioClientModule,
-    ],
-    controllers: [AlbumsController],
-    providers: [AlbumsService],
-    exports: [AlbumsService],
+  imports: [
+    TypeOrmModule.forFeature([Album]),
+    forwardRef(() => UsersModule),
+    forwardRef(() => TracksModule),
+    MinioClientModule,
+  ],
+  controllers: [AlbumsController],
+  providers: [AlbumsService],
+  exports: [AlbumsService],
 })
 export class AlbumsModule {}

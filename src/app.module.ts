@@ -14,30 +14,30 @@ import { MinioClientModule } from './minio-client/minio-client.module';
 import { SamplesModule } from './samples/samples.module';
 
 export function DatabaseOrmModule(): DynamicModule {
-    // we could load the configuration from dotEnv here,
-    // but typeORM cli would not be able to find the configuration file.
+  // we could load the configuration from dotEnv here,
+  // but typeORM cli would not be able to find the configuration file.
 
-    return TypeOrmModule.forRoot(ormconfig);
+  return TypeOrmModule.forRoot(ormconfig);
 }
 
 @Module({
-    imports: [
-        ConfigModule.forRoot(),
-        AuthModule,
-        UsersModule,
-        AlbumsModule,
-        TracksModule,
-        TypeOrmModule.forRoot(ormconfig),
-        LoggerModule.forRoot({
-            pinoHttp: {
-                level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
-                prettyPrint: process.env.NODE_ENV !== 'production',
-            },
-        }),
-        MinioClientModule,
-        SamplesModule,
-    ],
-    controllers: [AppController],
-    providers: [AppService],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    UsersModule,
+    AlbumsModule,
+    TracksModule,
+    TypeOrmModule.forRoot(ormconfig),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+        prettyPrint: process.env.NODE_ENV !== 'production',
+      },
+    }),
+    MinioClientModule,
+    SamplesModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

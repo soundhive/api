@@ -1,5 +1,5 @@
 export class AuthenticatedUserDTO {
-    userId: string;
+  userId: string;
 
-    username: string;
+  username: string;
 }

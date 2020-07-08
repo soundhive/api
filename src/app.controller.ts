@@ -1,10 +1,10 @@
 import {
-    Body,
-    Controller,
-    Get,
-    Post,
-    Request,
-    UseGuards,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 
 import { AppService } from './app.service';
@@ -17,22 +17,22 @@ import { ValidatedJWTReq } from './auth/dto/validated-jwt-req';
 
 @Controller()
 export class AppController {
-    constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
-    @UseGuards(LocalAuthGuard)
-    @Post('auth/login')
-    login(@Body() authUserDTO: AuthUserDTO): { access_token: string } {
-        return this.authService.login(new User(authUserDTO));
-    }
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  login(@Body() authUserDTO: AuthUserDTO): { access_token: string } {
+    return this.authService.login(new User(authUserDTO));
+  }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    static getProfile(@Request() req: ValidatedJWTReq): User {
-        return req.user;
-    }
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  static getProfile(@Request() req: ValidatedJWTReq): User {
+    return req.user;
+  }
 
-    @Get('/')
-    static getRoot(): { message: string } {
-        return AppService.getHello();
-    }
+  @Get('/')
+  static getRoot(): { message: string } {
+    return AppService.getHello();
+  }
 }

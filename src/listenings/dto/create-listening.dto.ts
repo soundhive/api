@@ -3,9 +3,9 @@ import { User } from 'src/users/user.entity';
 import { Exists } from 'src/validators/exists.validation';
 
 export class CreateListeningDTO {
-    @Exists(Track)
-    track: Track;
+  @Exists(Track)
+  track: Track;
 
-    @Exists(User)
-    user: User;
+  @Exists(User)
+  user: User;
 }

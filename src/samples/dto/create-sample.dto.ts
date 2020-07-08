@@ -1,31 +1,31 @@
 import {
-    IsNotEmpty,
-    IsString,
-    IsOptional,
-    IsIn,
-    // IsBoolean,
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsIn,
+  // IsBoolean,
 } from 'class-validator';
 
 export class CreateSampleDTO {
-    @IsNotEmpty()
-    @IsString()
-    title: string;
+  @IsNotEmpty()
+  @IsString()
+  title: string;
 
-    @IsNotEmpty()
-    @IsString()
-    description: string;
+  @IsNotEmpty()
+  @IsString()
+  description: string;
 
-    @IsOptional()
-    @IsString()
-    @IsIn(['public', 'followers'])
-    visibility: string;
+  @IsOptional()
+  @IsString()
+  @IsIn(['public', 'followers'])
+  visibility: string;
 
-    @IsNotEmpty()
-    @IsString()
-    license: string;
+  @IsNotEmpty()
+  @IsString()
+  license: string;
 
-    @IsNotEmpty()
-    @IsString()
-    @IsIn(['true', 'false'])
-    downloadable: string;
+  @IsNotEmpty()
+  @IsString()
+  @IsIn(['true', 'false'])
+  downloadable: string;
 }

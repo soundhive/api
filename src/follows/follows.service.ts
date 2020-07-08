@@ -10,54 +10,54 @@ import { FindFollowDTO } from './dto/find-follow-dto';
 
 @Injectable()
 export class FollowsService {
-    constructor(
-        @InjectRepository(Follow)
-        private followRepository: Repository<Follow>,
-    ) {}
+  constructor(
+    @InjectRepository(Follow)
+    private followRepository: Repository<Follow>,
+  ) {}
 
-    async create(createFollowDTO: CreateFollowDTO): Promise<Follow> {
-        const existingFollow:
-            | Follow
-            | undefined = await this.followRepository.findOne({
-            from: createFollowDTO.from,
-            to: createFollowDTO.to,
-        });
-        if (!existingFollow) {
-            return this.followRepository.save(createFollowDTO);
-        }
-
-        return existingFollow;
+  async create(createFollowDTO: CreateFollowDTO): Promise<Follow> {
+    const existingFollow:
+      | Follow
+      | undefined = await this.followRepository.findOne({
+      from: createFollowDTO.from,
+      to: createFollowDTO.to,
+    });
+    if (!existingFollow) {
+      return this.followRepository.save(createFollowDTO);
     }
 
-    async delete(deleteFollowDTO: DeleteFollowDTO): Promise<DeleteResult> {
-        return this.followRepository.delete(deleteFollowDTO);
-    }
+    return existingFollow;
+  }
 
-    async findUserFollowed(
-        findFollowsUserDTO: FindFollowsUserDTO,
-    ): Promise<User[]> {
-        const followings: Follow[] = await this.followRepository.find({
-            from: findFollowsUserDTO,
-        });
+  async delete(deleteFollowDTO: DeleteFollowDTO): Promise<DeleteResult> {
+    return this.followRepository.delete(deleteFollowDTO);
+  }
 
-        return followings.map((e) => e.to);
-    }
+  async findUserFollowed(
+    findFollowsUserDTO: FindFollowsUserDTO,
+  ): Promise<User[]> {
+    const followings: Follow[] = await this.followRepository.find({
+      from: findFollowsUserDTO,
+    });
 
-    async findUserFollowers(
-        findFollowsUserDTO: FindFollowsUserDTO,
-    ): Promise<User[]> {
-        const followings: Follow[] = await this.followRepository.find({
-            to: findFollowsUserDTO,
-        });
+    return followings.map((e) => e.to);
+  }
 
-        return followings.map((e) => e.from);
-    }
+  async findUserFollowers(
+    findFollowsUserDTO: FindFollowsUserDTO,
+  ): Promise<User[]> {
+    const followings: Follow[] = await this.followRepository.find({
+      to: findFollowsUserDTO,
+    });
 
-    async findBy(params: {}): Promise<Follow[]> {
-        return this.followRepository.find(params);
-    }
+    return followings.map((e) => e.from);
+  }
 
-    async findOne(follow: FindFollowDTO): Promise<Follow | undefined> {
-        return this.followRepository.findOne(follow);
-    }
+  async findBy(params: {}): Promise<Follow[]> {
+    return this.followRepository.find(params);
+  }
+
+  async findOne(follow: FindFollowDTO): Promise<Follow | undefined> {
+    return this.followRepository.findOne(follow);
+  }
 }

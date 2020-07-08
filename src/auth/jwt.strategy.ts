@@ -7,15 +7,15 @@ import { AuthenticatedUserDTO } from './dto/authenticated-user.dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor() {
-        super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false,
-            secretOrKey: jwtConstants.secret,
-        });
-    }
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: jwtConstants.secret,
+    });
+  }
 
-    validate(payload: { sub: string; username: string }): AuthenticatedUserDTO {
-        return { userId: payload.sub, username: payload.username };
-    }
+  validate(payload: { sub: string; username: string }): AuthenticatedUserDTO {
+    return { userId: payload.sub, username: payload.username };
+  }
 }
