@@ -15,8 +15,8 @@ import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 import { UserListeningsResponseDTO } from 'src/listenings/dto/responses/user-listenings-response.dto';
 import { ListeningsService } from 'src/listenings/listenings.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Support } from 'src/supports/support.entity';
-import { SupportsService } from 'src/supports/supports.service';
+import { Follow } from 'src/follows/follow.entity';
+import { FollowsService } from 'src/follows/follows.service';
 import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { DeleteResult } from 'typeorm';
 import { Album } from 'src/albums/album.entity';
@@ -34,7 +34,7 @@ export class UsersController {
         private readonly listeningsService: ListeningsService,
         private readonly albumsService: AlbumsService,
         private readonly tracksService: TracksService,
-        private readonly supportsService: SupportsService,
+        private readonly followsService: FollowsService,
     ) {}
 
     @Post()
@@ -96,38 +96,38 @@ export class UsersController {
         );
     }
 
-    @Get(':username/supports')
-    async findSupports(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
-        return this.supportsService.findUserSupported(findUserDTO);
+    @Get(':username/followings')
+    async findFollowings(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
+        return this.followsService.findUserFollowed(findUserDTO);
     }
 
-    @Get(':username/supporters')
-    async findSupporters(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
-        return this.supportsService.findUserSupporters(findUserDTO);
+    @Get(':username/followers')
+    async findFollowers(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
+        return this.followsService.findUserFollowers(findUserDTO);
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete(':username/unsupport')
-    async unSupportUser(
+    @Delete(':username/follow')
+    async unfollowUser(
         @Param() findUserDTO: FindUserDTO,
         @Request() req: { user: AuthenticatedUserDTO },
     ): Promise<DeleteResult> {
         const emitor = await this.usersService.findOne(req.user);
         const target = await this.usersService.findOne(findUserDTO);
-        const support = new Support({ from: emitor, to: target });
-        return this.supportsService.delete(support);
+        const follow = new Follow({ from: emitor, to: target });
+        return this.followsService.delete(follow);
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post(':username/support')
-    async support(
+    @Post(':username/follow')
+    async follow(
         @Request() req: { user: AuthenticatedUserDTO },
         @Param() findUserDTO: FindUserDTO,
-    ): Promise<Support> {
+    ): Promise<Follow> {
         const emitor = await this.usersService.findOne(req.user);
         const target = await this.usersService.findOne(findUserDTO);
-        const support = new Support({ from: emitor, to: target });
+        const follow = new Follow({ from: emitor, to: target });
 
-        return this.supportsService.create(support);
+        return this.followsService.create(follow);
     }
 }

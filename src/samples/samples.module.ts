@@ -1,6 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SupportsModule } from 'src/supports/supports.module';
+import { FollowsModule } from 'src/follows/follows.module';
 import { UsersModule } from 'src/users/users.module';
 import { ListeningsModule } from 'src/listenings/listenings.module';
 import { AlbumsModule } from 'src/albums/albums.module';
@@ -16,7 +16,7 @@ import { SamplesController } from './samples.controller';
         forwardRef(() => ListeningsModule),
         forwardRef(() => AlbumsModule),
         MinioClientModule,
-        forwardRef(() => SupportsModule),
+        forwardRef(() => FollowsModule),
     ],
     controllers: [SamplesController],
     providers: [SamplesService],

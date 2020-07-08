@@ -7,9 +7,9 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('supports')
-export class Support {
-    constructor(partial: Partial<Support>) {
+@Entity('follows')
+export class Follow {
+    constructor(partial: Partial<Follow>) {
         Object.assign(this, partial);
     }
 
@@ -17,11 +17,11 @@ export class Support {
     id: string;
 
     @CreateDateColumn()
-    supportedAt: Date;
+    followedAt: Date;
 
-    @ManyToOne((type) => User, (user) => user.supporters, { eager: true })
+    @ManyToOne((type) => User, (user) => user.followers, { eager: true })
     to: User;
 
-    @ManyToOne((type) => User, (user) => user.supporting, { eager: true })
+    @ManyToOne((type) => User, (user) => user.followers, { eager: true })
     from: User;
 }
