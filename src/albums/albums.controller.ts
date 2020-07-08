@@ -9,19 +9,17 @@ import {
     Post,
     Put,
     Request,
-    UnauthorizedException,
     UseGuards,
     BadRequestException,
     UploadedFile,
     UseInterceptors,
 } from '@nestjs/common';
-import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { UsersService } from 'src/users/users.service';
 import { TracksService } from 'src/tracks/tracks.service';
 import { Track } from 'src/tracks/track.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { Album } from './album.entity';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
@@ -32,7 +30,6 @@ import { UpdateAlbumDTO } from './dto/update-album.dto';
 export class AlbumsController {
     constructor(
         private readonly albumsService: AlbumsService,
-        private readonly usersService: UsersService,
         private readonly tracksService: TracksService,
     ) {}
 
@@ -40,7 +37,7 @@ export class AlbumsController {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('coverFile'))
     async create(
-        @Request() req: { user: AuthenticatedUserDTO },
+        @Request() req: ValidatedJWTReq,
         @Body() createAlbumDTO: CreateAlbumDTO,
         @UploadedFile() file: BufferedFile,
     ): Promise<Album> {
@@ -54,23 +51,18 @@ export class AlbumsController {
             );
         }
 
-        const user = await this.usersService.findOne(req.user);
-        if (!user) {
-            throw new UnauthorizedException();
-        }
-
         const albumCover: string = await this.albumsService.uploadFileCover(
             file,
             'albums',
         );
 
-        return new Album(
-            await this.albumsService.create({
-                ...createAlbumDTO,
-                user,
-                coverFilename: albumCover,
-            }),
-        );
+        const album = await this.albumsService.create({
+            ...createAlbumDTO,
+            user: req.user,
+            coverFilename: albumCover,
+        });
+
+        return new Album(album);
     }
 
     @Get()

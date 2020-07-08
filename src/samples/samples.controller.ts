@@ -15,15 +15,14 @@ import {
     UploadedFile,
     UseInterceptors,
 } from '@nestjs/common';
-import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
-import { UsersService } from 'src/users/users.service';
 
 import { UpdateResult } from 'typeorm';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { CreateSampleDTO } from './dto/create-sample.dto';
 import { FindSampleDTO } from './dto/find-sample.dto';
 import { UpdateSampleDTO } from './dto/update-sample.dto';
@@ -34,7 +33,6 @@ import { SamplesService } from './samples.service';
 export class SamplesController {
     constructor(
         private readonly samplesService: SamplesService,
-        private readonly usersService: UsersService,
         private readonly listeningsService: ListeningsService,
     ) {}
 
@@ -42,7 +40,7 @@ export class SamplesController {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('sampleFile'))
     async create(
-        @Request() req: { user: AuthenticatedUserDTO },
+        @Request() req: ValidatedJWTReq,
         @Body() createSampleDTO: CreateSampleDTO,
         @UploadedFile() file: BufferedFile,
     ): Promise<Sample> {
@@ -64,12 +62,6 @@ export class SamplesController {
             );
         }
 
-        const user = await this.usersService.findOne(req.user);
-
-        if (!user) {
-            throw new UnauthorizedException('Invalid user');
-        }
-
         const filename: string = await this.samplesService.uploadSampleFile(
             file,
             'samples',
@@ -79,7 +71,7 @@ export class SamplesController {
             await this.samplesService.create({
                 ...createSampleDTO,
                 downloadable: createSampleDTO.downloadable === 'true',
-                user,
+                user: req.user,
                 filename,
             }),
         );
@@ -94,7 +86,7 @@ export class SamplesController {
     @Get(':id')
     async findOne(
         @Param() findSampleDTO: FindSampleDTO,
-        @Request() req: { user: AuthenticatedUserDTO },
+        @Request() req: ValidatedJWTReq,
     ): Promise<Sample> {
         const sample: Sample | undefined = await this.samplesService.findOne(
             findSampleDTO,
@@ -104,11 +96,7 @@ export class SamplesController {
             throw new NotFoundException();
         }
 
-        const user = await this.usersService.findOne(req.user);
-        if (!user) {
-            throw new BadRequestException();
-        }
-        if (await this.samplesService.isVisibleByUser(sample, user)) {
+        if (await this.samplesService.isVisibleByUser(sample, req.user)) {
             return sample;
         }
 
@@ -155,11 +143,10 @@ export class SamplesController {
     @Post(':id/listen')
     async listen(
         @Param() findSampleDTO: FindSampleDTO,
-        @Request() req: { user: AuthenticatedUserDTO },
+        @Request() req: ValidatedJWTReq,
     ): Promise<void> {
-        const user = await this.usersService.findOne(req.user);
         const sample = await this.samplesService.findOne(findSampleDTO);
-        const listening = new Listening({ user, sample });
+        const listening = new Listening({ user: req.user, sample });
         await this.listeningsService.create(listening);
     }
 
