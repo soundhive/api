@@ -11,6 +11,8 @@ import {
   Delete,
   BadRequestException,
   HttpCode,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { FindLastListeningsForUserDTO } from 'src/listenings/dto/find-last-listenings-user.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
@@ -24,6 +26,8 @@ import { AlbumsService } from 'src/albums/albums.service';
 import { TracksService } from 'src/tracks/tracks.service';
 import { Track } from 'src/tracks/track.entity';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { BufferedFile } from 'src/minio-client/file.model';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
@@ -39,8 +43,30 @@ export class UsersController {
   ) {}
 
   @Post()
-  async create(@Body() createUserDTO: CreateUserDTO): Promise<User> {
-    return this.usersService.create(new User(createUserDTO));
+  @UseInterceptors(FileInterceptor('profile_picture'))
+  async create(
+    @Body() createUserDTO: CreateUserDTO,
+    @UploadedFile() file: BufferedFile,
+  ): Promise<User> {
+    if (!file) {
+      throw new BadRequestException('Missing profile picture file');
+    }
+
+    if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
+      throw new BadRequestException(
+        `Invalid profile picture image format: ${file.mimetype}`,
+      );
+    }
+
+    const filename: string = await this.usersService.uploadProfilePicture(
+      file,
+      'users/avatars',
+    );
+
+    return this.usersService.create({
+      ...createUserDTO,
+      profilePicture: filename,
+    });
   }
 
   @Get()

@@ -54,11 +54,11 @@ export class TracksService {
     track: BufferedFile,
     subFolder: string,
   ): Promise<string> {
-    const uploadTrackFile = await this.minioClientService.upload(
+    const uploadedTrackFile = await this.minioClientService.upload(
       track,
       subFolder,
     );
 
-    return uploadTrackFile.path;
+    return uploadedTrackFile.path;
   }
 }

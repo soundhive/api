@@ -75,6 +75,9 @@ export class User {
   @VersionColumn()
   dataVersion: number;
 
+  @Column()
+  profilePicture: string;
+
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   @BeforeInsert()
   async hashPassword() {
