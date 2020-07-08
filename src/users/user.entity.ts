@@ -2,7 +2,7 @@
 import { Exclude } from 'class-transformer';
 import { Album } from 'src/albums/album.entity';
 import { Listening } from 'src/listenings/listening.entity';
-import { Support } from 'src/supports/support.entity';
+import { Follow } from 'src/follows/follow.entity';
 import { Track } from 'src/tracks/track.entity';
 import { Sample } from 'src/samples/samples.entity';
 import {
@@ -54,11 +54,11 @@ export class User {
     @OneToMany((type) => Sample, (sample) => sample.user)
     samples: Sample[];
 
-    @OneToMany((type) => Support, (support) => support.to)
-    supporters: Support[];
+    @OneToMany((type) => Follow, (follow) => follow.to)
+    followings: Follow[];
 
-    @OneToMany((type) => Support, (support) => support.from)
-    supporting: Support[];
+    @OneToMany((type) => Follow, (follow) => follow.from)
+    followers: Follow[];
 
     @Column({ default: true })
     isActive: boolean;
