@@ -6,6 +6,7 @@ import { User } from 'src/users/user.entity';
 import { CreateFollowDTO } from './dto/create-follow-dto';
 import { DeleteFollowDTO } from './dto/delete-follow.dto';
 import { FindFollowsUserDTO } from './dto/find-follows.user.dto';
+import { FindFollowDTO } from './dto/find-follow-dto';
 
 @Injectable()
 export class FollowsService {
@@ -50,5 +51,13 @@ export class FollowsService {
         });
 
         return followings.map((e) => e.from);
+    }
+
+    async findBy(params: {}): Promise<Follow[]> {
+        return this.followRepository.find(params);
+    }
+
+    async findOne(follow: FindFollowDTO): Promise<Follow | undefined> {
+        return this.followRepository.findOne(follow);
     }
 }

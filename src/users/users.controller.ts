@@ -9,6 +9,8 @@ import {
     Request,
     NotFoundException,
     Delete,
+    BadRequestException,
+    HttpCode,
 } from '@nestjs/common';
 import { FindLastListeningsForUserDTO } from 'src/listenings/dto/find-last-listenings-user.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
@@ -18,7 +20,6 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Follow } from 'src/follows/follow.entity';
 import { FollowsService } from 'src/follows/follows.service';
 import { AuthenticatedUserDTO } from 'src/auth/dto/authenticated-user.dto';
-import { DeleteResult } from 'typeorm';
 import { Album } from 'src/albums/album.entity';
 import { AlbumsService } from 'src/albums/albums.service';
 import { TracksService } from 'src/tracks/tracks.service';
@@ -107,15 +108,32 @@ export class UsersController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @HttpCode(204)
     @Delete(':username/follow')
     async unfollowUser(
         @Param() findUserDTO: FindUserDTO,
         @Request() req: { user: AuthenticatedUserDTO },
-    ): Promise<DeleteResult> {
+    ): Promise<void> {
         const emitor = await this.usersService.findOne(req.user);
+        if (!emitor) {
+            throw new BadRequestException('Invalid user.');
+        }
         const target = await this.usersService.findOne(findUserDTO);
-        const follow = new Follow({ from: emitor, to: target });
-        return this.followsService.delete(follow);
+        if (!target) {
+            throw new BadRequestException('Could not find user.');
+        }
+        const follow = await this.followsService.findOne({
+            from: emitor,
+            to: target,
+        });
+
+        if (!follow) {
+            throw new NotFoundException('You are not following this user.');
+        }
+        await this.followsService.delete({
+            from: emitor,
+            to: target,
+        });
     }
 
     @UseGuards(JwtAuthGuard)
@@ -125,9 +143,23 @@ export class UsersController {
         @Param() findUserDTO: FindUserDTO,
     ): Promise<Follow> {
         const emitor = await this.usersService.findOne(req.user);
+        if (!emitor) {
+            throw new BadRequestException('Invalid user.');
+        }
         const target = await this.usersService.findOne(findUserDTO);
-        const follow = new Follow({ from: emitor, to: target });
+        if (!target) {
+            throw new BadRequestException('Could not find user.');
+        }
+        const existingFollow = await this.followsService.findOne({
+            from: emitor,
+            to: target,
+        });
+        if (existingFollow) {
+            throw new BadRequestException(
+                'You are already following this user.',
+            );
+        }
 
-        return this.followsService.create(follow);
+        return this.followsService.create({ from: emitor, to: target });
     }
 }
