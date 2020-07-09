@@ -14,6 +14,7 @@ import {
   UseGuards,
   UploadedFile,
   UseInterceptors,
+  ForbiddenException,
 } from '@nestjs/common';
 import { AlbumsService } from 'src/albums/albums.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -53,20 +54,6 @@ export class TracksController {
       throw new BadRequestException('Missing track file');
     }
 
-    if (
-      ![
-        'audio/flac',
-        'audio/mpeg',
-        'audio/ogg',
-        'audio/wav',
-        'audio/wave',
-      ].includes(file.mimetype)
-    ) {
-      throw new BadRequestException(
-        `Invalid track file media type: ${file.mimetype}`,
-      );
-    }
-
     const album = await this.albumsService.findOne({
       id: createTrackDTO.album,
     });
@@ -80,8 +67,8 @@ export class TracksController {
       'tracks',
     );
 
-    return new Track(
-      await this.tracksService.create({
+    return this.tracksService.create(
+      new Track({
         ...createTrackDTO,
         downloadable: createTrackDTO.downloadable === 'true',
         user: req.user,
@@ -89,6 +76,52 @@ export class TracksController {
         filename,
       }),
     );
+  }
+
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('trackFile'))
+  async update(
+    @Request() req: ValidatedJWTReq,
+    @Param() findTrackDTO: FindTrackDTO,
+    @Body() trackData: UpdateTrackDTO,
+    @UploadedFile() file: BufferedFile,
+  ): Promise<Track> {
+    const existingTrack = await this.tracksService.findOne(findTrackDTO);
+
+    if (!existingTrack) {
+      throw new BadRequestException('Could not find track');
+    }
+
+    if (existingTrack.user.id !== req.user.id) {
+      throw new ForbiddenException();
+    }
+
+    let filename: string;
+    if (file) {
+      filename = await this.tracksService.uploadTrackFile(file, 'tracks');
+    } else {
+      filename = existingTrack.filename;
+    }
+
+    const result: UpdateResult = await this.tracksService.update(findTrackDTO, {
+      ...trackData,
+      filename,
+    });
+
+    // There is always at least one field updated (UpdatedAt)
+    if (!result.affected || result.affected < 1) {
+      throw new BadRequestException('Could not update track.');
+    }
+
+    // Fetch updated track
+    const updatedTrack = await this.tracksService.findOne(findTrackDTO);
+
+    if (!updatedTrack) {
+      throw new BadRequestException('Could not find track');
+    }
+
+    return updatedTrack;
   }
 
   @Get()
@@ -127,32 +160,6 @@ export class TracksController {
     return this.listeningsService.findLastForTrack(
       findLastListeningsForTrackDTO,
     );
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  async update(
-    @Param() findTrackDTO: FindTrackDTO,
-    @Body() trackData: UpdateTrackDTO,
-  ): Promise<Track> {
-    const result: UpdateResult = await this.tracksService.update(
-      findTrackDTO,
-      trackData,
-    );
-
-    if (!result.affected || result.affected === 0) {
-      throw BadRequestException;
-    }
-
-    const track: Track | undefined = await this.tracksService.findOne(
-      findTrackDTO,
-    );
-
-    if (!track) {
-      throw BadRequestException;
-    }
-
-    return track;
   }
 
   @UseGuards(JwtAuthGuard)

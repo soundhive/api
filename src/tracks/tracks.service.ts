@@ -51,14 +51,28 @@ export class TracksService {
   }
 
   async uploadTrackFile(
-    track: BufferedFile,
+    file: BufferedFile,
     subFolder: string,
   ): Promise<string> {
-    const uploadTrackFile = await this.minioClientService.upload(
-      track,
+    if (
+      ![
+        'audio/flac',
+        'audio/mpeg',
+        'audio/ogg',
+        'audio/wav',
+        'audio/wave',
+      ].includes(file.mimetype)
+    ) {
+      throw new BadRequestException(
+        `Invalid track file media type: ${file.mimetype}`,
+      );
+    }
+
+    const uploadedTrackFile = await this.minioClientService.upload(
+      file,
       subFolder,
     );
 
-    return uploadTrackFile.path;
+    return uploadedTrackFile.path;
   }
 }

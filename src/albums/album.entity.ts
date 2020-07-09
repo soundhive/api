@@ -42,7 +42,10 @@ export class Album extends BaseEntity {
   @OneToMany((type) => Track, (track) => track.album)
   tracks: Track[];
 
-  @ManyToOne((type) => User, (user) => user.albums, { nullable: false })
+  @ManyToOne((type) => User, (user) => user.albums, {
+    nullable: false,
+    eager: true,
+  })
   @Exclude()
   user: User;
 }
