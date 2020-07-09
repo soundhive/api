@@ -19,5 +19,5 @@ export class UpdateAlbumDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  filename: string;
+  coverFilename: string;
 }
