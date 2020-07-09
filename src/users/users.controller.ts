@@ -57,10 +57,12 @@ export class UsersController {
       'users/avatars',
     );
 
-    return this.usersService.create({
-      ...createUserDTO,
-      profilePicture: filename,
-    });
+    return this.usersService.create(
+      new User({
+        ...createUserDTO,
+        profilePicture: filename,
+      }),
+    );
   }
 
   @Get()
