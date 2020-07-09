@@ -14,6 +14,7 @@ import {
   UseGuards,
   UploadedFile,
   UseInterceptors,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Listening } from 'src/listenings/listening.entity';
@@ -77,6 +78,55 @@ export class SamplesController {
     );
   }
 
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('sampleFile'))
+  async update(
+    @Request() req: ValidatedJWTReq,
+    @Param() findSampleDTO: FindSampleDTO,
+    @Body() sampleData: UpdateSampleDTO,
+    @UploadedFile() file: BufferedFile,
+  ): Promise<Sample> {
+    const existringSample = await this.samplesService.findOne(findSampleDTO);
+
+    if (!existringSample) {
+      throw new BadRequestException('Could not find sample');
+    }
+
+    if (existringSample.user.id !== req.user.id) {
+      throw new ForbiddenException();
+    }
+
+    let filename: string;
+    if (file) {
+      filename = await this.samplesService.uploadSampleFile(file, 'samples');
+    } else {
+      filename = existringSample.filename;
+    }
+
+    const result: UpdateResult = await this.samplesService.update(
+      findSampleDTO,
+      {
+        ...sampleData,
+        filename,
+      },
+    );
+
+    // There is always at least one field updated (UpdatedAt)
+    if (!result.affected || result.affected < 1) {
+      throw new BadRequestException('Could not update sample.');
+    }
+
+    // Fetch updated sample
+    const updatedSample = await this.samplesService.findOne(findSampleDTO);
+
+    if (!updatedSample) {
+      throw new BadRequestException('Could not find sample');
+    }
+
+    return updatedSample;
+  }
+
   @Get()
   async find(): Promise<Sample[]> {
     return this.samplesService.find();
@@ -112,32 +162,6 @@ export class SamplesController {
   // async findLastStats(@Param() findLastListeningsForSampleDTO: FindLastListeningsForSampleDTO): Promise<SampleListeningsResponseDTO> {
   //   return this.listeningsService.findLastForSample(findLastListeningsForSampleDTO)
   // }
-
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  async update(
-    @Param() findSampleDTO: FindSampleDTO,
-    @Body() sampleData: UpdateSampleDTO,
-  ): Promise<Sample> {
-    const result: UpdateResult = await this.samplesService.update(
-      findSampleDTO,
-      sampleData,
-    );
-
-    if (!result.affected || result.affected === 0) {
-      throw BadRequestException;
-    }
-
-    const sample: Sample | undefined = await this.samplesService.findOne(
-      findSampleDTO,
-    );
-
-    if (!sample) {
-      throw BadRequestException;
-    }
-
-    return sample;
-  }
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/listen')
