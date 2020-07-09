@@ -17,7 +17,10 @@ import { ValidatedJWTReq } from './auth/dto/validated-jwt-req';
 
 @Controller()
 export class AppController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private appService: AppService,
+  ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
@@ -27,12 +30,12 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  static getProfile(@Request() req: ValidatedJWTReq): User {
+  getProfile(@Request() req: ValidatedJWTReq): User {
     return req.user;
   }
 
   @Get('/')
-  static getRoot(): { message: string } {
-    return AppService.getHello();
+  getRoot(): { message: string } {
+    return this.appService.getHello();
   }
 }

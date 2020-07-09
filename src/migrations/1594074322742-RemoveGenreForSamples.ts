@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class RemoveGenreForSamples1594074322742 implements MigrationInterface {

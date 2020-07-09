@@ -16,7 +16,7 @@ export class AuthService {
     pass: string,
   ): Promise<User | undefined> {
     const user = await this.usersService.findOne({ username });
-    if (user && (await AuthService.passwordsAreEqual(user.password, pass))) {
+    if (user && (await this.passwordsAreEqual(user.password, pass))) {
       return user;
     }
     return undefined;
@@ -29,7 +29,7 @@ export class AuthService {
     };
   }
 
-  private static async passwordsAreEqual(
+  private async passwordsAreEqual(
     hashedPassword: string,
     plainPassword: string,
   ): Promise<boolean> {

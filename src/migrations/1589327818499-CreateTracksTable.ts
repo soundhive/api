@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateTracksTable1589327818499 implements MigrationInterface {
