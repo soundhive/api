@@ -87,13 +87,13 @@ export class SamplesController {
     @Body() sampleData: UpdateSampleDTO,
     @UploadedFile() file: BufferedFile,
   ): Promise<Sample> {
-    const existringSample = await this.samplesService.findOne(findSampleDTO);
+    const existingSample = await this.samplesService.findOne(findSampleDTO);
 
-    if (!existringSample) {
+    if (!existingSample) {
       throw new BadRequestException('Could not find sample');
     }
 
-    if (existringSample.user.id !== req.user.id) {
+    if (existingSample.user.id !== req.user.id) {
       throw new ForbiddenException();
     }
 
@@ -101,7 +101,7 @@ export class SamplesController {
     if (file) {
       filename = await this.samplesService.uploadSampleFile(file, 'samples');
     } else {
-      filename = existringSample.filename;
+      filename = existingSample.filename;
     }
 
     const result: UpdateResult = await this.samplesService.update(

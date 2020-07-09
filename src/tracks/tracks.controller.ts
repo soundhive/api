@@ -87,13 +87,13 @@ export class TracksController {
     @Body() trackData: UpdateTrackDTO,
     @UploadedFile() file: BufferedFile,
   ): Promise<Track> {
-    const existringTrack = await this.tracksService.findOne(findTrackDTO);
+    const existingTrack = await this.tracksService.findOne(findTrackDTO);
 
-    if (!existringTrack) {
+    if (!existingTrack) {
       throw new BadRequestException('Could not find track');
     }
 
-    if (existringTrack.user.id !== req.user.id) {
+    if (existingTrack.user.id !== req.user.id) {
       throw new ForbiddenException();
     }
 
@@ -101,7 +101,7 @@ export class TracksController {
     if (file) {
       filename = await this.tracksService.uploadTrackFile(file, 'tracks');
     } else {
-      filename = existringTrack.filename;
+      filename = existingTrack.filename;
     }
 
     const result: UpdateResult = await this.tracksService.update(findTrackDTO, {
