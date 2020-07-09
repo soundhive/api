@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable func-names */
-/* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import {

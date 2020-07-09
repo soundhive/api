@@ -12,7 +12,6 @@ module.exports = {
     'airbnb-typescript/base',
     'prettier',
     'prettier/@typescript-eslint',
-
   ],
   root: true,
   env: {
@@ -26,6 +25,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'import/no-cycle': 'off',
     'no-restricted-syntax': 'off',
-    'no-await-in-loop': 'off'
+    'no-await-in-loop': 'off',
+    'class-methods-use-this': 'off',
   },
 };
