@@ -1,11 +1,12 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { User } from './user.entity';
 import { FindUserDTO } from './dto/find-user.dto';
 import { InsertUserDTO } from './dto/insert-user.dto';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -43,5 +44,12 @@ export class UsersService {
     );
 
     return uploadedProfilePicture.path;
+  }
+
+  async update(
+    user: FindUserDTO,
+    userData: UpdateUserDTO,
+  ): Promise<UpdateResult> {
+    return this.usersRepository.update({ username: user.username }, userData);
   }
 }
