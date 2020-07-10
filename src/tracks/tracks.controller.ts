@@ -166,7 +166,7 @@ export class TracksController {
   }
 
   @ApiOperation({ summary: 'Get all tracks' })
-  @ApiCreatedResponse({ type: [Track], description: 'Track objects' })
+  @ApiOkResponse({ type: [Track], description: 'Track objects' })
   @Get()
   async find(): Promise<Track[]> {
     return this.tracksService.find();
