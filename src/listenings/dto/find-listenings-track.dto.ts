@@ -7,6 +7,7 @@ import {
 } from 'class-validator';
 import { Track } from 'src/tracks/track.entity';
 import { Exists } from 'src/validators/exists.validation';
+import { ListeningPeriod } from '../listening.entity';
 
 export class FindListeningsForTrackDTO {
   @IsUUID('all')
@@ -22,5 +23,5 @@ export class FindListeningsForTrackDTO {
   @IsNotEmpty()
   @IsString()
   @IsIn(['hour', 'day', 'week', 'month', 'year'])
-  period: string;
+  period: ListeningPeriod;
 }

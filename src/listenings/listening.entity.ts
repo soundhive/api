@@ -8,8 +8,16 @@ import {
 } from 'typeorm';
 import { Sample } from 'src/samples/samples.entity';
 
+enum ListeningPeriod {
+  Hour = 'hour',
+  Day = 'day',
+  Week = 'week',
+  Month = 'month',
+  Year = 'year',
+}
+
 @Entity('listening')
-export class Listening {
+class Listening {
   constructor(partial: Partial<Listening>) {
     Object.assign(this, partial);
   }
@@ -29,3 +37,5 @@ export class Listening {
   @ManyToOne(() => Sample, (sample) => sample.listenings, { nullable: true })
   sample: Sample;
 }
+
+export { Listening, ListeningPeriod };
