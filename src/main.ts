@@ -12,6 +12,15 @@ async function bootstrap() {
     .setTitle('Soundhive API')
     .setDescription('The soundhive API description')
     .setVersion('0.1')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      in: 'header',
+      name: 'Authorization',
+      description:
+        'JWT authentication. Format is `Authorization: bearer <token>`',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('swagger', app, document);
