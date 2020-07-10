@@ -241,6 +241,7 @@ export class TracksController {
     type: UnauthorizedResponse,
     description: 'Invalid JWT token',
   })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post(':id/listen')
   async listen(
@@ -273,7 +274,7 @@ export class TracksController {
     const trackToDelete = await this.tracksService.findOne(track);
 
     if (trackToDelete?.user.id !== req.user.id) {
-      throw new ForbiddenException('You do not own this track.');
+      throw new ForbiddenException(['You do not own this track.']);
     }
 
     await this.tracksService.delete(track);

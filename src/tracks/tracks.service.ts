@@ -6,8 +6,8 @@ import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { InsertTrackDTO } from './dto/insert-track.dto';
-import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track, TrackFileMediaType } from './track.entity';
+import { InsertUpdatedTrackDTO } from './dto/insert-updated-track.dto';
 
 @Injectable()
 export class TracksService {
@@ -34,7 +34,7 @@ export class TracksService {
 
   async update(
     track: FindTrackDTO,
-    trackData: UpdateTrackDTO,
+    trackData: InsertUpdatedTrackDTO,
   ): Promise<UpdateResult> {
     return this.trackRepository.update({ id: track.id }, trackData);
   }
