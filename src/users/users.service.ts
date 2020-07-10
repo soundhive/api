@@ -6,7 +6,7 @@ import { BufferedFile } from 'src/minio-client/file.model';
 import { User } from './user.entity';
 import { FindUserDTO } from './dto/find-user.dto';
 import { InsertUserDTO } from './dto/insert-user.dto';
-import { UpdateUserDTO } from './dto/update-user.dto';
+import { InsertUpdatedUserDTO } from './dto/update-insert-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -48,7 +48,7 @@ export class UsersService {
 
   async update(
     user: FindUserDTO,
-    userData: UpdateUserDTO,
+    userData: InsertUpdatedUserDTO,
   ): Promise<UpdateResult> {
     return this.usersRepository.update({ username: user.username }, userData);
   }
