@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/users/user.entity';
 import { Exclude } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import { Track } from '../tracks/track.entity';
 
 @Entity('albums')
@@ -21,21 +22,27 @@ export class Album extends BaseEntity {
     Object.assign(this, partial);
   }
 
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty()
   @Column({ type: 'varchar', length: '60' })
   title: string;
 
+  @ApiProperty()
   @Column('text', { nullable: true })
   description?: string;
 
+  @ApiProperty()
   @Column()
   coverFilename: string;
 
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
 

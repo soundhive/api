@@ -16,6 +16,7 @@ import {
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 
 import argon2 = require('argon2');
 
@@ -26,12 +27,15 @@ export class User {
     Object.assign(this, partial);
   }
 
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty()
   @Column()
   name: string;
 
+  @ApiProperty()
   @Column()
   username: string;
 
@@ -39,6 +43,7 @@ export class User {
   @Exclude()
   password: string;
 
+  @ApiProperty()
   @Column()
   email: string;
 
@@ -60,14 +65,15 @@ export class User {
   @OneToMany((type) => Follow, (follow) => follow.from)
   followers: Follow[];
 
+  @Exclude()
   @Column({ default: true })
   isActive: boolean;
 
-  @Exclude()
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 
-  @Exclude()
+  @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
 
@@ -75,12 +81,12 @@ export class User {
   @VersionColumn()
   dataVersion: number;
 
+  @ApiProperty()
   @Column()
   profilePicture: string;
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   @BeforeInsert()
-  async hashPassword() {
+  async hashPassword(): Promise<void> {
     this.password = await argon2.hash(this.password);
   }
 }

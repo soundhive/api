@@ -13,6 +13,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { ApiProperty } from '@nestjs/swagger';
 import { Album } from '../albums/album.entity';
 
 @Entity('tracks')
@@ -22,33 +23,42 @@ export class Track extends BaseEntity {
     Object.assign(this, partial);
   }
 
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty()
   @Column({ type: 'varchar', length: '60' })
   title: string;
 
+  @ApiProperty()
   @Column('text')
   description: string;
 
+  @ApiProperty()
   @Column()
   genre: string;
 
+  @ApiProperty()
   @Column()
   filename: string;
 
+  @ApiProperty()
   @Column()
   license: string;
 
+  @ApiProperty()
   @Column()
   downloadable: boolean;
 
   @OneToMany((type) => Listening, (listening) => listening.track)
   listenings: Listening[];
 
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
 
