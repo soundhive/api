@@ -173,9 +173,19 @@ export class TracksController {
     await this.listeningsService.create(listening);
   }
 
-  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(204)
-  async delete(@Param() track: FindTrackDTO): Promise<void> {
+  @Delete(':id')
+  async delete(
+    @Request() req: ValidatedJWTReq,
+    @Param() track: FindTrackDTO,
+  ): Promise<void> {
+    const trackToDelete = await this.tracksService.findOne(track);
+
+    if (trackToDelete?.user.id !== req.user.id) {
+      throw new ForbiddenException('You do not own this track.');
+    }
+
     await this.tracksService.delete(track);
   }
 }
