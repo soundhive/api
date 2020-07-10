@@ -1,32 +1,39 @@
 import { IsNotEmpty, IsString, IsOptional, IsBoolean } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateTrackDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  title: string;
+  @ApiPropertyOptional()
+  title?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  description: string;
+  @ApiPropertyOptional()
+  description?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  genre: string;
+  @ApiPropertyOptional()
+  genre?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  filename: string;
+  @ApiPropertyOptional()
+  filename?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  license: string;
+  @ApiPropertyOptional()
+  license?: string;
 
   @IsOptional()
   @IsBoolean()
-  downloadable: boolean;
+  @ApiPropertyOptional()
+  downloadable?: boolean;
 }
