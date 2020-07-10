@@ -7,7 +7,7 @@ import { BufferedFile } from 'src/minio-client/file.model';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { InsertTrackDTO } from './dto/insert-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
-import { Track } from './track.entity';
+import { Track, TrackFileMediaType } from './track.entity';
 
 @Injectable()
 export class TracksService {
@@ -54,15 +54,7 @@ export class TracksService {
     file: BufferedFile,
     subFolder: string,
   ): Promise<string> {
-    if (
-      ![
-        'audio/flac',
-        'audio/mpeg',
-        'audio/ogg',
-        'audio/wav',
-        'audio/wave',
-      ].includes(file.mimetype)
-    ) {
+    if (!Object.values(TrackFileMediaType).includes(file.mimetype)) {
       throw new BadRequestException(
         `Invalid track file media type: ${file.mimetype}`,
       );

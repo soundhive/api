@@ -16,8 +16,16 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Album } from '../albums/album.entity';
 
+enum TrackFileMediaType {
+  'audio/flac',
+  'audio/mpeg',
+  'audio/ogg',
+  'audio/wav',
+  'audio/wave',
+}
+
 @Entity('tracks')
-export class Track extends BaseEntity {
+class Track extends BaseEntity {
   constructor(partial: Partial<Track>) {
     super();
     Object.assign(this, partial);
@@ -72,3 +80,5 @@ export class Track extends BaseEntity {
   @Exclude()
   user: User;
 }
+
+export { Track, TrackFileMediaType };
