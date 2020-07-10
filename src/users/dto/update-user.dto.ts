@@ -8,21 +8,21 @@ export class UpdateUserDTO {
   @IsNotEmpty()
   @IsString()
   @ApiPropertyOptional()
-  name: string;
+  name?: string;
 
   @IsOptional()
   @ApiPropertyOptional()
-  username: string;
+  username?: string;
 
   @IsOptional()
   @IsEmail()
   @IsNotEmpty()
   @IsUnique(User)
   @ApiPropertyOptional()
-  email: string;
+  email?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @ApiPropertyOptional()
-  password: string;
+  password?: string;
 }

@@ -1,13 +1,13 @@
 export class InsertUpdatedSampleDTO {
-  title: string;
+  title?: string;
 
-  description: string;
+  description?: string;
 
-  filename: string;
+  filename?: string;
 
-  visibility: string;
+  visibility?: string;
 
-  license: string;
+  license?: string;
 
-  downloadable: boolean;
+  downloadable?: boolean;
 }

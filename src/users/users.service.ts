@@ -6,7 +6,7 @@ import { BufferedFile } from 'src/minio-client/file.model';
 import { User } from './user.entity';
 import { FindUserDTO } from './dto/find-user.dto';
 import { InsertUserDTO } from './dto/insert-user.dto';
-import { InsertUpdatedUserDTO } from './dto/update-insert-user.dto';
+import { InsertUpdatedUserDTO } from './dto/insert-updated-user.dto';
 
 @Injectable()
 export class UsersService {

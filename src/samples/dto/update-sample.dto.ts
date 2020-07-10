@@ -12,29 +12,29 @@ export class UpdateSampleDTO {
   @IsNotEmpty()
   @IsString()
   @ApiPropertyOptional()
-  title: string;
+  title?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   @ApiPropertyOptional()
-  description: string;
+  description?: string;
 
   @IsOptional()
   @IsString()
   @IsIn(['public', 'followers'])
   @ApiPropertyOptional()
-  visibility: string;
+  visibility?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   @ApiPropertyOptional()
-  license: string;
+  license?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsBoolean()
   @ApiPropertyOptional()
-  downloadable: boolean;
+  downloadable?: boolean;
 }

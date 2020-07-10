@@ -6,17 +6,17 @@ export class UpdateAlbumDTO {
   @IsNotEmpty()
   @IsString()
   @ApiPropertyOptional()
-  title: string;
+  title?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   @ApiPropertyOptional()
-  description: string;
+  description?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   @ApiPropertyOptional()
-  genre: string;
+  genre?: string;
 }
