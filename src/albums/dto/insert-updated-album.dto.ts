@@ -4,6 +4,4 @@ export class InsertUpdatedAlbumDTO {
   description?: string;
 
   genre?: string;
-
-  coverFilename?: string;
 }

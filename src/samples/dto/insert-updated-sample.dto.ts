@@ -3,8 +3,6 @@ export class InsertUpdatedSampleDTO {
 
   description?: string;
 
-  filename?: string;
-
   visibility?: string;
 
   license?: string;

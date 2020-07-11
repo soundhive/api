@@ -8,8 +8,6 @@ export class InsertTrackDTO {
 
   genre: string;
 
-  filename: string;
-
   license: string;
 
   downloadable: boolean;

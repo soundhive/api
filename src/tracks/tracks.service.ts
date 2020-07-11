@@ -13,42 +13,62 @@ import { InsertUpdatedTrackDTO } from './dto/insert-updated-track.dto';
 @Injectable()
 export class TracksService {
   constructor(
-    @InjectRepository(Track) private trackRepository: Repository<Track>,
+    @InjectRepository(Track) private tracksRepository: Repository<Track>,
     private minioClientService: MinioClientService,
   ) {}
 
-  async create(createTrackDTO: InsertTrackDTO): Promise<Track> {
-    return this.trackRepository.save(createTrackDTO);
+  async create(
+    insertTrackDTO: InsertTrackDTO,
+    trackFile: BufferedFile,
+  ): Promise<Track> {
+    const track = new Track(insertTrackDTO);
+    track.filename = await this.uploadTrackFile(trackFile);
+
+    return this.tracksRepository.save(track);
   }
 
   async find(): Promise<Track[]> {
-    return this.trackRepository.find();
+    return this.tracksRepository.find();
   }
 
   async findBy(params: {}): Promise<Track[]> {
-    return this.trackRepository.find(params);
+    return this.tracksRepository.find(params);
   }
 
   async findOne(track: FindTrackDTO): Promise<Track | undefined> {
-    return this.trackRepository.findOne({ id: track.id });
+    return this.tracksRepository.findOne({ id: track.id });
   }
 
   async update(
     track: FindTrackDTO,
     trackData: InsertUpdatedTrackDTO,
+    existingTrack: Track,
+    trackFile?: BufferedFile,
   ): Promise<UpdateResult> {
-    return this.trackRepository.update({ id: track.id }, trackData);
+    if (trackFile) {
+      // Uplodad new track
+      const filename = await this.uploadTrackFile(trackFile);
+      // Delete old track file
+      this.minioClientService.delete(existingTrack.filename);
+
+      return this.tracksRepository.update(
+        { id: track.id },
+        { ...trackData, filename },
+      );
+    }
+
+    return this.tracksRepository.update({ id: track.id }, trackData);
   }
 
   async delete(trackDTO: FindTrackDTO): Promise<DeleteResult> {
-    const track = await this.trackRepository.findOne(trackDTO);
+    const track = await this.tracksRepository.findOne(trackDTO);
 
     if (!track) {
       throw new BadRequestException();
     }
 
     this.minioClientService.delete(track.filename);
-    return this.trackRepository.delete(track.id);
+    return this.tracksRepository.delete(track.id);
   }
 
   async uploadTrackFile(file: BufferedFile): Promise<string> {

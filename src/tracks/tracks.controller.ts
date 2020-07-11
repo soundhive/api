@@ -76,9 +76,9 @@ export class TracksController {
   async create(
     @Request() req: ValidatedJWTReq,
     @Body() createTrackDTO: CreateTrackDTO,
-    @UploadedFile() file: BufferedFile,
+    @UploadedFile() trackFile: BufferedFile,
   ): Promise<Track> {
-    if (!file) {
+    if (!trackFile) {
       throw new BadRequestException('Missing track file');
     }
 
@@ -90,16 +90,14 @@ export class TracksController {
       throw new BadRequestException('Invalid album');
     }
 
-    const filename: string = await this.tracksService.uploadTrackFile(file);
-
     return this.tracksService.create(
-      new Track({
+      {
         ...createTrackDTO,
         downloadable: createTrackDTO.downloadable === 'true',
         user: req.user,
         album,
-        filename,
-      }),
+      },
+      trackFile,
     );
   }
 
@@ -123,7 +121,7 @@ export class TracksController {
     @Request() req: ValidatedJWTReq,
     @Param() findTrackDTO: FindTrackDTO,
     @Body() trackData: UpdateTrackDTO,
-    @UploadedFile() file: BufferedFile,
+    @UploadedFile() trackFile: BufferedFile,
   ): Promise<Track> {
     const existingTrack = await this.tracksService.findOne(findTrackDTO);
 
@@ -135,17 +133,12 @@ export class TracksController {
       throw new ForbiddenException();
     }
 
-    let filename: string;
-    if (file) {
-      filename = await this.tracksService.uploadTrackFile(file);
-    } else {
-      filename = existingTrack.filename;
-    }
-
-    const result: UpdateResult = await this.tracksService.update(findTrackDTO, {
-      ...trackData,
-      filename,
-    });
+    const result: UpdateResult = await this.tracksService.update(
+      findTrackDTO,
+      trackData,
+      existingTrack,
+      trackFile,
+    );
 
     // There is always at least one field updated (UpdatedAt)
     if (!result.affected || result.affected < 1) {

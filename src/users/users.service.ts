@@ -17,7 +17,13 @@ export class UsersService {
     private minioClientService: MinioClientService,
   ) {}
 
-  async create(user: InsertUserDTO): Promise<User> {
+  async create(
+    insertUserDTO: InsertUserDTO,
+    profilePictureFile: BufferedFile,
+  ): Promise<User> {
+    const user = new User(insertUserDTO);
+    user.profilePicture = await this.uploadProfilePicture(profilePictureFile);
+
     return this.usersRepository.save(user);
   }
 
@@ -48,7 +54,22 @@ export class UsersService {
   async update(
     user: FindUserDTO,
     userData: InsertUpdatedUserDTO,
+    existingUser: User,
+    profilePictureFile?: BufferedFile,
   ): Promise<UpdateResult> {
+    if (profilePictureFile) {
+      // Uplodad new profile pic
+      const profilePicture = await this.uploadProfilePicture(
+        profilePictureFile,
+      );
+      // Delete old profile pic
+      this.minioClientService.delete(existingUser.profilePicture);
+
+      return this.usersRepository.update(
+        { username: user.username },
+        { ...userData, profilePicture },
+      );
+    }
     return this.usersRepository.update({ username: user.username }, userData);
   }
 }

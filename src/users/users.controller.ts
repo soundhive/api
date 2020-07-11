@@ -75,20 +75,13 @@ export class UsersController {
   @Post()
   async create(
     @Body() createUserDTO: CreateUserDTO,
-    @UploadedFile() file: BufferedFile,
+    @UploadedFile() ProfilePictireFile: BufferedFile,
   ): Promise<User> {
-    if (!file) {
+    if (!ProfilePictireFile) {
       throw new BadRequestException('Missing profile picture file');
     }
 
-    const filename: string = await this.usersService.uploadProfilePicture(file);
-
-    return this.usersService.create(
-      new User({
-        ...createUserDTO,
-        profilePicture: filename,
-      }),
-    );
+    return this.usersService.create(createUserDTO, ProfilePictireFile);
   }
 
   @ApiOperation({ summary: 'Update user' })
@@ -111,7 +104,7 @@ export class UsersController {
     @Request() req: ValidatedJWTReq,
     @Param() findUserDTO: FindUserDTO,
     @Body() userData: UpdateUserDTO,
-    @UploadedFile() file: BufferedFile,
+    @UploadedFile() ProfilePictireFile: BufferedFile,
   ): Promise<User> {
     const existingUser = await this.usersService.findOne(findUserDTO);
 
@@ -127,17 +120,12 @@ export class UsersController {
       throw new ForbiddenException('username modification is forbidden.');
     }
 
-    let filename: string;
-    if (file) {
-      filename = await this.usersService.uploadProfilePicture(file);
-    } else {
-      filename = existingUser.profilePicture;
-    }
-
-    const result: UpdateResult = await this.usersService.update(findUserDTO, {
-      ...userData,
-      profilePicture: filename,
-    });
+    const result: UpdateResult = await this.usersService.update(
+      findUserDTO,
+      userData,
+      existingUser,
+      ProfilePictireFile,
+    );
 
     // There is always at least one field updated (UpdatedAt)
     if (!result.affected || result.affected < 1) {

@@ -5,7 +5,5 @@ export class InsertAlbumDTO {
 
   description?: string;
 
-  coverFilename: string;
-
   user: User;
 }

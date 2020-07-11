@@ -5,8 +5,6 @@ export class InsertSampleDTO {
 
   description: string;
 
-  filename: string;
-
   user: User;
 
   visibility: string;

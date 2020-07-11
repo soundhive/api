@@ -5,8 +5,6 @@ export class InsertUpdatedTrackDTO {
 
   genre?: string;
 
-  filename?: string;
-
   license?: string;
 
   downloadable?: boolean;
