@@ -1,6 +1,6 @@
 import { IsIn, IsNotEmpty, IsNumberString, IsString } from 'class-validator';
 import { User } from 'src/users/user.entity';
-import { Exists } from 'src/validators/exists.validation';
+import { Exists } from 'src/shared/validators/exists.validation';
 import { ApiProperty } from '@nestjs/swagger';
 import { ListeningPeriod } from '../listening.entity';
 

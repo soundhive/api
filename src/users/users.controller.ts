@@ -44,7 +44,7 @@ import {
   ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
-import { BadRequestResponse } from 'src/dto/bad-request-response.dto';
+import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
