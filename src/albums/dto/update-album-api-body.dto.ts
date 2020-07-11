@@ -6,11 +6,11 @@ import { UpdateAlbumDTO } from './update-album.dto';
 export class UpdateAlbumAPIBody extends UpdateAlbumDTO {
   @ApiPropertyOptional({
     type: 'file',
-    description: `An audio file of format ${
+    description: `An image file of format ${
       Object.values(ImageFileMediaTypes).filter(
         (value) => typeof value === 'string',
       ) as string[]
     }`,
   })
-  coverFile?: BufferedFile;
+  cover_file?: BufferedFile;
 }

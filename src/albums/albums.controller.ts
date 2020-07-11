@@ -64,7 +64,7 @@ export class AlbumsController {
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('coverFile'))
+  @UseInterceptors(FileInterceptor('cover_file'))
   @Post()
   async create(
     @Request() req: ValidatedJWTReq,
@@ -72,7 +72,7 @@ export class AlbumsController {
     @UploadedFile() file: BufferedFile,
   ): Promise<Album> {
     if (!file) {
-      throw new BadRequestException('Missing coverFile');
+      throw new BadRequestException('Missing cover_file');
     }
 
     const albumCover: string = await this.albumsService.uploadFileCover(file);
@@ -145,7 +145,7 @@ export class AlbumsController {
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('coverFile'))
+  @UseInterceptors(FileInterceptor('cover_file'))
   @Put(':id')
   async update(
     @Request() req: ValidatedJWTReq,

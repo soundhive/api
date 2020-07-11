@@ -71,7 +71,7 @@ export class TracksController {
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('trackFile'))
+  @UseInterceptors(FileInterceptor('track_file'))
   @Post()
   async create(
     @Request() req: ValidatedJWTReq,
@@ -117,7 +117,7 @@ export class TracksController {
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('trackFile'))
+  @UseInterceptors(FileInterceptor('track_file'))
   @Put(':id')
   async update(
     @Request() req: ValidatedJWTReq,

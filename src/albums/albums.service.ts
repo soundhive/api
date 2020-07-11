@@ -55,7 +55,7 @@ export class AlbumsService {
   async uploadFileCover(file: BufferedFile): Promise<string> {
     if (!Object.values(ImageFileMediaTypes).includes(file.mimetype)) {
       throw new BadRequestException(
-        `Invalid cover file media type: ${file.mimetype}`,
+        `Invalid cover_file media type: ${file.mimetype}`,
       );
     }
 

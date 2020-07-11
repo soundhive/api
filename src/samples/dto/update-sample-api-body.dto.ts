@@ -12,5 +12,5 @@ export class UpdateSampleAPIBody extends UpdateSampleDTO {
       ) as string[]
     }`,
   })
-  sampleFile: BufferedFile;
+  sample_file: BufferedFile;
 }

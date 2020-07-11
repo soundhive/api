@@ -67,7 +67,7 @@ export class SamplesController {
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('sampleFile'))
+  @UseInterceptors(FileInterceptor('sample_file'))
   @Post()
   async create(
     @Request() req: ValidatedJWTReq,
@@ -110,7 +110,7 @@ export class SamplesController {
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('sampleFile'))
+  @UseInterceptors(FileInterceptor('sample_file'))
   @Put(':id')
   async update(
     @Request() req: ValidatedJWTReq,
