@@ -1,4 +1,4 @@
-import { Exists } from 'src/validators/exists.validation';
+import { Exists } from 'src/shared/validators/exists.validation';
 import { User } from 'src/users/user.entity';
 
 export class CreateFollowDTO {

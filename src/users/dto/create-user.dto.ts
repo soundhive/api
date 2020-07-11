@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, IsAlphanumeric } from 'class-validator';
-import { IsUnique } from 'src/validators/unique.validation';
+import { IsUnique } from 'src/shared/validators/unique.validation';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../user.entity';
 

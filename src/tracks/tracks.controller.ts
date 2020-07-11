@@ -39,7 +39,7 @@ import {
   ApiOkResponse,
   ApiNoContentResponse,
 } from '@nestjs/swagger';
-import { BadRequestResponse } from 'src/dto/bad-request-response.dto';
+import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';

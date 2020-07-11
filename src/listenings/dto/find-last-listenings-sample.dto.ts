@@ -5,7 +5,7 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { Exists } from 'src/validators/exists.validation';
+import { Exists } from 'src/shared/validators/exists.validation';
 import { Sample } from 'src/samples/samples.entity';
 import { ListeningPeriod } from '../listening.entity';
 

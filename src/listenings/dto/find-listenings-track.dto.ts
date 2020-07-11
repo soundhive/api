@@ -6,7 +6,7 @@ import {
   IsUUID,
 } from 'class-validator';
 import { Track } from 'src/tracks/track.entity';
-import { Exists } from 'src/validators/exists.validation';
+import { Exists } from 'src/shared/validators/exists.validation';
 import { ListeningPeriod } from '../listening.entity';
 
 export class FindListeningsForTrackDTO {
