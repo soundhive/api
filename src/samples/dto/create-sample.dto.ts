@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsOptional,
-  IsIn,
-  // IsBoolean,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsIn } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateSampleDTO {
@@ -18,7 +12,6 @@ export class CreateSampleDTO {
   @ApiProperty()
   description: string;
 
-  @IsOptional()
   @IsString()
   @IsIn(['public', 'followers'])
   @ApiProperty()
@@ -29,7 +22,6 @@ export class CreateSampleDTO {
   @ApiProperty()
   license: string;
 
-  @IsNotEmpty()
   @IsString()
   @IsIn(['true', 'false'])
   @ApiProperty()
