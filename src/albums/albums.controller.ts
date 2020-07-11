@@ -69,19 +69,19 @@ export class AlbumsController {
   async create(
     @Request() req: ValidatedJWTReq,
     @Body() createAlbumDTO: CreateAlbumDTO,
-    @UploadedFile() file: BufferedFile,
+    @UploadedFile() coverFile: BufferedFile,
   ): Promise<Album> {
-    if (!file) {
+    if (!coverFile) {
       throw new BadRequestException('Missing cover_file');
     }
 
-    const albumCover: string = await this.albumsService.uploadFileCover(file);
-
-    const album = await this.albumsService.create({
-      ...createAlbumDTO,
-      user: req.user,
-      coverFilename: albumCover,
-    });
+    const album = await this.albumsService.create(
+      {
+        ...createAlbumDTO,
+        user: req.user,
+      },
+      coverFile,
+    );
 
     return new Album(album);
   }
@@ -151,7 +151,7 @@ export class AlbumsController {
     @Request() req: ValidatedJWTReq,
     @Param() findAlbumDTO: FindAlbumDTO,
     @Body() albumData: UpdateAlbumDTO,
-    @UploadedFile() file: BufferedFile,
+    @UploadedFile() coverFile: BufferedFile,
   ): Promise<Album> {
     const existingAlbum = await this.albumsService.findOne(findAlbumDTO);
 
@@ -163,17 +163,12 @@ export class AlbumsController {
       throw new ForbiddenException();
     }
 
-    let coverFilename: string;
-    if (file) {
-      coverFilename = await this.albumsService.uploadFileCover(file);
-    } else {
-      coverFilename = existingAlbum.coverFilename;
-    }
-
-    const result: UpdateResult = await this.albumsService.update(findAlbumDTO, {
-      ...albumData,
-      coverFilename,
-    });
+    const result: UpdateResult = await this.albumsService.update(
+      findAlbumDTO,
+      albumData,
+      existingAlbum,
+      coverFile,
+    );
 
     // There is always at least one field updated (UpdatedAt)
     if (!result.affected || result.affected < 1) {

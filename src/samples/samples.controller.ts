@@ -37,7 +37,6 @@ import {
 } from '@nestjs/swagger';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
-import { AudioFileMediaType } from 'src/media-types';
 import { CreateSampleDTO } from './dto/create-sample.dto';
 import { FindSampleDTO } from './dto/find-sample.dto';
 import { UpdateSampleDTO } from './dto/update-sample.dto';
@@ -72,27 +71,21 @@ export class SamplesController {
   async create(
     @Request() req: ValidatedJWTReq,
     @Body() createSampleDTO: CreateSampleDTO,
-    @UploadedFile() file: BufferedFile,
+    @UploadedFile() sampleFile: BufferedFile,
   ): Promise<Sample> {
-    if (!file) {
+    if (!sampleFile) {
       throw new BadRequestException('Missing sample file');
     }
 
-    if (!Object.values(AudioFileMediaType).includes(file.mimetype)) {
-      throw new BadRequestException(
-        `Invalid sample file media type: ${file.mimetype}`,
-      );
-    }
-
-    const filename: string = await this.samplesService.uploadSampleFile(file);
-
     return new Sample(
-      await this.samplesService.create({
-        ...createSampleDTO,
-        downloadable: createSampleDTO.downloadable === 'true',
-        user: req.user,
-        filename,
-      }),
+      await this.samplesService.create(
+        {
+          ...createSampleDTO,
+          downloadable: createSampleDTO.downloadable === 'true',
+          user: req.user,
+        },
+        sampleFile,
+      ),
     );
   }
 
@@ -116,7 +109,7 @@ export class SamplesController {
     @Request() req: ValidatedJWTReq,
     @Param() findSampleDTO: FindSampleDTO,
     @Body() sampleData: UpdateSampleDTO,
-    @UploadedFile() file: BufferedFile,
+    @UploadedFile() sampleFile: BufferedFile,
   ): Promise<Sample> {
     const existingSample = await this.samplesService.findOne(findSampleDTO);
 
@@ -128,19 +121,11 @@ export class SamplesController {
       throw new ForbiddenException();
     }
 
-    let filename: string;
-    if (file) {
-      filename = await this.samplesService.uploadSampleFile(file);
-    } else {
-      filename = existingSample.filename;
-    }
-
     const result: UpdateResult = await this.samplesService.update(
       findSampleDTO,
-      {
-        ...sampleData,
-        filename,
-      },
+      sampleData,
+      existingSample,
+      sampleFile,
     );
 
     // There is always at least one field updated (UpdatedAt)

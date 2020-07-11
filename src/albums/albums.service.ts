@@ -18,8 +18,14 @@ export class AlbumsService {
     private minioClientService: MinioClientService,
   ) {}
 
-  async create(insertAlbumDTO: InsertAlbumDTO): Promise<Album> {
-    return this.albumsRepository.save(insertAlbumDTO);
+  async create(
+    insertAlbumDTO: InsertAlbumDTO,
+    coverFile: BufferedFile,
+  ): Promise<Album> {
+    const album = new Album(insertAlbumDTO);
+    album.coverFilename = await this.uploadFileCover(coverFile);
+
+    return this.albumsRepository.save(album);
   }
 
   async find(): Promise<Album[]> {
@@ -37,7 +43,21 @@ export class AlbumsService {
   async update(
     album: FindAlbumDTO,
     albumData: InsertUpdatedAlbumDTO,
+    existingAlbum: Album,
+    coverFile?: BufferedFile,
   ): Promise<UpdateResult> {
+    if (coverFile) {
+      // Uplodad new album cover
+      const coverFilename = await this.uploadFileCover(coverFile);
+      // Delete old album cover file
+      this.minioClientService.delete(existingAlbum.coverFilename);
+
+      return this.albumsRepository.update(
+        { id: album.id },
+        { ...albumData, coverFilename },
+      );
+    }
+
     return this.albumsRepository.update({ id: album.id }, albumData);
   }
 

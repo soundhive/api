@@ -19,8 +19,14 @@ export class SamplesService {
     private followsService: FollowsService,
   ) {}
 
-  async create(createSampleDTO: InsertSampleDTO): Promise<Sample> {
-    return this.sampleRepository.save(createSampleDTO);
+  async create(
+    insertSampleDTO: InsertSampleDTO,
+    sampleFile: BufferedFile,
+  ): Promise<Sample> {
+    const sample = new Sample(insertSampleDTO);
+    sample.filename = await this.uploadSampleFile(sampleFile);
+
+    return this.sampleRepository.save(sample);
   }
 
   async find(): Promise<Sample[]> {
@@ -38,7 +44,21 @@ export class SamplesService {
   async update(
     sample: FindSampleDTO,
     sampleData: InsertUpdatedSampleDTO,
+    existingSample: Sample,
+    sampleFile?: BufferedFile,
   ): Promise<UpdateResult> {
+    if (sampleFile) {
+      // Uplodad new sample
+      const filename = await this.uploadSampleFile(sampleFile);
+      // Delete old sample file
+      this.minioClientService.delete(existingSample.filename);
+
+      return this.sampleRepository.update(
+        { id: sample.id },
+        { ...sampleData, filename },
+      );
+    }
+
     return this.sampleRepository.update({ id: sample.id }, sampleData);
   }
 

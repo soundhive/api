@@ -6,6 +6,4 @@ export class InsertUserDTO {
   email: string;
 
   password: string;
-
-  profilePicture: string;
 }

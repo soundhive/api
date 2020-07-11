@@ -6,6 +6,4 @@ export class InsertUpdatedUserDTO {
   email?: string;
 
   password?: string;
-
-  profilePicture?: string;
 }
