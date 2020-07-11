@@ -53,10 +53,8 @@ export class SamplesService {
     return this.sampleRepository.delete(sample.id);
   }
 
-  async uploadSampleFile(
-    sample: BufferedFile,
-    subFolder: string,
-  ): Promise<string> {
+  async uploadSampleFile(sample: BufferedFile): Promise<string> {
+    const subFolder = 'samples';
     const uploadSampleFile = await this.minioClientService.upload(
       sample,
       subFolder,
