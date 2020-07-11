@@ -12,6 +12,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('samples')
 export class Sample extends BaseEntity {
@@ -20,25 +21,31 @@ export class Sample extends BaseEntity {
     Object.assign(this, partial);
   }
 
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', length: '60' })
+  @ApiProperty()
   title: string;
 
   @Column('text')
+  @ApiProperty()
   description: string;
 
   @Column()
+  @ApiProperty()
   filename: string;
 
   @OneToMany((type) => Listening, (listening) => listening.sample)
   listenings: Listening[];
 
   @CreateDateColumn()
+  @ApiProperty()
   createdAt: Date;
 
   @UpdateDateColumn()
+  @ApiProperty()
   updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.samples, {
@@ -49,11 +56,14 @@ export class Sample extends BaseEntity {
   user: User;
 
   @Column()
+  @ApiProperty()
   visibility: string;
 
   @Column()
+  @ApiProperty()
   license: string;
 
   @Column()
+  @ApiProperty()
   downloadable: boolean;
 }

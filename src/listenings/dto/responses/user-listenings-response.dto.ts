@@ -1,8 +1,10 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Keyframe } from 'src/listenings/keyframe';
+
 export class UserListeningsResponseDTO {
+  @ApiProperty()
   listenings: number;
 
-  keyframes: {
-    count: number;
-    period: Date;
-  }[];
+  @ApiProperty({ type: [Keyframe] })
+  keyframes: Keyframe[];
 }

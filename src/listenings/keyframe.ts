@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AuthUserDTO {
+export class Keyframe {
   @ApiProperty()
-  username: string;
+  count: number;
 
   @ApiProperty()
-  password: string;
+  period: Date;
 }

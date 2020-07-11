@@ -4,10 +4,11 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { AudioFileMediaType } from 'src/media-types';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { InsertTrackDTO } from './dto/insert-track.dto';
-import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
+import { InsertUpdatedTrackDTO } from './dto/insert-updated-track.dto';
 
 @Injectable()
 export class TracksService {
@@ -34,7 +35,7 @@ export class TracksService {
 
   async update(
     track: FindTrackDTO,
-    trackData: UpdateTrackDTO,
+    trackData: InsertUpdatedTrackDTO,
   ): Promise<UpdateResult> {
     return this.trackRepository.update({ id: track.id }, trackData);
   }
@@ -54,15 +55,7 @@ export class TracksService {
     file: BufferedFile,
     subFolder: string,
   ): Promise<string> {
-    if (
-      ![
-        'audio/flac',
-        'audio/mpeg',
-        'audio/ogg',
-        'audio/wav',
-        'audio/wave',
-      ].includes(file.mimetype)
-    ) {
+    if (!Object.values(AudioFileMediaType).includes(file.mimetype)) {
       throw new BadRequestException(
         `Invalid track file media type: ${file.mimetype}`,
       );

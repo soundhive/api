@@ -24,11 +24,27 @@ import { UpdateResult } from 'typeorm';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
+import {
+  ApiOperation,
+  ApiConsumes,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiUnauthorizedResponse,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
+import { BadRequestResponse } from 'src/dto/bad-request-response.dto';
+import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
+import { AudioFileMediaType } from 'src/media-types';
 import { CreateSampleDTO } from './dto/create-sample.dto';
 import { FindSampleDTO } from './dto/find-sample.dto';
 import { UpdateSampleDTO } from './dto/update-sample.dto';
 import { Sample } from './samples.entity';
 import { SamplesService } from './samples.service';
+import { CreateSampleAPIBody } from './dto/create-sample-api-body.dto';
+import { UpdateSampleAPIBody } from './dto/update-sample-api-body.dto';
 
 @Controller('samples')
 export class SamplesController {
@@ -37,9 +53,22 @@ export class SamplesController {
     private readonly listeningsService: ListeningsService,
   ) {}
 
-  @Post()
+  @ApiOperation({ summary: 'Create a sample' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateSampleAPIBody })
+  @ApiCreatedResponse({ type: Sample, description: 'Sample object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('sampleFile'))
+  @Post()
   async create(
     @Request() req: ValidatedJWTReq,
     @Body() createSampleDTO: CreateSampleDTO,
@@ -49,15 +78,7 @@ export class SamplesController {
       throw new BadRequestException('Missing sample file');
     }
 
-    if (
-      ![
-        'audio/flac',
-        'audio/mpeg',
-        'audio/ogg',
-        'audio/wav',
-        'audio/wave',
-      ].includes(file.mimetype)
-    ) {
+    if (!Object.values(AudioFileMediaType).includes(file.mimetype)) {
       throw new BadRequestException(
         `Invalid sample file media type: ${file.mimetype}`,
       );
@@ -78,9 +99,22 @@ export class SamplesController {
     );
   }
 
-  @Put(':id')
+  @ApiOperation({ summary: 'Update a sample' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateSampleAPIBody })
+  @ApiOkResponse({ type: Sample, description: 'Sample object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('sampleFile'))
+  @Put(':id')
   async update(
     @Request() req: ValidatedJWTReq,
     @Param() findSampleDTO: FindSampleDTO,
@@ -127,11 +161,20 @@ export class SamplesController {
     return updatedSample;
   }
 
+  @ApiOperation({ summary: 'Get all samples' })
+  @ApiOkResponse({ type: [Sample], description: 'Sample objects' })
   @Get()
   async find(): Promise<Sample[]> {
     return this.samplesService.find();
   }
 
+  @ApiOperation({ summary: 'Get a sample' })
+  @ApiOkResponse({ type: Sample, description: 'Sample object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(
@@ -163,6 +206,19 @@ export class SamplesController {
   //   return this.listeningsService.findLastForSample(findLastListeningsForSampleDTO)
   // }
 
+  @ApiOperation({ summary: 'Increment listening count' })
+  @ApiCreatedResponse({
+    description: 'Success',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post(':id/listen')
   async listen(
@@ -174,9 +230,30 @@ export class SamplesController {
     await this.listeningsService.create(listening);
   }
 
-  @Delete(':id')
+  @ApiOperation({ summary: 'Delete sample' })
+  @ApiNoContentResponse({ description: 'Deletion successful' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @HttpCode(204)
-  async delete(@Param() sample: FindSampleDTO): Promise<void> {
+  @Delete(':id')
+  async delete(
+    @Request() req: ValidatedJWTReq,
+    @Param() sample: FindSampleDTO,
+  ): Promise<void> {
+    const sampleToDelete = await this.samplesService.findOne(sample);
+
+    if (sampleToDelete?.user.id !== req.user.id) {
+      throw new ForbiddenException(['You do not own this sample.']);
+    }
+
     await this.samplesService.delete(sample);
   }
 }

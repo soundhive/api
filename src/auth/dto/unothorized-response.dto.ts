@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AuthUserDTO {
+export class UnauthorizedResponse {
   @ApiProperty()
-  username: string;
+  statusCode: string;
 
   @ApiProperty()
-  password: string;
+  message: string;
 }

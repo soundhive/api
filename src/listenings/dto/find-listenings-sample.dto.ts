@@ -7,6 +7,7 @@ import {
 } from 'class-validator';
 import { Exists } from 'src/validators/exists.validation';
 import { Sample } from 'src/samples/samples.entity';
+import { ListeningPeriod } from '../listening.entity';
 
 export class FindListeningsForSampleDTO {
   @IsUUID('all')
@@ -22,5 +23,5 @@ export class FindListeningsForSampleDTO {
   @IsNotEmpty()
   @IsString()
   @IsIn(['hour', 'day', 'week', 'month', 'year'])
-  period: string;
+  period: ListeningPeriod;
 }

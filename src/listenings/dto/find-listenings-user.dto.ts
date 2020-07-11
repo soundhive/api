@@ -1,6 +1,7 @@
 import { IsDateString, IsIn, IsNotEmpty, IsString } from 'class-validator';
 import { User } from 'src/users/user.entity';
 import { Exists } from 'src/validators/exists.validation';
+import { ListeningPeriod } from '../listening.entity';
 
 export class FindListeningsForUserDTO {
   @IsNotEmpty()
@@ -17,5 +18,5 @@ export class FindListeningsForUserDTO {
   @IsNotEmpty()
   @IsString()
   @IsIn(['hour', 'day', 'week', 'month', 'year'])
-  period: string;
+  period: ListeningPeriod;
 }

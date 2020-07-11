@@ -1,23 +1,22 @@
 import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateAlbumDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  title: string;
+  @ApiPropertyOptional()
+  title?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  description: string;
+  @ApiPropertyOptional()
+  description?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  genre: string;
-
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  coverFilename: string;
+  @ApiPropertyOptional()
+  genre?: string;
 }

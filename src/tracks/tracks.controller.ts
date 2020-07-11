@@ -28,11 +28,26 @@ import { UpdateResult } from 'typeorm';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
+import {
+  ApiOperation,
+  ApiConsumes,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiUnauthorizedResponse,
+  ApiOkResponse,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
+import { BadRequestResponse } from 'src/dto/bad-request-response.dto';
+import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
+import { CreateTrackAPIBody } from './dto/create-track-api-body.dto';
+import { UpdateTrackAPIBody } from './dto/update-track-api-body.dto';
 
 @Controller('tracks')
 export class TracksController {
@@ -42,9 +57,22 @@ export class TracksController {
     private readonly listeningsService: ListeningsService,
   ) {}
 
-  @Post()
+  @ApiOperation({ summary: 'Post a track' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateTrackAPIBody })
+  @ApiCreatedResponse({ type: Track, description: 'Track object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('trackFile'))
+  @Post()
   async create(
     @Request() req: ValidatedJWTReq,
     @Body() createTrackDTO: CreateTrackDTO,
@@ -78,9 +106,22 @@ export class TracksController {
     );
   }
 
-  @Put(':id')
+  @ApiOperation({ summary: 'Update a track' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateTrackAPIBody })
+  @ApiOkResponse({ type: Track, description: 'Track object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('trackFile'))
+  @Put(':id')
   async update(
     @Request() req: ValidatedJWTReq,
     @Param() findTrackDTO: FindTrackDTO,
@@ -124,11 +165,19 @@ export class TracksController {
     return updatedTrack;
   }
 
+  @ApiOperation({ summary: 'Get all tracks' })
+  @ApiOkResponse({ type: [Track], description: 'Track objects' })
   @Get()
   async find(): Promise<Track[]> {
     return this.tracksService.find();
   }
 
+  @ApiOperation({ summary: 'Get a track' })
+  @ApiOkResponse({ type: Track, description: 'Track object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
   @Get(':id')
   async findOne(@Param() findTrackDTO: FindTrackDTO): Promise<Track> {
     const track: Track | undefined = await this.tracksService.findOne(
@@ -142,6 +191,15 @@ export class TracksController {
     return track;
   }
 
+  @ApiOperation({ summary: "Get a track's statistics" })
+  @ApiOkResponse({
+    type: TrackListeningsResponseDTO,
+    description: 'Stats for the track',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
   @Get(':id/stats')
   async findStats(
     @Param() findTrackDTO: FindTrackDTO,
@@ -153,6 +211,15 @@ export class TracksController {
     });
   }
 
+  @ApiOperation({ summary: "Get a track's statistics" })
+  @ApiOkResponse({
+    type: TrackListeningsResponseDTO,
+    description: 'Stats for the track',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
   @Get(':id/stats/last/:count/:period')
   async findLastStats(
     @Param() findLastListeningsForTrackDTO: FindLastListeningsForTrackDTO,
@@ -162,6 +229,19 @@ export class TracksController {
     );
   }
 
+  @ApiOperation({ summary: 'Increment listening count' })
+  @ApiCreatedResponse({
+    description: 'Success',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post(':id/listen')
   async listen(
@@ -173,9 +253,30 @@ export class TracksController {
     await this.listeningsService.create(listening);
   }
 
-  @Delete(':id')
+  @ApiOperation({ summary: 'Delete track' })
+  @ApiNoContentResponse({ description: 'Deletion successful' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @HttpCode(204)
-  async delete(@Param() track: FindTrackDTO): Promise<void> {
+  @Delete(':id')
+  async delete(
+    @Request() req: ValidatedJWTReq,
+    @Param() track: FindTrackDTO,
+  ): Promise<void> {
+    const trackToDelete = await this.tracksService.findOne(track);
+
+    if (trackToDelete?.user.id !== req.user.id) {
+      throw new ForbiddenException(['You do not own this track.']);
+    }
+
     await this.tracksService.delete(track);
   }
 }

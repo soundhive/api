@@ -3,10 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { ImageFileMediaTypes } from 'src/media-types';
 import { User } from './user.entity';
 import { FindUserDTO } from './dto/find-user.dto';
 import { InsertUserDTO } from './dto/insert-user.dto';
-import { UpdateUserDTO } from './dto/update-user.dto';
+import { InsertUpdatedUserDTO } from './dto/insert-updated-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +33,7 @@ export class UsersService {
     file: BufferedFile,
     subFolder: string,
   ): Promise<string> {
-    if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
+    if (!Object.values(ImageFileMediaTypes).includes(file.mimetype)) {
       throw new BadRequestException(
         `Invalid profile picture image format: ${file.mimetype}`,
       );
@@ -48,7 +49,7 @@ export class UsersService {
 
   async update(
     user: FindUserDTO,
-    userData: UpdateUserDTO,
+    userData: InsertUpdatedUserDTO,
   ): Promise<UpdateResult> {
     return this.usersRepository.update({ username: user.username }, userData);
   }

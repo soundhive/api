@@ -8,8 +8,8 @@ import { FollowsService } from 'src/follows/follows.service';
 import { User } from 'src/users/user.entity';
 import { FindSampleDTO } from './dto/find-sample.dto';
 import { InsertSampleDTO } from './dto/insert-sample.dto';
-import { UpdateSampleDTO } from './dto/update-sample.dto';
 import { Sample } from './samples.entity';
+import { InsertUpdatedSampleDTO } from './dto/insert-updated-sample.dto';
 
 @Injectable()
 export class SamplesService {
@@ -37,7 +37,7 @@ export class SamplesService {
 
   async update(
     sample: FindSampleDTO,
-    sampleData: UpdateSampleDTO,
+    sampleData: InsertUpdatedSampleDTO,
   ): Promise<UpdateResult> {
     return this.sampleRepository.update({ id: sample.id }, sampleData);
   }

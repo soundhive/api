@@ -22,11 +22,26 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { UpdateResult } from 'typeorm';
+import {
+  ApiOperation,
+  ApiConsumes,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiUnauthorizedResponse,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
+import { BadRequestResponse } from 'src/dto/bad-request-response.dto';
+import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { Album } from './album.entity';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { FindAlbumDTO } from './dto/find-album.dto';
 import { UpdateAlbumDTO } from './dto/update-album.dto';
+import { CreateAlbumAPIBody } from './dto/create-album-api-body.dto';
+import { UpdateAlbumAPIBody } from './dto/update-album-api-body.dto';
 
 @Controller('albums')
 export class AlbumsController {
@@ -35,9 +50,22 @@ export class AlbumsController {
     private readonly tracksService: TracksService,
   ) {}
 
-  @Post()
+  @ApiOperation({ summary: 'Post a album' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateAlbumAPIBody })
+  @ApiCreatedResponse({ type: Album, description: 'Album object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('coverFile'))
+  @Post()
   async create(
     @Request() req: ValidatedJWTReq,
     @Body() createAlbumDTO: CreateAlbumDTO,
@@ -61,11 +89,19 @@ export class AlbumsController {
     return new Album(album);
   }
 
+  @ApiOperation({ summary: 'Get all albums' })
+  @ApiCreatedResponse({ type: [Album], description: 'Album objects' })
   @Get()
   async find(): Promise<Album[]> {
     return this.albumsService.find();
   }
 
+  @ApiOperation({ summary: 'Get a track' })
+  @ApiOkResponse({ type: Track, description: 'Track object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
   @Get(':id')
   async findOne(@Param() findAlbumDTO: FindAlbumDTO): Promise<Album> {
     const album: Album | undefined = await this.albumsService.findOne(
@@ -79,6 +115,12 @@ export class AlbumsController {
     return album;
   }
 
+  @ApiOperation({ summary: "Get an album's tracks" })
+  @ApiOkResponse({ type: [Track], description: 'Track objects' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
   @Get(':id/tracks')
   async findTracks(@Param() findAlbumDTO: FindAlbumDTO): Promise<Track[]> {
     const album: Album | undefined = await this.albumsService.findOne(
@@ -92,9 +134,22 @@ export class AlbumsController {
     return this.tracksService.findBy({ album });
   }
 
-  @Put(':id')
+  @ApiOperation({ summary: 'Update an album' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateAlbumAPIBody })
+  @ApiOkResponse({ type: Album, description: 'Album object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('coverFile'))
+  @Put(':id')
   async update(
     @Request() req: ValidatedJWTReq,
     @Param() findAlbumDTO: FindAlbumDTO,
@@ -138,10 +193,30 @@ export class AlbumsController {
     return updatedAlbum;
   }
 
-  @Delete(':id')
+  @ApiOperation({ summary: 'Delete album' })
+  @ApiNoContentResponse({ description: 'Deletion successful' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @HttpCode(204)
-  async delete(@Param() album: FindAlbumDTO): Promise<void> {
+  @Delete(':id')
+  async delete(
+    @Request() req: ValidatedJWTReq,
+    @Param() album: FindAlbumDTO,
+  ): Promise<void> {
+    const albumToDelete = await this.albumsService.findOne(album);
+
+    if (albumToDelete?.user.id !== req.user.id) {
+      throw new ForbiddenException(['You do not own this album.']);
+    }
+
     await this.albumsService.delete(album);
   }
 }

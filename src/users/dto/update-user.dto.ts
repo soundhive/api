@@ -1,28 +1,28 @@
 import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { IsUnique } from 'src/validators/unique.validation';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from '../user.entity';
 
 export class UpdateUserDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  name: string;
+  @ApiPropertyOptional()
+  name?: string;
 
   @IsOptional()
-  username: string;
+  @ApiPropertyOptional()
+  username?: string;
 
   @IsOptional()
   @IsEmail()
   @IsNotEmpty()
   @IsUnique(User)
-  email: string;
+  @ApiPropertyOptional()
+  email?: string;
 
   @IsOptional()
   @IsNotEmpty()
-  password: string;
-
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  profilePicture: string;
+  @ApiPropertyOptional()
+  password?: string;
 }

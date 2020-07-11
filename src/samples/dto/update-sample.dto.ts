@@ -5,35 +5,36 @@ import {
   IsIn,
   IsBoolean,
 } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateSampleDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  title: string;
+  @ApiPropertyOptional()
+  title?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  description: string;
-
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  filename: string;
+  @ApiPropertyOptional()
+  description?: string;
 
   @IsOptional()
   @IsString()
   @IsIn(['public', 'followers'])
-  visibility: string;
+  @ApiPropertyOptional()
+  visibility?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  license: string;
+  @ApiPropertyOptional()
+  license?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsBoolean()
-  downloadable: boolean;
+  @ApiPropertyOptional()
+  downloadable?: boolean;
 }
