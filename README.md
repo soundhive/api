@@ -62,15 +62,9 @@ npm run start:dev
 npm run start:prod
 ```
 
-## Test
+## Documentation
 
-```bash
-# unit tests
-npm run test
+An OpenAPI docuemntation is available trough swagger on the `/doc` routes.
 
-# e2e tests
-npm run test:e2e
-
-# test coverage
-npm run test:cov
-```
+- When running locally: [localhost:3000/doc/](https://localhost:3000/doc/)
+- Deployed version: [soundhive-api-staging.herokuapp.com/doc/](https://soundhive-api-staging.herokuapp.com/doc/)
