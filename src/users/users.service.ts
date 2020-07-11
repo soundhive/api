@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { ImageFileMediaTypes } from 'src/media-types';
 import { User } from './user.entity';
 import { FindUserDTO } from './dto/find-user.dto';
 import { InsertUserDTO } from './dto/insert-user.dto';
@@ -32,7 +33,7 @@ export class UsersService {
     file: BufferedFile,
     subFolder: string,
   ): Promise<string> {
-    if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
+    if (!Object.values(ImageFileMediaTypes).includes(file.mimetype)) {
       throw new BadRequestException(
         `Invalid profile picture image format: ${file.mimetype}`,
       );

@@ -37,6 +37,7 @@ import {
 } from '@nestjs/swagger';
 import { BadRequestResponse } from 'src/dto/bad-request-response.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
+import { AudioFileMediaType } from 'src/media-types';
 import { CreateSampleDTO } from './dto/create-sample.dto';
 import { FindSampleDTO } from './dto/find-sample.dto';
 import { UpdateSampleDTO } from './dto/update-sample.dto';
@@ -77,15 +78,7 @@ export class SamplesController {
       throw new BadRequestException('Missing sample file');
     }
 
-    if (
-      ![
-        'audio/flac',
-        'audio/mpeg',
-        'audio/ogg',
-        'audio/wav',
-        'audio/wave',
-      ].includes(file.mimetype)
-    ) {
+    if (!Object.values(AudioFileMediaType).includes(file.mimetype)) {
       throw new BadRequestException(
         `Invalid sample file media type: ${file.mimetype}`,
       );

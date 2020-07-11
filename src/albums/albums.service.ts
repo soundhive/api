@@ -4,6 +4,7 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { ImageFileMediaTypes } from 'src/media-types';
 import { Album } from './album.entity';
 import { FindAlbumDTO } from './dto/find-album.dto';
 import { InsertAlbumDTO } from './dto/insert-album-dto';
@@ -55,7 +56,7 @@ export class AlbumsService {
     file: BufferedFile,
     subFolder: string,
   ): Promise<string> {
-    if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
+    if (!Object.values(ImageFileMediaTypes).includes(file.mimetype)) {
       throw new BadRequestException(
         `Invalid cover file media type: ${file.mimetype}`,
       );

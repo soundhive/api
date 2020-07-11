@@ -14,16 +14,8 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
-enum SampleFileMediaType {
-  'audio/flac',
-  'audio/mpeg',
-  'audio/ogg',
-  'audio/wav',
-  'audio/wave',
-}
-
 @Entity('samples')
-class Sample extends BaseEntity {
+export class Sample extends BaseEntity {
   constructor(partial: Partial<Sample>) {
     super();
     Object.assign(this, partial);
@@ -75,4 +67,3 @@ class Sample extends BaseEntity {
   @ApiProperty()
   downloadable: boolean;
 }
-export { Sample, SampleFileMediaType };

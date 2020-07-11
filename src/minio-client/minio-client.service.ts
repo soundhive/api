@@ -19,10 +19,6 @@ export class MinioClientService {
     file: BufferedFile,
     subFolder: string,
   ): Promise<{ path: string }> {
-    // if (!(file.mimetype.includes('jpeg') || file.mimetype.includes('png'))) {
-    //     throw new HttpException('Invalid file type', HttpStatus.BAD_REQUEST)
-    // }
-
     const hashedFileName = crypto
       .createHash('md5')
       .update(Date.now().toString())
