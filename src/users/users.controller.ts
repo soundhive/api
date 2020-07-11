@@ -81,10 +81,7 @@ export class UsersController {
       throw new BadRequestException('Missing profile picture file');
     }
 
-    const filename: string = await this.usersService.uploadProfilePicture(
-      file,
-      'users/avatars',
-    );
+    const filename: string = await this.usersService.uploadProfilePicture(file);
 
     return this.usersService.create(
       new User({
@@ -132,10 +129,7 @@ export class UsersController {
 
     let filename: string;
     if (file) {
-      filename = await this.usersService.uploadProfilePicture(
-        file,
-        'users/avatars',
-      );
+      filename = await this.usersService.uploadProfilePicture(file);
     } else {
       filename = existingUser.profilePicture;
     }

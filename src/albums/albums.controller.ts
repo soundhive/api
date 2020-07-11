@@ -75,10 +75,7 @@ export class AlbumsController {
       throw new BadRequestException('Missing coverFile');
     }
 
-    const albumCover: string = await this.albumsService.uploadFileCover(
-      file,
-      'albums',
-    );
+    const albumCover: string = await this.albumsService.uploadFileCover(file);
 
     const album = await this.albumsService.create({
       ...createAlbumDTO,
@@ -168,7 +165,7 @@ export class AlbumsController {
 
     let coverFilename: string;
     if (file) {
-      coverFilename = await this.albumsService.uploadFileCover(file, 'albums');
+      coverFilename = await this.albumsService.uploadFileCover(file);
     } else {
       coverFilename = existingAlbum.coverFilename;
     }

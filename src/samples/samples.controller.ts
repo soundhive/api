@@ -84,10 +84,7 @@ export class SamplesController {
       );
     }
 
-    const filename: string = await this.samplesService.uploadSampleFile(
-      file,
-      'samples',
-    );
+    const filename: string = await this.samplesService.uploadSampleFile(file);
 
     return new Sample(
       await this.samplesService.create({
@@ -133,7 +130,7 @@ export class SamplesController {
 
     let filename: string;
     if (file) {
-      filename = await this.samplesService.uploadSampleFile(file, 'samples');
+      filename = await this.samplesService.uploadSampleFile(file);
     } else {
       filename = existingSample.filename;
     }

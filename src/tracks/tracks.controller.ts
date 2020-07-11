@@ -90,10 +90,7 @@ export class TracksController {
       throw new BadRequestException('Invalid album');
     }
 
-    const filename: string = await this.tracksService.uploadTrackFile(
-      file,
-      'tracks',
-    );
+    const filename: string = await this.tracksService.uploadTrackFile(file);
 
     return this.tracksService.create(
       new Track({
@@ -140,7 +137,7 @@ export class TracksController {
 
     let filename: string;
     if (file) {
-      filename = await this.tracksService.uploadTrackFile(file, 'tracks');
+      filename = await this.tracksService.uploadTrackFile(file);
     } else {
       filename = existingTrack.filename;
     }

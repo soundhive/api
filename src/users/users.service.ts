@@ -29,16 +29,14 @@ export class UsersService {
     return this.usersRepository.findOne({ username: user.username });
   }
 
-  async uploadProfilePicture(
-    file: BufferedFile,
-    subFolder: string,
-  ): Promise<string> {
+  async uploadProfilePicture(file: BufferedFile): Promise<string> {
     if (!Object.values(ImageFileMediaTypes).includes(file.mimetype)) {
       throw new BadRequestException(
         `Invalid profile picture image format: ${file.mimetype}`,
       );
     }
 
+    const subFolder = 'users/avatars';
     const uploadedProfilePicture = await this.minioClientService.upload(
       file,
       subFolder,
