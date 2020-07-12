@@ -1,10 +1,17 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { AudioFileMediaType } from 'src/media-types';
+import { ListeningsService } from 'src/listenings/listenings.service';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { InsertTrackDTO } from './dto/insert-track.dto';
 import { Track } from './track.entity';
@@ -15,6 +22,8 @@ export class TracksService {
   constructor(
     @InjectRepository(Track) private tracksRepository: Repository<Track>,
     private minioClientService: MinioClientService,
+    @Inject(forwardRef(() => ListeningsService))
+    private listeningsService: ListeningsService,
   ) {}
 
   async create(
@@ -64,7 +73,13 @@ export class TracksService {
     const track = await this.tracksRepository.findOne(trackDTO);
 
     if (!track) {
-      throw new BadRequestException();
+      throw new NotFoundException('Could not find track');
+    }
+
+    const listenings = await this.listeningsService.findBy({ track });
+
+    for (const listening of listenings) {
+      await this.listeningsService.delete(listening);
     }
 
     this.minioClientService.delete(track.filename);

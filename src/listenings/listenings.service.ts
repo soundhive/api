@@ -5,7 +5,7 @@ import { Track } from 'src/tracks/track.entity';
 import { TracksService } from 'src/tracks/tracks.service';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { Between, Repository } from 'typeorm';
+import { Between, Repository, DeleteResult } from 'typeorm';
 
 import { CreateListeningDTO } from './dto/create-listening.dto';
 import { FindLastListeningsForTrackDTO } from './dto/find-last-listenings-track.dto';
@@ -27,6 +27,10 @@ export class ListeningsService {
 
   async create(createListeningDTO: CreateListeningDTO): Promise<Listening> {
     return this.listeningRepository.save(createListeningDTO);
+  }
+
+  async findBy(params: {}): Promise<Listening[]> {
+    return this.listeningRepository.find(params);
   }
 
   async findForTrack(
@@ -242,5 +246,9 @@ export class ListeningsService {
       after,
       before: new Date(),
     });
+  }
+
+  async delete(listening: Listening): Promise<DeleteResult> {
+    return this.listeningRepository.delete(listening.id);
   }
 }
