@@ -2,6 +2,8 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { MinioService } from 'nestjs-minio-client';
 import * as Minio from 'minio';
 import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 import { config } from './config';
 import { BufferedFile } from './file.model';
 
@@ -59,6 +61,29 @@ export class MinioClientService {
     } catch {
       throw new HttpException(
         'Error deleting file',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async download(
+    downloadPath: string,
+    objetName: string,
+    baseBucket: string = this.baseBucket,
+  ): Promise<void> {
+    try {
+      const dataStream = await this.client.getObject(baseBucket, objetName);
+
+      // Pipe stream to file
+      const basedir = path.dirname(downloadPath);
+      fs.mkdirSync(basedir, {
+        recursive: true,
+      });
+      const writable = fs.createWriteStream(downloadPath);
+      dataStream.pipe(writable);
+    } catch {
+      throw new HttpException(
+        'Error getting file',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
