@@ -1,10 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { ImageFileMediaTypes } from 'src/media-types';
 import { UpdatePlaylistDTO } from './update-playlist.dto';
 
 export class UpdatePlaylistAPIBody extends UpdatePlaylistDTO {
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: 'file',
     description: `An image file of format ${
       Object.values(ImageFileMediaTypes).filter(
@@ -12,5 +12,5 @@ export class UpdatePlaylistAPIBody extends UpdatePlaylistDTO {
       ) as string[]
     }`,
   })
-  cover_file: BufferedFile;
+  cover_file?: BufferedFile;
 }

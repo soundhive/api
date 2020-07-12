@@ -32,7 +32,6 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { BufferedFile } from 'src/minio-client/file.model';
-import { Track } from 'src/tracks/track.entity';
 import { PlaylistsService } from './playlists.service';
 import { CreatePlaylistAPIBody } from './dto/create-playlist-api-body.dto';
 import { CreatePlaylistDTO } from './dto/create-playlist.dto';
@@ -95,7 +94,7 @@ export class PlaylistsController {
   }
 
   @ApiOperation({ summary: 'Get a playlist and its tracks' })
-  @ApiOkResponse({ type: Track, description: 'Track object' })
+  @ApiOkResponse({ type: Playlist, description: 'Playlist object' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
     description: 'Invalid input',
