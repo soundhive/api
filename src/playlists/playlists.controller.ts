@@ -193,11 +193,6 @@ export class PlaylistsController {
       tracks,
     );
 
-    // // There is always at least one field updated (UpdatedAt)
-    // if (!result.affected || result.affected < 1) {
-    //   throw new BadRequestException('Could not update playlist.');
-    // }
-
     // Fetch updated playlist
     const updatedPlaylist = await this.playlistsService.findOne(
       findPlaylistDTO,
