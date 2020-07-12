@@ -12,6 +12,8 @@ import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { AudioFileMediaType } from 'src/media-types';
 import { ListeningsService } from 'src/listenings/listenings.service';
+import { getAudioDurationInSeconds } from 'get-audio-duration';
+import * as fs from 'fs';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { InsertTrackDTO } from './dto/insert-track.dto';
 import { Track } from './track.entity';
@@ -33,7 +35,18 @@ export class TracksService {
     const track = new Track(insertTrackDTO);
     track.filename = await this.uploadTrackFile(trackFile);
 
+    track.duration = await this.getTrackDuration(track);
+
     return this.tracksRepository.save(track);
+  }
+
+  async getTrackDuration(track: Track): Promise<number> {
+    const trackFilePath = `/tmp/soundhive/${track.filename}`;
+    await this.minioClientService.download(trackFilePath, track.filename);
+    const duration = Math.round(await getAudioDurationInSeconds(trackFilePath));
+    fs.unlinkSync(trackFilePath);
+
+    return duration;
   }
 
   async find(): Promise<Track[]> {

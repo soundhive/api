@@ -41,6 +41,7 @@
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
     "dotenv": "^8.2.0",
+    "get-audio-duration": "^2.0.2",
     "minio": "^7.0.16",
     "nestjs-minio-client": "^1.0.4",
     "nestjs-pino": "^1.2.0",

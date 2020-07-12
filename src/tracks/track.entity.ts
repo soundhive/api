@@ -71,4 +71,8 @@ export class Track extends BaseEntity {
   })
   @Exclude()
   user: User;
+
+  @ApiProperty()
+  @Column()
+  duration: number; // in seconds
 }
