@@ -62,7 +62,11 @@ export class Track extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne((type) => Album, (album) => album.tracks, { nullable: false })
+  @ApiProperty()
+  @ManyToOne((type) => Album, (album) => album.tracks, {
+    nullable: false,
+    eager: true,
+  })
   album: Album;
 
   @ManyToOne(() => User, (user) => user.tracks, {
