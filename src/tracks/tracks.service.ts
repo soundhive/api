@@ -6,7 +6,13 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import {
+  DeleteResult,
+  Repository,
+  UpdateResult,
+  FindConditions,
+  FindManyOptions,
+} from 'typeorm';
 
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
@@ -14,6 +20,11 @@ import { AudioFileMediaType } from 'src/media-types';
 import { ListeningsService } from 'src/listenings/listenings.service';
 import { getAudioDurationInSeconds } from 'get-audio-duration';
 import * as fs from 'fs';
+import {
+  paginate,
+  Pagination,
+  IPaginationOptions,
+} from 'nestjs-typeorm-paginate';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { InsertTrackDTO } from './dto/insert-track.dto';
 import { Track } from './track.entity';
@@ -27,6 +38,13 @@ export class TracksService {
     @Inject(forwardRef(() => ListeningsService))
     private listeningsService: ListeningsService,
   ) {}
+
+  async paginate(
+    options: IPaginationOptions,
+    searchOptions?: FindConditions<Track> | FindManyOptions<Track>,
+  ): Promise<Pagination<Track>> {
+    return paginate<Track>(this.tracksRepository, options, searchOptions);
+  }
 
   async create(
     insertTrackDTO: InsertTrackDTO,

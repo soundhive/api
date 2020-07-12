@@ -41,6 +41,7 @@ import {
 } from '@nestjs/swagger';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
+import { Pagination } from 'nestjs-typeorm-paginate';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
@@ -48,6 +49,7 @@ import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
 import { CreateTrackAPIBody } from './dto/create-track-api-body.dto';
 import { UpdateTrackAPIBody } from './dto/update-track-api-body.dto';
+import { TrackPagination } from './dto/pagination-response.dto';
 
 @Controller('tracks')
 export class TracksController {
@@ -156,10 +158,17 @@ export class TracksController {
   }
 
   @ApiOperation({ summary: 'Get all tracks' })
-  @ApiOkResponse({ type: [Track], description: 'Track objects' })
+  @ApiOkResponse({ type: [TrackPagination], description: 'Track objects' })
   @Get()
-  async find(): Promise<Track[]> {
-    return this.tracksService.find();
+  async find(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<Pagination<Track>> {
+    return this.tracksService.paginate({
+      page,
+      limit,
+      route: '/tracks',
+    });
   }
 
   @ApiOperation({ summary: 'Get a track' })
