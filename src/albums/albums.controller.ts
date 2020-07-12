@@ -14,6 +14,7 @@ import {
   UploadedFile,
   UseInterceptors,
   ForbiddenException,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { TracksService } from 'src/tracks/tracks.service';
@@ -35,6 +36,9 @@ import {
 } from '@nestjs/swagger';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
+import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
 import { Album } from './album.entity';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
@@ -93,7 +97,7 @@ export class AlbumsController {
     return this.albumsService.find();
   }
 
-  @ApiOperation({ summary: 'Get a track' })
+  @ApiOperation({ summary: 'Get an album' })
   @ApiOkResponse({ type: Track, description: 'Track object' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
@@ -113,13 +117,16 @@ export class AlbumsController {
   }
 
   @ApiOperation({ summary: "Get an album's tracks" })
-  @ApiOkResponse({ type: [Track], description: 'Track objects' })
+  @ApiOkResponse({ type: [TrackPagination], description: 'Track objects' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
     description: 'Invalid input',
   })
   @Get(':id/tracks')
-  async findTracks(@Param() findAlbumDTO: FindAlbumDTO): Promise<Track[]> {
+  async findTracks(
+    @Param() findAlbumDTO: FindAlbumDTO,
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<Track>> {
     const album: Album | undefined = await this.albumsService.findOne(
       findAlbumDTO,
     );
@@ -128,7 +135,14 @@ export class AlbumsController {
       throw NotFoundException;
     }
 
-    return this.tracksService.findBy({ album });
+    return this.tracksService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: `/albums/${album.id}/tracks`,
+      },
+      { where: { album } },
+    );
   }
 
   @ApiOperation({ summary: 'Update an album' })

@@ -45,6 +45,7 @@
     "minio": "^7.0.16",
     "nestjs-minio-client": "^1.0.4",
     "nestjs-pino": "^1.2.0",
+    "nestjs-typeorm-paginate": "^2.0.3",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",

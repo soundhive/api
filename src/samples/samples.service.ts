@@ -1,11 +1,22 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import {
+  DeleteResult,
+  Repository,
+  UpdateResult,
+  FindConditions,
+  FindManyOptions,
+} from 'typeorm';
 
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { FollowsService } from 'src/follows/follows.service';
 import { User } from 'src/users/user.entity';
+import {
+  IPaginationOptions,
+  Pagination,
+  paginate,
+} from 'nestjs-typeorm-paginate';
 import { FindSampleDTO } from './dto/find-sample.dto';
 import { InsertSampleDTO } from './dto/insert-sample.dto';
 import { Sample } from './samples.entity';
@@ -18,6 +29,13 @@ export class SamplesService {
     private minioClientService: MinioClientService,
     private followsService: FollowsService,
   ) {}
+
+  async paginate(
+    options: IPaginationOptions,
+    searchOptions?: FindConditions<Sample> | FindManyOptions<Sample>,
+  ): Promise<Pagination<Sample>> {
+    return paginate<Sample>(this.sampleRepository, options, searchOptions);
+  }
 
   async create(
     insertSampleDTO: InsertSampleDTO,

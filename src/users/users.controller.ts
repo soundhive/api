@@ -45,6 +45,9 @@ import {
 } from '@nestjs/swagger';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
+import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -171,16 +174,26 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: "Get a user's tracks" })
-  @ApiOkResponse({ type: [Track], description: 'User tracks' })
+  @ApiOkResponse({ type: [TrackPagination], description: 'User tracks' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
     description: 'Invalid input',
   })
   @Get(':username/tracks')
-  async findTracks(@Param() findUserDTO: FindUserDTO): Promise<Track[]> {
+  async findTracks(
+    @Param() findUserDTO: FindUserDTO,
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<Track>> {
     const user: User | undefined = await this.usersService.findOne(findUserDTO);
 
-    return this.tracksService.findBy({ user });
+    return this.tracksService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: '/users',
+      },
+      { where: { user } },
+    );
   }
 
   @ApiOperation({ summary: "Get a user's albums" })

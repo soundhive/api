@@ -15,6 +15,7 @@ import {
   UploadedFile,
   UseInterceptors,
   ForbiddenException,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Listening } from 'src/listenings/listening.entity';
@@ -37,6 +38,8 @@ import {
 } from '@nestjs/swagger';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
+import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import { Pagination } from 'nestjs-typeorm-paginate';
 import { CreateSampleDTO } from './dto/create-sample.dto';
 import { FindSampleDTO } from './dto/find-sample.dto';
 import { UpdateSampleDTO } from './dto/update-sample.dto';
@@ -44,6 +47,7 @@ import { Sample } from './samples.entity';
 import { SamplesService } from './samples.service';
 import { CreateSampleAPIBody } from './dto/create-sample-api-body.dto';
 import { UpdateSampleAPIBody } from './dto/update-sample-api-body.dto';
+import { SamplePagination } from './dto/pagination-response.dto';
 
 @Controller('samples')
 export class SamplesController {
@@ -144,10 +148,16 @@ export class SamplesController {
   }
 
   @ApiOperation({ summary: 'Get all samples' })
-  @ApiOkResponse({ type: [Sample], description: 'Sample objects' })
+  @ApiOkResponse({ type: [SamplePagination], description: 'Sample objects' })
   @Get()
-  async find(): Promise<Sample[]> {
-    return this.samplesService.find();
+  async find(
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<Sample>> {
+    return this.samplesService.paginate({
+      page: paginationQuery.page ? paginationQuery.page : 1,
+      limit: paginationQuery.limit ? paginationQuery.limit : 10,
+      route: '/tracks',
+    });
   }
 
   @ApiOperation({ summary: 'Get a sample' })
