@@ -42,6 +42,7 @@ import {
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
@@ -161,12 +162,11 @@ export class TracksController {
   @ApiOkResponse({ type: [TrackPagination], description: 'Track objects' })
   @Get()
   async find(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
+    @Query() paginationQuery: PaginationQuery,
   ): Promise<Pagination<Track>> {
     return this.tracksService.paginate({
-      page,
-      limit,
+      page: paginationQuery.page ? paginationQuery.page : 1,
+      limit: paginationQuery.limit ? paginationQuery.limit : 10,
       route: '/tracks',
     });
   }

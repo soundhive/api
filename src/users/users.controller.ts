@@ -47,6 +47,7 @@ import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -181,16 +182,15 @@ export class UsersController {
   @Get(':username/tracks')
   async findTracks(
     @Param() findUserDTO: FindUserDTO,
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
+    @Query() paginationQuery: PaginationQuery,
   ): Promise<Pagination<Track>> {
     const user: User | undefined = await this.usersService.findOne(findUserDTO);
 
     return this.tracksService.paginate(
       {
-        page,
-        limit,
-        route: '/tracks',
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: '/users',
       },
       { where: { user } },
     );
