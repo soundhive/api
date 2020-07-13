@@ -43,9 +43,9 @@ export class MinioClientService {
         file.buffer,
         metaData,
       );
-    } catch {
+    } catch (e) {
       throw new HttpException(
-        'Error uploading file',
+        `Error uploading file: ${e.code}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
