@@ -14,6 +14,7 @@ import {
   ForbiddenException,
   HttpCode,
   Delete,
+  Query,
 } from '@nestjs/common';
 import {
   ApiOperation,
@@ -33,6 +34,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { Track } from 'src/tracks/track.entity';
+import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import { Pagination } from 'nestjs-typeorm-paginate';
 import { PlaylistsService } from './playlists.service';
 import { CreatePlaylistAPIBody } from './dto/create-playlist-api-body.dto';
 import { CreatePlaylistDTO } from './dto/create-playlist.dto';
@@ -88,10 +91,16 @@ export class PlaylistsController {
   }
 
   @ApiOperation({ summary: 'Get all playlists and their tracks' })
-  @ApiCreatedResponse({ type: [Playlist], description: 'Playlist objects' })
+  @ApiOkResponse({ type: [Playlist], description: 'Playlist objects' })
   @Get()
-  async find(): Promise<Playlist[]> {
-    return this.playlistsService.find();
+  async find(
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<Playlist>> {
+    return this.playlistsService.paginate({
+      page: paginationQuery.page ? paginationQuery.page : 1,
+      limit: paginationQuery.limit ? paginationQuery.limit : 10,
+      route: '/playlists',
+    });
   }
 
   @ApiOperation({ summary: 'Get a playlist' })

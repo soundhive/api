@@ -1,11 +1,21 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult } from 'typeorm';
+import {
+  Repository,
+  DeleteResult,
+  FindConditions,
+  FindManyOptions,
+} from 'typeorm';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { ImageFileMediaTypes } from 'src/media-types';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { TracksService } from 'src/tracks/tracks.service';
 import { isUUID } from 'class-validator';
+import {
+  IPaginationOptions,
+  Pagination,
+  paginate,
+} from 'nestjs-typeorm-paginate';
 import { Playlist } from './playlists.entity';
 import { InsertPlaylistDTO } from './dto/insert-playlist.dto';
 import { FindPlaylistDTO } from './dto/find-playlist.dto';
@@ -19,6 +29,13 @@ export class PlaylistsService {
     private minioClientService: MinioClientService,
     private tracksService: TracksService,
   ) {}
+
+  async paginate(
+    options: IPaginationOptions,
+    searchOptions?: FindConditions<Playlist> | FindManyOptions<Playlist>,
+  ): Promise<Pagination<Playlist>> {
+    return paginate<Playlist>(this.playlistsRepository, options, searchOptions);
+  }
 
   async create(
     insertPlaylistDTO: InsertPlaylistDTO,
