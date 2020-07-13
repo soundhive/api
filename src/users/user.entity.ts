@@ -61,10 +61,10 @@ export class User {
   samples: Sample[];
 
   @OneToMany((type) => Follow, (follow) => follow.to)
-  followings: Follow[];
+  followers: Follow[];
 
   @OneToMany((type) => Follow, (follow) => follow.from)
-  followers: Follow[];
+  followings: Follow[];
 
   @OneToMany((type) => Playlist, (playlist) => playlist.user)
   playlists: Playlist[];

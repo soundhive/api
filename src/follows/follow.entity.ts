@@ -28,6 +28,7 @@ export class Follow extends BaseEntity {
   @ApiProperty({ type: () => User })
   to: User;
 
+  @ManyToOne((type) => User, (user) => user.followings, { eager: true })
   @ApiProperty({ type: () => User })
   from: User;
 }
