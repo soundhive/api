@@ -17,7 +17,7 @@ const ormConfig: ConnectionOptions = {
   database: config.database || 'soundhive',
   synchronize: false,
   dropSchema: false,
-  migrationsRun: false,
+  migrationsRun: process.env.NODE_ENV === 'production', // run on heroku
   logging: true,
   entities: [`${__dirname}/**/*.entity{.ts,.js}`],
   // allow both start:prod and start:dev to use migrations
