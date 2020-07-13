@@ -51,6 +51,10 @@ export class Track extends BaseEntity {
   @Column()
   downloadable: boolean;
 
+  @ApiProperty()
+  @Column()
+  duration: number; // in seconds
+
   @OneToMany((type) => Listening, (listening) => listening.track)
   listenings: Listening[];
 
@@ -75,8 +79,4 @@ export class Track extends BaseEntity {
   })
   @Exclude()
   user: User;
-
-  @ApiProperty()
-  @Column()
-  duration: number; // in seconds
 }

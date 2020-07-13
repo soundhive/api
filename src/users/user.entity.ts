@@ -17,6 +17,7 @@ import {
   VersionColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Playlist } from 'src/playlists/playlists.entity';
 
 import argon2 = require('argon2');
 
@@ -64,6 +65,9 @@ export class User {
 
   @OneToMany((type) => Follow, (follow) => follow.from)
   followers: Follow[];
+
+  @OneToMany((type) => Playlist, (playlist) => playlist.user)
+  playlists: Playlist[];
 
   @Exclude()
   @Column({ default: true })
