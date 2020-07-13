@@ -274,7 +274,7 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Follow someone' })
-  @ApiCreatedResponse({ type: Follow, description: 'Follow object' })
+  @ApiOkResponse({ type: Follow, description: 'Follow object' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
     description: 'Invalid input',
