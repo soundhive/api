@@ -105,7 +105,7 @@ export class AlbumsController {
   }
 
   @ApiOperation({ summary: 'Get an album' })
-  @ApiOkResponse({ type: Track, description: 'Track object' })
+  @ApiOkResponse({ type: Album, description: 'Track object' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
     description: 'Invalid input',
