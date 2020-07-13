@@ -7,9 +7,10 @@ import { config } from './config';
     MinioModule.register({
       endPoint: config.MINIO_ENDPOINT,
       port: config.MINIO_PORT,
-      useSSL: false,
+      useSSL: config.MINIO_USESSL,
       accessKey: config.MINIO_ACCESSKEY,
       secretKey: config.MINIO_SECRETKEY,
+      region: config.MINIO_REGION,
     }),
   ],
   providers: [MinioClientService],
