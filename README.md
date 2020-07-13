@@ -66,5 +66,5 @@ npm run start:prod
 
 An OpenAPI docuemntation is available trough swagger on the `/doc` routes.
 
-- When running locally: [localhost:3000/doc/](https://localhost:3000/doc/)
+- When running locally: [localhost:3000/doc/](http://localhost:3000/doc/)
 - Deployed version: [soundhive-api-staging.herokuapp.com/doc/](https://soundhive-api-staging.herokuapp.com/doc/)
