@@ -46,6 +46,7 @@ import { FindAlbumDTO } from './dto/find-album.dto';
 import { UpdateAlbumDTO } from './dto/update-album.dto';
 import { CreateAlbumAPIBody } from './dto/create-album-api-body.dto';
 import { UpdateAlbumAPIBody } from './dto/update-album-api-body.dto';
+import { AlbumPagination } from './dto/pagination-response.dto';
 
 @Controller('albums')
 export class AlbumsController {
@@ -91,10 +92,16 @@ export class AlbumsController {
   }
 
   @ApiOperation({ summary: 'Get all albums' })
-  @ApiCreatedResponse({ type: [Album], description: 'Album objects' })
+  @ApiOkResponse({ type: [AlbumPagination], description: 'Album objects' })
   @Get()
-  async find(): Promise<Album[]> {
-    return this.albumsService.find();
+  async find(
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<Album>> {
+    return this.albumsService.paginate({
+      page: paginationQuery.page ? paginationQuery.page : 1,
+      limit: paginationQuery.limit ? paginationQuery.limit : 10,
+      route: '/albums',
+    });
   }
 
   @ApiOperation({ summary: 'Get an album' })
