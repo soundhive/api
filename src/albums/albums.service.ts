@@ -1,11 +1,22 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import {
+  DeleteResult,
+  Repository,
+  UpdateResult,
+  FindConditions,
+  FindManyOptions,
+} from 'typeorm';
 
 import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { ImageFileMediaTypes } from 'src/media-types';
 import { TracksService } from 'src/tracks/tracks.service';
+import {
+  IPaginationOptions,
+  Pagination,
+  paginate,
+} from 'nestjs-typeorm-paginate';
 import { Album } from './album.entity';
 import { FindAlbumDTO } from './dto/find-album.dto';
 import { InsertAlbumDTO } from './dto/insert-album-dto';
@@ -19,6 +30,13 @@ export class AlbumsService {
     private minioClientService: MinioClientService,
     private tracksService: TracksService,
   ) {}
+
+  async paginate(
+    options: IPaginationOptions,
+    searchOptions?: FindConditions<Album> | FindManyOptions<Album>,
+  ): Promise<Pagination<Album>> {
+    return paginate<Album>(this.albumsRepository, options, searchOptions);
+  }
 
   async create(
     insertAlbumDTO: InsertAlbumDTO,
