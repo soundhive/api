@@ -11,9 +11,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToMany,
 } from 'typeorm';
 
 import { ApiProperty } from '@nestjs/swagger';
+import { Playlist } from 'src/playlists/playlists.entity';
 import { Album } from '../albums/album.entity';
 
 @Entity('tracks')
@@ -79,4 +81,8 @@ export class Track extends BaseEntity {
   })
   @Exclude()
   user: User;
+
+  @Exclude()
+  @ManyToMany((type) => Playlist, (playlist) => playlist.tracks)
+  playlists: Playlist[];
 }

@@ -32,6 +32,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { Track } from 'src/tracks/track.entity';
 import { PlaylistsService } from './playlists.service';
 import { CreatePlaylistAPIBody } from './dto/create-playlist-api-body.dto';
 import { CreatePlaylistDTO } from './dto/create-playlist.dto';
@@ -93,7 +94,7 @@ export class PlaylistsController {
     return this.playlistsService.find();
   }
 
-  @ApiOperation({ summary: 'Get a playlist and its tracks' })
+  @ApiOperation({ summary: 'Get a playlist' })
   @ApiOkResponse({ type: Playlist, description: 'Playlist object' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
@@ -112,34 +113,26 @@ export class PlaylistsController {
     return playlist;
   }
 
-  //   @ApiOperation({ summary: "Get a playlist's tracks" })
-  //   @ApiOkResponse({ type: [TrackPagination], description: 'Track objects' })
-  //   @ApiBadRequestResponse({
-  //     type: BadRequestResponse,
-  //     description: 'Invalid input',
-  //   })
-  //   @Get(':id/tracks')
-  //   async findTracks(
-  //     @Param() findPlaylistDTO: FindPlaylistDTO,
-  //     @Query() paginationQuery: PaginationQuery,
-  //   ): Promise<Pagination<Track>> {
-  //     const playlist: Playlist | undefined = await this.playlistsService.findOne(
-  //       findPlaylistDTO,
-  //     );
+  @ApiOperation({ summary: "Get a playlist's tracks" })
+  @ApiOkResponse({ type: [Track], description: 'Track objects' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @Get(':id/tracks')
+  async findTracks(
+    @Param() findPlaylistDTO: FindPlaylistDTO,
+  ): Promise<Track[]> {
+    const playlist: Playlist | undefined = await this.playlistsService.findOne(
+      findPlaylistDTO,
+    );
 
-  //     if (!playlist) {
-  //       throw NotFoundException;
-  //     }
+    if (!playlist) {
+      throw new NotFoundException();
+    }
 
-  //     return this.tracksService.paginate(
-  //       {
-  //         page: paginationQuery.page ? paginationQuery.page : 1,
-  //         limit: paginationQuery.limit ? paginationQuery.limit : 10,
-  //         route: `/playlists/${playlist.id}/tracks`,
-  //       },
-  //       { where: { playlist } },
-  //     );
-  //   }
+    return playlist.tracks;
+  }
 
   @ApiOperation({ summary: 'Update a playlist' })
   @ApiConsumes('multipart/form-data')

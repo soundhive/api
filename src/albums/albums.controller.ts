@@ -132,7 +132,7 @@ export class AlbumsController {
     );
 
     if (!album) {
-      throw NotFoundException;
+      throw new NotFoundException();
     }
 
     return this.tracksService.paginate(
