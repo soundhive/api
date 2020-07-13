@@ -47,12 +47,9 @@ export class Playlist extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  //   @ManyToMany((type) => Track, (track) => track.playlists)
-  //   tracks: Track[];
-
-  @ManyToMany((type) => Track, { eager: true })
+  @Exclude()
+  @ManyToMany((type) => Track, (track) => track.playlists, { eager: true })
   @JoinTable()
-  @ApiProperty({ type: () => [Track] })
   tracks: Track[];
 
   @ManyToOne((type) => User, (user) => user.playlists, {
