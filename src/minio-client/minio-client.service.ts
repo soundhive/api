@@ -72,15 +72,12 @@ export class MinioClientService {
     baseBucket: string = this.baseBucket,
   ): Promise<void> {
     try {
-      const dataStream = await this.client.getObject(baseBucket, objetName);
-
-      // Pipe stream to file
       const basedir = path.dirname(downloadPath);
       fs.mkdirSync(basedir, {
         recursive: true,
       });
-      const writable = fs.createWriteStream(downloadPath);
-      dataStream.pipe(writable);
+
+      return this.client.fGetObject(baseBucket, objetName, downloadPath);
     } catch {
       throw new HttpException(
         'Error getting file',
