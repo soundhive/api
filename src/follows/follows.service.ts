@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult } from 'typeorm';
 import { Follow } from 'src/follows/follow.entity';
@@ -16,13 +16,14 @@ export class FollowsService {
   ) {}
 
   async create(createFollowDTO: CreateFollowDTO): Promise<Follow> {
-    const existingFollow:
-      | Follow
-      | undefined = await this.followRepository.findOne({
+    const existingFollow = await this.followRepository.findOne({
       from: createFollowDTO.from,
       to: createFollowDTO.to,
     });
     if (!existingFollow) {
+      if (createFollowDTO.from.id === createFollowDTO.to.id) {
+        throw new BadRequestException('You cannot follow yourself');
+      }
       return this.followRepository.save(createFollowDTO);
     }
 
