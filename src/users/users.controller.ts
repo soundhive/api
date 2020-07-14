@@ -294,13 +294,6 @@ export class UsersController {
     if (!target) {
       throw new BadRequestException('Could not find user.');
     }
-    const existingFollow = await this.followsService.findOne({
-      from: req.user,
-      to: target,
-    });
-    if (existingFollow) {
-      throw new BadRequestException('You are already following this user.');
-    }
 
     return this.followsService.create({ from: req.user, to: target });
   }
