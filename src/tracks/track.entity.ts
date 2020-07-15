@@ -79,7 +79,7 @@ export class Track extends BaseEntity {
     nullable: false,
     eager: true,
   })
-  @Exclude()
+  @ApiProperty()
   user: User;
 
   @Exclude()
