@@ -196,6 +196,8 @@ export class TracksController {
       throw NotFoundException;
     }
 
+    track.listeningCount = await this.listeningsService.countForTrack(track);
+
     return track;
   }
 
