@@ -98,6 +98,10 @@ export class TracksController {
       throw new BadRequestException('Invalid album');
     }
 
+    if (album.user.id !== req.user.id) {
+      throw new ForbiddenException('You do not own this album');
+    }
+
     return this.tracksService.create(
       {
         ...createTrackDTO,
