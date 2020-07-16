@@ -16,6 +16,7 @@ import {
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Playlist } from 'src/playlists/playlists.entity';
+import { Favorite } from 'src/favorites/favorite.entity';
 import { Album } from '../albums/album.entity';
 
 @Entity('tracks')
@@ -59,6 +60,9 @@ export class Track extends BaseEntity {
 
   @OneToMany((type) => Listening, (listening) => listening.track)
   listenings: Listening[];
+
+  @OneToMany((type) => Favorite, (favorite) => favorite.track)
+  favoriters: Favorite[];
 
   @ApiProperty()
   @CreateDateColumn()

@@ -1,10 +1,11 @@
 import { Exists } from 'src/shared/validators/exists.validation';
 import { User } from 'src/users/user.entity';
+import { Track } from 'src/tracks/track.entity';
 
-export class DeleteFollowDTO {
-  @Exists(User)
-  to: User;
+export class FindFavoriteDTO {
+  @Exists(Track)
+  track: Track;
 
   @Exists(User)
-  from: User;
+  user: User;
 }
