@@ -191,7 +191,7 @@ export class UsersController {
   ): Promise<Pagination<Track>> {
     const user: User | undefined = await this.usersService.findOne(findUserDTO);
 
-    return this.tracksService.paginate(
+    const paginatedDataReponse = await this.tracksService.paginate(
       {
         page: paginationQuery.page ? paginationQuery.page : 1,
         limit: paginationQuery.limit ? paginationQuery.limit : 10,
@@ -199,6 +199,20 @@ export class UsersController {
       },
       { where: { user } },
     );
+
+    const items = await Promise.all(
+      paginatedDataReponse.items.map(
+        async (track): Promise<Track> => {
+          // eslint-disable-next-line no-param-reassign
+          track.listeningCount = await this.listeningsService.countForTrack(
+            track,
+          );
+          return track;
+        },
+      ),
+    );
+
+    return { ...paginatedDataReponse, items };
   }
 
   @ApiOperation({ summary: "Get a user's albums" })

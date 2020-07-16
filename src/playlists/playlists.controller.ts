@@ -36,6 +36,7 @@ import { BufferedFile } from 'src/minio-client/file.model';
 import { Track } from 'src/tracks/track.entity';
 import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { ListeningsService } from 'src/listenings/listenings.service';
 import { PlaylistsService } from './playlists.service';
 import { CreatePlaylistAPIBody } from './dto/create-playlist-api-body.dto';
 import { CreatePlaylistDTO } from './dto/create-playlist.dto';
@@ -46,7 +47,10 @@ import { UpdatePlaylistAPIBody } from './dto/update-playlist-api-body.dto';
 
 @Controller('playlists')
 export class PlaylistsController {
-  constructor(private readonly playlistsService: PlaylistsService) {}
+  constructor(
+    private readonly playlistsService: PlaylistsService,
+    private readonly listeningsService: ListeningsService,
+  ) {}
 
   @ApiOperation({ summary: 'Create a playlist' })
   @ApiConsumes('multipart/form-data')
@@ -139,6 +143,18 @@ export class PlaylistsController {
     if (!playlist) {
       throw new NotFoundException();
     }
+
+    playlist.tracks = await Promise.all(
+      playlist.tracks.map(
+        async (track): Promise<Track> => {
+          // eslint-disable-next-line no-param-reassign
+          track.listeningCount = await this.listeningsService.countForTrack(
+            track,
+          );
+          return track;
+        },
+      ),
+    );
 
     return playlist.tracks;
   }
