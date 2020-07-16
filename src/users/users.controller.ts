@@ -273,7 +273,8 @@ export class UsersController {
   })
   @Get(':username/samples')
   async findSamples(@Param() findUserDTO: FindUserDTO): Promise<Sample[]> {
-    return this.samplesService.findBy({ user: findUserDTO });
+    const user = await this.usersService.findOne(findUserDTO);
+    return this.samplesService.findBy({ user });
   }
 
   @ApiOperation({ summary: "Get a user's followers" })
