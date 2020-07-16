@@ -85,7 +85,6 @@ export class SamplesController {
       await this.samplesService.create(
         {
           ...createSampleDTO,
-          downloadable: createSampleDTO.downloadable === 'true',
           user: req.user,
         },
         sampleFile,

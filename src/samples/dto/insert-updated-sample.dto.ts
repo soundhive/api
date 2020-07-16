@@ -6,6 +6,4 @@ export class InsertUpdatedSampleDTO {
   visibility?: string;
 
   license?: string;
-
-  downloadable?: boolean;
 }

@@ -21,9 +21,4 @@ export class CreateSampleDTO {
   @IsString()
   @ApiProperty()
   license: string;
-
-  @IsString()
-  @IsIn(['true', 'false'])
-  @ApiProperty()
-  downloadable: string;
 }

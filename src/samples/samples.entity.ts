@@ -62,8 +62,4 @@ export class Sample extends BaseEntity {
   @Column()
   @ApiProperty()
   license: string;
-
-  @Column()
-  @ApiProperty()
-  downloadable: boolean;
 }
