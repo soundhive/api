@@ -14,7 +14,7 @@ import {
   ManyToMany,
 } from 'typeorm';
 
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Playlist } from 'src/playlists/playlists.entity';
 import { Favorite } from 'src/favorites/favorite.entity';
 import { Album } from '../albums/album.entity';
@@ -57,6 +57,10 @@ export class Track extends BaseEntity {
   @ApiProperty()
   @Column()
   duration: number; // in seconds
+
+  // Not a column!
+  @ApiPropertyOptional()
+  listeningCount?: number;
 
   @OneToMany((type) => Listening, (listening) => listening.track)
   listenings: Listening[];

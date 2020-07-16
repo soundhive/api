@@ -251,4 +251,8 @@ export class ListeningsService {
   async delete(listening: Listening): Promise<DeleteResult> {
     return this.listeningRepository.delete(listening.id);
   }
+
+  async countForTrack(track: Track): Promise<number> {
+    return this.listeningRepository.count({ track });
+  }
 }

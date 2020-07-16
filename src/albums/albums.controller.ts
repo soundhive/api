@@ -39,6 +39,7 @@ import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
+import { ListeningsService } from 'src/listenings/listenings.service';
 import { Album } from './album.entity';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDTO } from './dto/create-album.dto';
@@ -53,6 +54,7 @@ export class AlbumsController {
   constructor(
     private readonly albumsService: AlbumsService,
     private readonly tracksService: TracksService,
+    private readonly listeningsService: ListeningsService,
   ) {}
 
   @ApiOperation({ summary: 'Post a album' })
@@ -142,7 +144,7 @@ export class AlbumsController {
       throw new NotFoundException();
     }
 
-    return this.tracksService.paginate(
+    const paginatedDataReponse = await this.tracksService.paginate(
       {
         page: paginationQuery.page ? paginationQuery.page : 1,
         limit: paginationQuery.limit ? paginationQuery.limit : 10,
@@ -150,6 +152,20 @@ export class AlbumsController {
       },
       { where: { album } },
     );
+
+    const items = await Promise.all(
+      paginatedDataReponse.items.map(
+        async (track): Promise<Track> => {
+          // eslint-disable-next-line no-param-reassign
+          track.listeningCount = await this.listeningsService.countForTrack(
+            track,
+          );
+          return track;
+        },
+      ),
+    );
+
+    return { ...paginatedDataReponse, items };
   }
 
   @ApiOperation({ summary: 'Update an album' })

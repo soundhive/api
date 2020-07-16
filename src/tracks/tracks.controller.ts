@@ -173,11 +173,25 @@ export class TracksController {
   async find(
     @Query() paginationQuery: PaginationQuery,
   ): Promise<Pagination<Track>> {
-    return this.tracksService.paginate({
+    const paginatedDataReponse = await this.tracksService.paginate({
       page: paginationQuery.page ? paginationQuery.page : 1,
       limit: paginationQuery.limit ? paginationQuery.limit : 10,
       route: '/tracks',
     });
+
+    const items = await Promise.all(
+      paginatedDataReponse.items.map(
+        async (track): Promise<Track> => {
+          // eslint-disable-next-line no-param-reassign
+          track.listeningCount = await this.listeningsService.countForTrack(
+            track,
+          );
+          return track;
+        },
+      ),
+    );
+
+    return { ...paginatedDataReponse, items };
   }
 
   @ApiOperation({ summary: 'Get a track' })
@@ -195,6 +209,8 @@ export class TracksController {
     if (!track) {
       throw NotFoundException;
     }
+
+    track.listeningCount = await this.listeningsService.countForTrack(track);
 
     return track;
   }

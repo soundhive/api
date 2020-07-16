@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from 'src/users/users.module';
 import { TracksModule } from 'src/tracks/tracks.module';
 import { MinioClientModule } from 'src/minio-client/minio-client.module';
+import { ListeningsModule } from 'src/listenings/listenings.module';
 import { Playlist } from './playlists.entity';
 import { PlaylistsService } from './playlists.service';
 import { PlaylistsController } from './playlists.controller';
@@ -11,6 +12,7 @@ import { PlaylistsController } from './playlists.controller';
   imports: [
     TypeOrmModule.forFeature([Playlist]),
     forwardRef(() => UsersModule),
+    forwardRef(() => ListeningsModule),
     forwardRef(() => TracksModule),
     MinioClientModule,
   ],
