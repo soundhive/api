@@ -2,7 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TracksModule } from 'src/tracks/tracks.module';
-import { SamplesModule } from 'src/samples/samples.module'
+import { SamplesModule } from 'src/samples/samples.module';
 import { ListeningsModule } from 'src/listenings/listenings.module';
 import { FollowsModule } from 'src/follows/follows.module';
 import { AlbumsModule } from 'src/albums/albums.module';
