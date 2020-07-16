@@ -50,6 +50,7 @@ import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import { FavoritesService } from 'src/favorites/favorites.service';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -67,6 +68,7 @@ export class UsersController {
     private readonly tracksService: TracksService,
     private readonly followsService: FollowsService,
     private readonly samplesService: SamplesService,
+    private readonly favoritesService: FavoritesService,
   ) {}
 
   @ApiOperation({ summary: 'Sign up' })
@@ -351,5 +353,29 @@ export class UsersController {
       from: emitor,
       to: target,
     });
+  }
+
+  @ApiOperation({ summary: "Get the user's favorite tracks" })
+  @ApiOkResponse({
+    type: [Track],
+    description: 'Favorite tracks',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @Get(':username/favorites')
+  async favoriters(@Param() findUserDTO: FindUserDTO): Promise<Track[]> {
+    const user = await this.usersService.findOne(findUserDTO);
+
+    const favs = await this.favoritesService.findBy({ user });
+
+    const favorites = favs.map((fav) => fav.track);
+
+    return favorites;
   }
 }

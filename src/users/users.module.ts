@@ -7,6 +7,7 @@ import { ListeningsModule } from 'src/listenings/listenings.module';
 import { FollowsModule } from 'src/follows/follows.module';
 import { AlbumsModule } from 'src/albums/albums.module';
 import { MinioClientModule } from 'src/minio-client/minio-client.module';
+import { FavoritesModule } from 'src/favorites/favorites.module';
 import { User } from './user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -19,6 +20,7 @@ import { UsersService } from './users.service';
     forwardRef(() => FollowsModule),
     forwardRef(() => AlbumsModule),
     forwardRef(() => SamplesModule),
+    forwardRef(() => FavoritesModule),
     MinioClientModule,
   ],
   providers: [UsersService],

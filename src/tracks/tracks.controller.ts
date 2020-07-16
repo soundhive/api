@@ -43,6 +43,10 @@ import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import { FavoritesService } from 'src/favorites/favorites.service';
+import { Favorite } from 'src/favorites/favorite.entity';
+import { FavoritedResponseDTO } from 'src/favorites/dto/favorited-response.dto';
+import { User } from 'src/users/user.entity';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
@@ -58,6 +62,7 @@ export class TracksController {
     private readonly tracksService: TracksService,
     private readonly albumsService: AlbumsService,
     private readonly listeningsService: ListeningsService,
+    private readonly favoritesService: FavoritesService,
   ) {}
 
   @ApiOperation({ summary: 'Post a track' })
@@ -277,5 +282,116 @@ export class TracksController {
     }
 
     await this.tracksService.delete(track);
+  }
+
+  @ApiOperation({ summary: 'Favorite track' })
+  @ApiCreatedResponse({
+    description: 'Track favorited',
+    type: Favorite,
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/favorite')
+  async favorite(
+    @Param() findTrackDTO: FindTrackDTO,
+    @Request() req: ValidatedJWTReq,
+  ): Promise<Favorite> {
+    const track = await this.tracksService.findOne(findTrackDTO);
+    const favorite = new Favorite({ user: req.user, track });
+    return this.favoritesService.create(favorite);
+  }
+
+  @ApiOperation({ summary: 'Unavorite track' })
+  @ApiNoContentResponse({
+    description: 'Track unfavorited',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
+  @Delete(':id/favorite')
+  async unfavorite(
+    @Param() findTrackDTO: FindTrackDTO,
+    @Request() req: ValidatedJWTReq,
+  ): Promise<void> {
+    const track = await this.tracksService.findOne(findTrackDTO);
+    const favorite = new Favorite({ user: req.user, track });
+    const exisingFav = await this.favoritesService.findOne(favorite);
+
+    if (!exisingFav) {
+      throw new BadRequestException('This track is not in your favorites');
+    }
+
+    await this.favoritesService.delete(favorite);
+  }
+
+  @ApiOperation({ summary: 'Know if track is favorited' })
+  @ApiOkResponse({
+    type: FavoritedResponseDTO,
+    description: 'Success',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/isfavorited')
+  async isFavorited(
+    @Param() findTrackDTO: FindTrackDTO,
+    @Request() req: ValidatedJWTReq,
+  ): Promise<FavoritedResponseDTO> {
+    const track = await this.tracksService.findOne(findTrackDTO);
+    const favorite = new Favorite({ user: req.user, track });
+    const exisingFav = await this.favoritesService.findOne(favorite);
+
+    if (!exisingFav) {
+      return { favorited: false };
+    }
+
+    return { favorited: true };
+  }
+
+  @ApiOperation({ summary: 'Get the users favoriting a track' })
+  @ApiOkResponse({
+    type: [User],
+    description: 'Favoriers (users)',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @Get(':id/favoriters')
+  async favoriters(@Param() findTrackDTO: FindTrackDTO): Promise<User[]> {
+    const track = await this.tracksService.findOne(findTrackDTO);
+
+    const favs = await this.favoritesService.findBy({ track });
+
+    const favoriters = favs.map((fav) => fav.user);
+
+    return favoriters;
   }
 }

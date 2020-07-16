@@ -5,6 +5,7 @@ import { UsersModule } from 'src/users/users.module';
 
 import { AlbumsModule } from 'src/albums/albums.module';
 import { MinioClientModule } from 'src/minio-client/minio-client.module';
+import { FavoritesModule } from 'src/favorites/favorites.module';
 import { Track } from './track.entity';
 import { TracksController } from './tracks.controller';
 import { TracksService } from './tracks.service';
@@ -17,6 +18,7 @@ import { AlbumsService } from '../albums/albums.service';
     forwardRef(() => UsersModule),
     forwardRef(() => ListeningsModule),
     forwardRef(() => AlbumsModule),
+    forwardRef(() => FavoritesModule),
     MinioClientModule,
   ],
   controllers: [TracksController],

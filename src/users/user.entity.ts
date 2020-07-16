@@ -18,6 +18,7 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Playlist } from 'src/playlists/playlists.entity';
+import { Favorite } from 'src/favorites/favorite.entity';
 
 import argon2 = require('argon2');
 
@@ -50,6 +51,9 @@ export class User {
 
   @OneToMany((type) => Listening, (listening) => listening.user)
   listenings: Listening[];
+
+  @OneToMany((type) => Favorite, (favorite) => favorite.user)
+  favorites: Favorite[];
 
   @OneToMany((type) => Track, (track) => track.user)
   tracks: Track[];
