@@ -10,6 +10,4 @@ export class InsertSampleDTO {
   visibility: string;
 
   license: string;
-
-  downloadable: boolean;
 }

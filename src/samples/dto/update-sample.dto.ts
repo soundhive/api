@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsOptional,
-  IsIn,
-  IsBoolean,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsIn } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateSampleDTO {
@@ -31,10 +25,4 @@ export class UpdateSampleDTO {
   @IsString()
   @ApiPropertyOptional()
   license?: string;
-
-  @IsOptional()
-  @IsNotEmpty()
-  @IsBoolean()
-  @ApiPropertyOptional()
-  downloadable?: boolean;
 }
