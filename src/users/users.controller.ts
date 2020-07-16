@@ -26,6 +26,8 @@ import { FollowsService } from 'src/follows/follows.service';
 import { Album } from 'src/albums/album.entity';
 import { AlbumsService } from 'src/albums/albums.service';
 import { TracksService } from 'src/tracks/tracks.service';
+import { SamplesService } from 'src/samples/samples.service';
+import { Sample } from 'src/samples/samples.entity';
 import { Track } from 'src/tracks/track.entity';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -64,6 +66,7 @@ export class UsersController {
     private readonly albumsService: AlbumsService,
     private readonly tracksService: TracksService,
     private readonly followsService: FollowsService,
+    private readonly samplesService: SamplesService,
   ) {}
 
   @ApiOperation({ summary: 'Sign up' })
@@ -257,6 +260,20 @@ export class UsersController {
   @Get(':username/followings')
   async findFollowings(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
     return this.followsService.findUserFollowed(findUserDTO);
+  }
+
+  @ApiOperation({ summary: "Get a user's samples" })
+  @ApiOkResponse({
+    type: [Sample],
+    description: 'Samples',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @Get(':username/samples')
+  async findSamples(@Param() findUserDTO: FindUserDTO): Promise<Sample[]> {
+    return this.samplesService.findBy({ user: findUserDTO });
   }
 
   @ApiOperation({ summary: "Get a user's followers" })
