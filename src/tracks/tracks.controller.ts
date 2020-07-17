@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -11,50 +12,48 @@ import {
   Put,
   Query,
   Request,
-  UseGuards,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
-  ForbiddenException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { Pagination } from 'nestjs-typeorm-paginate';
 import { AlbumsService } from 'src/albums/albums.service';
+import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
+import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { FavoritedResponseDTO } from 'src/favorites/dto/favorited-response.dto';
+import { Favorite } from 'src/favorites/favorite.entity';
+import { FavoritesService } from 'src/favorites/favorites.service';
 import { FindLastListeningsForTrackDTO } from 'src/listenings/dto/find-last-listenings-track.dto';
 import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 import { TrackListeningsResponseDTO } from 'src/listenings/dto/responses/track-listenings-response.dto';
 import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
-
-import { UpdateResult } from 'typeorm';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from 'src/minio-client/file.model';
-import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
-import {
-  ApiOperation,
-  ApiConsumes,
-  ApiBody,
-  ApiCreatedResponse,
-  ApiBadRequestResponse,
-  ApiBearerAuth,
-  ApiUnauthorizedResponse,
-  ApiOkResponse,
-  ApiNoContentResponse,
-} from '@nestjs/swagger';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
-import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
-import { Pagination } from 'nestjs-typeorm-paginate';
 import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
-import { FavoritesService } from 'src/favorites/favorites.service';
-import { Favorite } from 'src/favorites/favorite.entity';
-import { FavoritedResponseDTO } from 'src/favorites/dto/favorited-response.dto';
 import { User } from 'src/users/user.entity';
+import { UpdateResult } from 'typeorm';
+import { CreateTrackAPIBody } from './dto/create-track-api-body.dto';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { FindTrackDTO } from './dto/find-track.dto';
+import { TrackPagination } from './dto/pagination-response.dto';
+import { UpdateTrackAPIBody } from './dto/update-track-api-body.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
-import { CreateTrackAPIBody } from './dto/create-track-api-body.dto';
-import { UpdateTrackAPIBody } from './dto/update-track-api-body.dto';
-import { TrackPagination } from './dto/pagination-response.dto';
 
 @Controller('tracks')
 export class TracksController {
@@ -192,6 +191,24 @@ export class TracksController {
     );
 
     return { ...paginatedDataReponse, items };
+  }
+
+  @ApiOperation({ summary: 'Get track charts' })
+  @ApiOkResponse({
+    type: [Track],
+    description: 'Charting tracks',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @Get('charts')
+  async charts(): Promise<Track[]> {
+    return this.tracksService.getChartingTracks();
   }
 
   @ApiOperation({ summary: 'Get a track' })

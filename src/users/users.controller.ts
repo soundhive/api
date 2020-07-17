@@ -442,7 +442,7 @@ export class UsersController {
       {
         page: paginationQuery.page ? paginationQuery.page : 1,
         limit: paginationQuery.limit ? paginationQuery.limit : 10,
-        route: '/users',
+        route: `/users/${user.username}/history`,
       },
       {
         where: { user },
