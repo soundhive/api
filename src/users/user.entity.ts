@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { Album } from 'src/albums/album.entity';
-import { Listening } from 'src/listenings/listening.entity';
+import { Favorite } from 'src/favorites/favorite.entity';
 import { Follow } from 'src/follows/follow.entity';
-import { Track } from 'src/tracks/track.entity';
+import { Listening } from 'src/listenings/listening.entity';
+import { Playlist } from 'src/playlists/playlists.entity';
 import { Sample } from 'src/samples/samples.entity';
+import { Track } from 'src/tracks/track.entity';
 import {
   BeforeInsert,
   Column,
@@ -16,9 +19,6 @@ import {
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
-import { Playlist } from 'src/playlists/playlists.entity';
-import { Favorite } from 'src/favorites/favorite.entity';
 
 import argon2 = require('argon2');
 
@@ -92,6 +92,8 @@ export class User {
   @ApiProperty()
   @Column()
   profilePicture: string;
+
+  following?: boolean;
 
   @BeforeInsert()
   async hashPassword(): Promise<void> {
