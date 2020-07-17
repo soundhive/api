@@ -427,7 +427,12 @@ export class UsersController {
         limit: paginationQuery.limit ? paginationQuery.limit : 10,
         route: '/users',
       },
-      { where: { user } },
+      {
+        where: { user },
+        order: {
+          listenedAt: 'DESC',
+        },
+      },
     );
   }
 }
