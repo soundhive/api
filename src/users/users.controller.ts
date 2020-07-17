@@ -51,6 +51,7 @@ import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { FavoritesService } from 'src/favorites/favorites.service';
+import { Listening } from 'src/listenings/listening.entity';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -391,5 +392,42 @@ export class UsersController {
     const favorites = favs.map((fav) => fav.track);
 
     return favorites;
+  }
+
+  @ApiOperation({ summary: "Get the user's history" })
+  @ApiOkResponse({
+    type: [Listening],
+    description: 'Listenings',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get(':username/history')
+  async history(
+    @Request() req: ValidatedJWTReq,
+    @Query() paginationQuery: PaginationQuery,
+    @Param() findUserDTO: FindUserDTO,
+  ): Promise<Pagination<Listening>> {
+    const user = await this.usersService.findOne(findUserDTO);
+
+    if (user?.id !== req.user.id) {
+      throw new ForbiddenException("You can not view someone else's history");
+    }
+
+    return this.listeningsService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: '/users',
+      },
+      { where: { user } },
+    );
   }
 }

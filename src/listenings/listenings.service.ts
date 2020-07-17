@@ -5,8 +5,19 @@ import { Track } from 'src/tracks/track.entity';
 import { TracksService } from 'src/tracks/tracks.service';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { Between, Repository, DeleteResult } from 'typeorm';
+import {
+  Between,
+  Repository,
+  DeleteResult,
+  FindConditions,
+  FindManyOptions,
+} from 'typeorm';
 
+import {
+  IPaginationOptions,
+  Pagination,
+  paginate,
+} from 'nestjs-typeorm-paginate';
 import { CreateListeningDTO } from './dto/create-listening.dto';
 import { FindLastListeningsForTrackDTO } from './dto/find-last-listenings-track.dto';
 import { FindLastListeningsForUserDTO } from './dto/find-last-listenings-user.dto';
@@ -254,5 +265,16 @@ export class ListeningsService {
 
   async countForTrack(track: Track): Promise<number> {
     return this.listeningRepository.count({ track });
+  }
+
+  async paginate(
+    options: IPaginationOptions,
+    searchOptions?: FindConditions<Listening> | FindManyOptions<Listening>,
+  ): Promise<Pagination<Listening>> {
+    return paginate<Listening>(
+      this.listeningRepository,
+      options,
+      searchOptions,
+    );
   }
 }
