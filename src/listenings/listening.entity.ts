@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Sample } from 'src/samples/samples.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 enum ListeningPeriod {
   Hour = 'hour',
@@ -22,19 +23,32 @@ class Listening {
     Object.assign(this, partial);
   }
 
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty()
   @CreateDateColumn()
   listenedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.listenings, { nullable: false })
+  @ManyToOne(() => User, (user) => user.listenings, {
+    nullable: false,
+    eager: true,
+  })
   user: User;
 
-  @ManyToOne(() => Track, (track) => track.listenings, { nullable: true })
+  @ApiProperty()
+  @ManyToOne(() => Track, (track) => track.listenings, {
+    nullable: true,
+    eager: true,
+  })
   track: Track;
 
-  @ManyToOne(() => Sample, (sample) => sample.listenings, { nullable: true })
+  @ApiProperty()
+  @ManyToOne(() => Sample, (sample) => sample.listenings, {
+    nullable: true,
+    eager: true,
+  })
   sample: Sample;
 }
 
