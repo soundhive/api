@@ -1,65 +1,65 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
+  HttpCode,
+  NotFoundException,
   Param,
   Post,
-  Query,
-  UseGuards,
-  Request,
-  NotFoundException,
-  Delete,
-  BadRequestException,
-  HttpCode,
-  UseInterceptors,
-  UploadedFile,
   Put,
-  ForbiddenException,
+  Query,
+  Request,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { FindLastListeningsForUserDTO } from 'src/listenings/dto/find-last-listenings-user.dto';
-import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
-import { UserListeningsResponseDTO } from 'src/listenings/dto/responses/user-listenings-response.dto';
-import { ListeningsService } from 'src/listenings/listenings.service';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Follow } from 'src/follows/follow.entity';
-import { FollowsService } from 'src/follows/follows.service';
-import { Album } from 'src/albums/album.entity';
-import { AlbumsService } from 'src/albums/albums.service';
-import { TracksService } from 'src/tracks/tracks.service';
-import { SamplesService } from 'src/samples/samples.service';
-import { Sample } from 'src/samples/samples.entity';
-import { Track } from 'src/tracks/track.entity';
-import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { BufferedFile } from 'src/minio-client/file.model';
-import { UpdateResult } from 'typeorm';
 import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
-  ApiOperation,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
-  ApiOkResponse,
-  ApiParam,
-  ApiBadRequestResponse,
   ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
-import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
-import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import { Album } from 'src/albums/album.entity';
+import { AlbumsService } from 'src/albums/albums.service';
+import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
+import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FavoritesService } from 'src/favorites/favorites.service';
-import { Listening } from 'src/listenings/listening.entity';
+import { Follow } from 'src/follows/follow.entity';
+import { FollowsService } from 'src/follows/follows.service';
+import { FindLastListeningsForUserDTO } from 'src/listenings/dto/find-last-listenings-user.dto';
+import { FindListeningsDTO } from 'src/listenings/dto/find-listenings.dto';
 import { ListeningPagination } from 'src/listenings/dto/responses/pagination-response.dto';
+import { UserListeningsResponseDTO } from 'src/listenings/dto/responses/user-listenings-response.dto';
+import { Listening } from 'src/listenings/listening.entity';
+import { ListeningsService } from 'src/listenings/listenings.service';
+import { BufferedFile } from 'src/minio-client/file.model';
+import { Sample } from 'src/samples/samples.entity';
+import { SamplesService } from 'src/samples/samples.service';
+import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
+import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
+import { Track } from 'src/tracks/track.entity';
+import { TracksService } from 'src/tracks/tracks.service';
+import { UpdateResult } from 'typeorm';
+import { CreateUserAPIBody } from './dto/create-user-api-body';
+import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
+import { UpdateUserAPIBody } from './dto/update-user-api-body';
+import { UpdateUserDTO } from './dto/update-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
-import { CreateUserDTO } from './dto/create-user.dto';
-import { UpdateUserDTO } from './dto/update-user.dto';
-import { UpdateUserAPIBody } from './dto/update-user-api-body';
-import { CreateUserAPIBody } from './dto/create-user-api-body';
 
 @Controller('users')
 export class UsersController {
@@ -169,12 +169,28 @@ export class UsersController {
     type: BadRequestResponse,
     description: 'Invalid input',
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':username')
-  async findOne(@Param() userReq: { username: string }): Promise<User> {
+  async findOne(
+    @Request() req: ValidatedJWTReq,
+    @Param() userReq: { username: string },
+  ): Promise<User> {
     const user: User | undefined = await this.usersService.findOne(userReq);
 
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    const follow = await this.followsService.findOne({
+      from: req.user,
+      to: user,
+    });
+
+    if (follow) {
+      user.following = true;
+    } else {
+      user.following = false;
     }
 
     return user;
