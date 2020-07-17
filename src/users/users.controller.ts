@@ -52,6 +52,7 @@ import { Pagination } from 'nestjs-typeorm-paginate';
 import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import { Listening } from 'src/listenings/listening.entity';
+import { ListeningPagination } from 'src/listenings/dto/responses/pagination-response.dto';
 import { FindUserDTO } from './dto/find-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -396,7 +397,7 @@ export class UsersController {
 
   @ApiOperation({ summary: "Get the user's history" })
   @ApiOkResponse({
-    type: [Listening],
+    type: [ListeningPagination],
     description: 'Listenings',
   })
   @ApiBadRequestResponse({
