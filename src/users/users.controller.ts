@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {
   BadRequestException,
   Body,
@@ -35,6 +36,7 @@ import { AlbumsService } from 'src/albums/albums.service';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Favorite } from 'src/favorites/favorite.entity';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import { Follow } from 'src/follows/follow.entity';
 import { FollowsService } from 'src/follows/follows.service';
@@ -207,7 +209,10 @@ export class UsersController {
     @Param() findUserDTO: FindUserDTO,
     @Query() paginationQuery: PaginationQuery,
   ): Promise<Pagination<Track>> {
-    const user: User | undefined = await this.usersService.findOne(findUserDTO);
+    const user = await this.usersService.findOne(findUserDTO);
+    if (!user) {
+      throw new BadRequestException();
+    }
 
     const paginatedDataReponse = await this.tracksService.paginate(
       {
@@ -221,10 +226,14 @@ export class UsersController {
     const items = await Promise.all(
       paginatedDataReponse.items.map(
         async (track): Promise<Track> => {
-          // eslint-disable-next-line no-param-reassign
           track.listeningCount = await this.listeningsService.countForTrack(
             track,
           );
+          track.favorited =
+            (await this.favoritesService.findOne({
+              track,
+              user,
+            })) !== undefined;
           return track;
         },
       ),
@@ -400,15 +409,40 @@ export class UsersController {
     type: UnauthorizedResponse,
     description: 'Invalid JWT token',
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':username/favorites')
-  async favoriters(@Param() findUserDTO: FindUserDTO): Promise<Track[]> {
+  async favoriters(
+    @Request() req: ValidatedJWTReq,
+    @Query() paginationQuery: PaginationQuery,
+    @Param() findUserDTO: FindUserDTO,
+  ): Promise<Pagination<Favorite>> {
     const user = await this.usersService.findOne(findUserDTO);
 
-    const favs = await this.favoritesService.findBy({ user });
+    if (user?.id !== req.user.id) {
+      throw new ForbiddenException("You can not view someone else's favorites");
+    }
 
-    const favorites = favs.map((fav) => fav.track);
+    const favs = await this.favoritesService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: `/users/${user.username}/favorites`,
+      },
+      {
+        where: { user },
+        order: {
+          favoritedAt: 'DESC',
+        },
+      },
+    );
 
-    return favorites;
+    const items = favs.items.map((fav) => {
+      fav.track.favorited = true;
+      return fav;
+    });
+
+    return { ...favs, items };
   }
 
   @ApiOperation({ summary: "Get the user's history" })
@@ -438,7 +472,7 @@ export class UsersController {
       throw new ForbiddenException("You can not view someone else's history");
     }
 
-    return this.listeningsService.paginate(
+    const listenings = await this.listeningsService.paginate(
       {
         page: paginationQuery.page ? paginationQuery.page : 1,
         limit: paginationQuery.limit ? paginationQuery.limit : 10,
@@ -451,5 +485,18 @@ export class UsersController {
         },
       },
     );
+
+    const items = await Promise.all(
+      listenings.items.map(async (listening) => {
+        listening.track.favorited =
+          (await this.favoritesService.findOne({
+            track: listening.track,
+            user,
+          })) !== undefined;
+        return listening;
+      }),
+    );
+
+    return { ...listenings, items };
   }
 }

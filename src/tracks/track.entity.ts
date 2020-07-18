@@ -1,22 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { Favorite } from 'src/favorites/favorite.entity';
 import { Listening } from 'src/listenings/listening.entity';
+import { Playlist } from 'src/playlists/playlists.entity';
 import { User } from 'src/users/user.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  ManyToMany,
 } from 'typeorm';
-
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Playlist } from 'src/playlists/playlists.entity';
-import { Favorite } from 'src/favorites/favorite.entity';
 import { Album } from '../albums/album.entity';
 
 @Entity('tracks')
@@ -61,6 +60,10 @@ export class Track extends BaseEntity {
   // Not a column!
   @ApiPropertyOptional()
   listeningCount?: number;
+
+  // Not a column!
+  @ApiPropertyOptional()
+  favorited?: boolean;
 
   @OneToMany((type) => Listening, (listening) => listening.track)
   listenings: Listening[];
