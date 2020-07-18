@@ -1,34 +1,33 @@
 import {
-  Injectable,
   BadRequestException,
-  NotFoundException,
-  Inject,
   forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  DeleteResult,
-  Repository,
-  UpdateResult,
-  FindConditions,
-  FindManyOptions,
-} from 'typeorm';
-
-import { MinioClientService } from 'src/minio-client/minio-client.service';
-import { BufferedFile } from 'src/minio-client/file.model';
-import { AudioFileMediaType } from 'src/media-types';
-import { ListeningsService } from 'src/listenings/listenings.service';
-import { getAudioDurationInSeconds } from 'get-audio-duration';
 import * as fs from 'fs';
+import { getAudioDurationInSeconds } from 'get-audio-duration';
 import {
+  IPaginationOptions,
   paginate,
   Pagination,
-  IPaginationOptions,
 } from 'nestjs-typeorm-paginate';
+import { ListeningsService } from 'src/listenings/listenings.service';
+import { AudioFileMediaType } from 'src/media-types';
+import { BufferedFile } from 'src/minio-client/file.model';
+import { MinioClientService } from 'src/minio-client/minio-client.service';
+import {
+  DeleteResult,
+  FindConditions,
+  FindManyOptions,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { FindTrackDTO } from './dto/find-track.dto';
 import { InsertTrackDTO } from './dto/insert-track.dto';
-import { Track } from './track.entity';
 import { InsertUpdatedTrackDTO } from './dto/insert-updated-track.dto';
+import { Track } from './track.entity';
 
 @Injectable()
 export class TracksService {
@@ -44,6 +43,35 @@ export class TracksService {
     searchOptions?: FindConditions<Track> | FindManyOptions<Track>,
   ): Promise<Pagination<Track>> {
     return paginate<Track>(this.tracksRepository, options, searchOptions);
+  }
+
+  async getChartingTracks(): Promise<Track[]> {
+    const trackids = await this.listeningsService.getChartingTrackIdsWithListeningCount();
+
+    const trackListeningMap = new Map(
+      trackids.map((i) => [i.trackId, i.listeningcount] as [string, string]),
+    );
+
+    const trackList = trackids.map((element) => element.trackId);
+
+    let tracks = await this.tracksRepository.findByIds(trackList);
+
+    tracks = tracks.map(
+      (track): Track => {
+        // eslint-disable-next-line no-param-reassign
+        track.listeningCount = Number(trackListeningMap.get(track.id));
+        return track;
+      },
+    );
+
+    tracks.sort((a, b) => {
+      if (a.listeningCount && b.listeningCount) {
+        return a.listeningCount < b.listeningCount ? 1 : -1;
+      }
+      return 0;
+    });
+
+    return tracks;
   }
 
   async create(

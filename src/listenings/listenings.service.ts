@@ -1,23 +1,22 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { Track } from 'src/tracks/track.entity';
 import { TracksService } from 'src/tracks/tracks.service';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import {
   Between,
-  Repository,
   DeleteResult,
   FindConditions,
   FindManyOptions,
+  Repository,
 } from 'typeorm';
-
-import {
-  IPaginationOptions,
-  Pagination,
-  paginate,
-} from 'nestjs-typeorm-paginate';
 import { CreateListeningDTO } from './dto/create-listening.dto';
 import { FindLastListeningsForTrackDTO } from './dto/find-last-listenings-track.dto';
 import { FindLastListeningsForUserDTO } from './dto/find-last-listenings-user.dto';
@@ -32,6 +31,7 @@ export class ListeningsService {
   constructor(
     @InjectRepository(Listening)
     private listeningRepository: Repository<Listening>,
+
     private readonly usersService: UsersService,
     private readonly tracksService: TracksService,
   ) {}
@@ -276,5 +276,19 @@ export class ListeningsService {
       options,
       searchOptions,
     );
+  }
+
+  async getChartingTrackIdsWithListeningCount(): Promise<
+    { trackId: string; listeningcount: string }[]
+  > {
+    const tracks = await this.listeningRepository
+      .createQueryBuilder('listenings')
+      .select('"trackId"')
+      .addSelect('COUNT("trackId") AS listeningCount')
+      .groupBy('"trackId"')
+      .limit(100)
+      .getRawMany();
+
+    return tracks;
   }
 }
