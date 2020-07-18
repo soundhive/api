@@ -215,15 +215,11 @@ export class TracksController {
 
     tracks = await Promise.all(
       tracks.map(async (track) => {
-        const favorite = await this.favoritesService.findOne({
-          track,
-          user: req.user,
-        });
-        if (favorite) {
-          track.favorited = true;
-        } else {
-          track.favorited = false;
-        }
+        track.favorited =
+          (await this.favoritesService.findOne({
+            track,
+            user: req.user,
+          })) !== undefined;
         return track;
       }),
     );

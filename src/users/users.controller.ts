@@ -229,15 +229,11 @@ export class UsersController {
           track.listeningCount = await this.listeningsService.countForTrack(
             track,
           );
-          const favorite = await this.favoritesService.findOne({
-            track,
-            user,
-          });
-          if (favorite) {
-            track.favorited = true;
-          } else {
-            track.favorited = false;
-          }
+          track.favorited =
+            (await this.favoritesService.findOne({
+              track,
+              user,
+            })) !== undefined;
           return track;
         },
       ),
@@ -492,15 +488,11 @@ export class UsersController {
 
     const items = await Promise.all(
       listenings.items.map(async (listening) => {
-        const favorite = await this.favoritesService.findOne({
-          track: listening.track,
-          user,
-        });
-        if (favorite) {
-          listening.track.favorited = true;
-        } else {
-          listening.track.favorited = false;
-        }
+        listening.track.favorited =
+          (await this.favoritesService.findOne({
+            track: listening.track,
+            user,
+          })) !== undefined;
         return listening;
       }),
     );
