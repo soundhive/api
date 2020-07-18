@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {
   BadRequestException,
   Body,
@@ -208,7 +209,10 @@ export class UsersController {
     @Param() findUserDTO: FindUserDTO,
     @Query() paginationQuery: PaginationQuery,
   ): Promise<Pagination<Track>> {
-    const user: User | undefined = await this.usersService.findOne(findUserDTO);
+    const user = await this.usersService.findOne(findUserDTO);
+    if (!user) {
+      throw new BadRequestException();
+    }
 
     const paginatedDataReponse = await this.tracksService.paginate(
       {
@@ -222,10 +226,18 @@ export class UsersController {
     const items = await Promise.all(
       paginatedDataReponse.items.map(
         async (track): Promise<Track> => {
-          // eslint-disable-next-line no-param-reassign
           track.listeningCount = await this.listeningsService.countForTrack(
             track,
           );
+          const favorite = await this.favoritesService.findOne({
+            track,
+            user,
+          });
+          if (favorite) {
+            track.favorited = true;
+          } else {
+            track.favorited = false;
+          }
           return track;
         },
       ),
@@ -429,7 +441,12 @@ export class UsersController {
       },
     );
 
-    return favs;
+    const items = favs.items.map((fav) => {
+      fav.track.favorited = true;
+      return fav;
+    });
+
+    return { ...favs, items };
   }
 
   @ApiOperation({ summary: "Get the user's history" })
@@ -459,7 +476,7 @@ export class UsersController {
       throw new ForbiddenException("You can not view someone else's history");
     }
 
-    return this.listeningsService.paginate(
+    const listenings = await this.listeningsService.paginate(
       {
         page: paginationQuery.page ? paginationQuery.page : 1,
         limit: paginationQuery.limit ? paginationQuery.limit : 10,
@@ -472,5 +489,22 @@ export class UsersController {
         },
       },
     );
+
+    const items = await Promise.all(
+      listenings.items.map(async (listening) => {
+        const favorite = await this.favoritesService.findOne({
+          track: listening.track,
+          user,
+        });
+        if (favorite) {
+          listening.track.favorited = true;
+        } else {
+          listening.track.favorited = false;
+        }
+        return listening;
+      }),
+    );
+
+    return { ...listenings, items };
   }
 }

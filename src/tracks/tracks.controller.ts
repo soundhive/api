@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {
   BadRequestException,
   Body,
@@ -206,9 +207,28 @@ export class TracksController {
     type: UnauthorizedResponse,
     description: 'Invalid JWT token',
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get('charts')
-  async charts(): Promise<Track[]> {
-    return this.tracksService.getChartingTracks();
+  async charts(@Request() req: ValidatedJWTReq): Promise<Track[]> {
+    let tracks = await this.tracksService.getChartingTracks();
+
+    tracks = await Promise.all(
+      tracks.map(async (track) => {
+        const favorite = await this.favoritesService.findOne({
+          track,
+          user: req.user,
+        });
+        if (favorite) {
+          track.favorited = true;
+        } else {
+          track.favorited = false;
+        }
+        return track;
+      }),
+    );
+
+    return tracks;
   }
 
   @ApiOperation({ summary: 'Get a track' })
@@ -217,8 +237,13 @@ export class TracksController {
     type: BadRequestResponse,
     description: 'Invalid input',
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async findOne(@Param() findTrackDTO: FindTrackDTO): Promise<Track> {
+  async findOne(
+    @Request() req: ValidatedJWTReq,
+    @Param() findTrackDTO: FindTrackDTO,
+  ): Promise<Track> {
     const track: Track | undefined = await this.tracksService.findOne(
       findTrackDTO,
     );
@@ -228,6 +253,12 @@ export class TracksController {
     }
 
     track.listeningCount = await this.listeningsService.countForTrack(track);
+
+    track.favorited =
+      (await this.favoritesService.findOne({
+        track,
+        user: req.user,
+      })) !== undefined;
 
     return track;
   }
