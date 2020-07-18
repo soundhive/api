@@ -1,13 +1,13 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+/* eslint-disable no-param-reassign */
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
-import { MinioClientService } from 'src/minio-client/minio-client.service';
-import { BufferedFile } from 'src/minio-client/file.model';
 import { ImageFileMediaTypes } from 'src/media-types';
-import { User } from './user.entity';
+import { BufferedFile } from 'src/minio-client/file.model';
+import { MinioClientService } from 'src/minio-client/minio-client.service';
+import { Repository } from 'typeorm';
 import { FindUserDTO } from './dto/find-user.dto';
 import { InsertUserDTO } from './dto/insert-user.dto';
-import { InsertUpdatedUserDTO } from './dto/insert-updated-user.dto';
+import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
@@ -52,11 +52,10 @@ export class UsersService {
   }
 
   async update(
-    user: FindUserDTO,
-    userData: InsertUpdatedUserDTO,
+    userData: Partial<User>,
     existingUser: User,
     profilePictureFile?: BufferedFile,
-  ): Promise<UpdateResult> {
+  ): Promise<User> {
     if (profilePictureFile) {
       // Uplodad new profile pic
       const profilePicture = await this.uploadProfilePicture(
@@ -65,11 +64,14 @@ export class UsersService {
       // Delete old profile pic
       this.minioClientService.delete(existingUser.profilePicture);
 
-      return this.usersRepository.update(
-        { username: user.username },
-        { ...userData, profilePicture },
-      );
+      userData.profilePicture = profilePicture;
     }
-    return this.usersRepository.update({ username: user.username }, userData);
+
+    // We need to save existing entity instead of update(Partial<User>)
+    // Otherwise the entity hooks won't be run (here, for password hashing)
+    Object.keys(userData).forEach((key) => {
+      existingUser[key] = userData[key];
+    });
+    return this.usersRepository.save(existingUser);
   }
 }

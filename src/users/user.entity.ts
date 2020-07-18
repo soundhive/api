@@ -10,6 +10,7 @@ import { Sample } from 'src/samples/samples.entity';
 import { Track } from 'src/tracks/track.entity';
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -96,6 +97,7 @@ export class User {
   following?: boolean;
 
   @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword(): Promise<void> {
     this.password = await argon2.hash(this.password);
   }

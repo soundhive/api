@@ -54,7 +54,6 @@ import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
 import { Track } from 'src/tracks/track.entity';
 import { TracksService } from 'src/tracks/tracks.service';
-import { UpdateResult } from 'typeorm';
 import { CreateUserAPIBody } from './dto/create-user-api-body';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
@@ -87,13 +86,13 @@ export class UsersController {
   @Post()
   async create(
     @Body() createUserDTO: CreateUserDTO,
-    @UploadedFile() ProfilePictireFile: BufferedFile,
+    @UploadedFile() ProfilePictureFile: BufferedFile,
   ): Promise<User> {
-    if (!ProfilePictireFile) {
+    if (!ProfilePictureFile) {
       throw new BadRequestException('Missing profile picture file');
     }
 
-    return this.usersService.create(createUserDTO, ProfilePictireFile);
+    return this.usersService.create(createUserDTO, ProfilePictureFile);
   }
 
   @ApiOperation({ summary: 'Update user' })
@@ -116,7 +115,7 @@ export class UsersController {
     @Request() req: ValidatedJWTReq,
     @Param() findUserDTO: FindUserDTO,
     @Body() userData: UpdateUserDTO,
-    @UploadedFile() ProfilePictireFile: BufferedFile,
+    @UploadedFile() ProfilePictureFile: BufferedFile,
   ): Promise<User> {
     const existingUser = await this.usersService.findOne(findUserDTO);
 
@@ -132,29 +131,7 @@ export class UsersController {
       throw new ForbiddenException('username modification is forbidden.');
     }
 
-    const result: UpdateResult = await this.usersService.update(
-      findUserDTO,
-      userData,
-      existingUser,
-      ProfilePictireFile,
-    );
-
-    // There is always at least one field updated (UpdatedAt)
-    if (!result.affected || result.affected < 1) {
-      throw new BadRequestException('Could not update user.');
-    }
-
-    // Fetch updated user
-    const updatedUser = await this.usersService.findOne({
-      ...findUserDTO,
-      ...userData,
-    });
-
-    if (!updatedUser) {
-      throw new BadRequestException('Could not find user');
-    }
-
-    return updatedUser;
+    return this.usersService.update(userData, existingUser, ProfilePictureFile);
   }
 
   @ApiOperation({ summary: 'Get all users' })
