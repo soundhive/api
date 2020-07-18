@@ -35,6 +35,7 @@ import { AlbumsService } from 'src/albums/albums.service';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Favorite } from 'src/favorites/favorite.entity';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import { Follow } from 'src/follows/follow.entity';
 import { FollowsService } from 'src/follows/follows.service';
@@ -400,15 +401,35 @@ export class UsersController {
     type: UnauthorizedResponse,
     description: 'Invalid JWT token',
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':username/favorites')
-  async favoriters(@Param() findUserDTO: FindUserDTO): Promise<Track[]> {
+  async favoriters(
+    @Request() req: ValidatedJWTReq,
+    @Query() paginationQuery: PaginationQuery,
+    @Param() findUserDTO: FindUserDTO,
+  ): Promise<Pagination<Favorite>> {
     const user = await this.usersService.findOne(findUserDTO);
 
-    const favs = await this.favoritesService.findBy({ user });
+    if (user?.id !== req.user.id) {
+      throw new ForbiddenException("You can not view someone else's favorites");
+    }
 
-    const favorites = favs.map((fav) => fav.track);
+    const favs = await this.favoritesService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: `/users/${user.username}/favorites`,
+      },
+      {
+        where: { user },
+        order: {
+          favoritedAt: 'DESC',
+        },
+      },
+    );
 
-    return favorites;
+    return favs;
   }
 
   @ApiOperation({ summary: "Get the user's history" })

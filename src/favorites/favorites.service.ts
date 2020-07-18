@@ -1,10 +1,20 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult } from 'typeorm';
-import { Favorite } from './favorite.entity';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
+import {
+  DeleteResult,
+  FindConditions,
+  FindManyOptions,
+  Repository,
+} from 'typeorm';
 import { CreateFavoriteDTO } from './dto/create-favorite.dto';
 import { DeleteFavoriteDTO } from './dto/delete-favorite.dto';
 import { FindFavoriteDTO } from './dto/find-favorite.dto';
+import { Favorite } from './favorite.entity';
 
 @Injectable()
 export class FavoritesService {
@@ -12,6 +22,13 @@ export class FavoritesService {
     @InjectRepository(Favorite)
     private favoriteRepository: Repository<Favorite>,
   ) {}
+
+  async paginate(
+    options: IPaginationOptions,
+    searchOptions?: FindConditions<Favorite> | FindManyOptions<Favorite>,
+  ): Promise<Pagination<Favorite>> {
+    return paginate<Favorite>(this.favoriteRepository, options, searchOptions);
+  }
 
   async create(createFavoriteDTO: CreateFavoriteDTO): Promise<Favorite> {
     const existingFav = await this.findOne(createFavoriteDTO);
