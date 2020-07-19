@@ -218,6 +218,7 @@ export class UsersController {
               track,
               user,
             })) !== undefined;
+
           return track;
         },
       ),
@@ -421,10 +422,18 @@ export class UsersController {
       },
     );
 
-    const items = favs.items.map((fav) => {
-      fav.track.favorited = true;
-      return fav;
-    });
+    const items = await Promise.all(
+      favs.items.map(async (fav) => {
+        fav.track.favorited = true;
+        fav.track.listeningCount = await this.listeningsService.countForTrack(
+          fav.track,
+        );
+        fav.track.favoriteCount = await this.favoritesService.countForTrack(
+          fav.track,
+        );
+        return fav;
+      }),
+    );
 
     return { ...favs, items };
   }
@@ -477,6 +486,13 @@ export class UsersController {
             track: listening.track,
             user,
           })) !== undefined;
+
+        listening.track.listeningCount = await this.listeningsService.countForTrack(
+          listening.track,
+        );
+        listening.track.favoriteCount = await this.favoritesService.countForTrack(
+          listening.track,
+        );
         return listening;
       }),
     );
