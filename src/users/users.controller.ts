@@ -47,6 +47,9 @@ import { UserListeningsResponseDTO } from 'src/listenings/dto/responses/user-lis
 import { Listening } from 'src/listenings/listening.entity';
 import { ListeningsService } from 'src/listenings/listenings.service';
 import { BufferedFile } from 'src/minio-client/file.model';
+import { PlaylistPagination } from 'src/playlists/dto/pagination-response.dto';
+import { Playlist } from 'src/playlists/playlists.entity';
+import { PlaylistsService } from 'src/playlists/playlists.service';
 import { Sample } from 'src/samples/samples.entity';
 import { SamplesService } from 'src/samples/samples.service';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
@@ -72,6 +75,7 @@ export class UsersController {
     private readonly followsService: FollowsService,
     private readonly samplesService: SamplesService,
     private readonly favoritesService: FavoritesService,
+    private readonly playlistsService: PlaylistsService,
   ) {}
 
   @ApiOperation({ summary: 'Sign up' })
@@ -475,5 +479,33 @@ export class UsersController {
     );
 
     return { ...listenings, items };
+  }
+
+  @ApiOperation({ summary: "Get a user's playlists" })
+  @ApiOkResponse({ type: [PlaylistPagination], description: 'User playlists' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @Get(':username/playlists')
+  async findPlaylists(
+    @Param() findUserDTO: FindUserDTO,
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<Playlist>> {
+    const user = await this.usersService.findOne(findUserDTO);
+    if (!user) {
+      throw new BadRequestException();
+    }
+
+    const paginatedDataReponse = await this.playlistsService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: `/users/${user.username}/playlists`,
+      },
+      { where: { user } },
+    );
+
+    return paginatedDataReponse;
   }
 }
