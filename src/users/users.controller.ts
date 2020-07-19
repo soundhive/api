@@ -176,6 +176,9 @@ export class UsersController {
       user.following = false;
     }
 
+    user.followerCount = await this.followsService.countFollowers(user);
+    user.followingCount = await this.followsService.countFollowings(user);
+
     return user;
   }
 

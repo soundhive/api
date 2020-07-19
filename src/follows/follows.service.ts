@@ -1,12 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult } from 'typeorm';
 import { Follow } from 'src/follows/follow.entity';
 import { User } from 'src/users/user.entity';
+import { DeleteResult, Repository } from 'typeorm';
 import { CreateFollowDTO } from './dto/create-follow-dto';
 import { DeleteFollowDTO } from './dto/delete-follow.dto';
-import { FindFollowsUserDTO } from './dto/find-follows.user.dto';
 import { FindFollowDTO } from './dto/find-follow-dto';
+import { FindFollowsUserDTO } from './dto/find-follows.user.dto';
 
 @Injectable()
 export class FollowsService {
@@ -60,5 +60,13 @@ export class FollowsService {
 
   async findOne(follow: FindFollowDTO): Promise<Follow | undefined> {
     return this.followRepository.findOne(follow);
+  }
+
+  async countFollowers(user: User): Promise<number> {
+    return this.followRepository.count({ to: user });
+  }
+
+  async countFollowings(user: User): Promise<number> {
+    return this.followRepository.count({ from: user });
   }
 }
