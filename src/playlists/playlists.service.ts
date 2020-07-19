@@ -1,25 +1,26 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Repository,
-  DeleteResult,
-  FindConditions,
-  FindManyOptions,
-} from 'typeorm';
-import { BufferedFile } from 'src/minio-client/file.model';
-import { ImageFileMediaTypes } from 'src/media-types';
-import { MinioClientService } from 'src/minio-client/minio-client.service';
-import { TracksService } from 'src/tracks/tracks.service';
 import { isUUID } from 'class-validator';
 import {
   IPaginationOptions,
-  Pagination,
   paginate,
+  Pagination,
 } from 'nestjs-typeorm-paginate';
-import { Playlist } from './playlists.entity';
-import { InsertPlaylistDTO } from './dto/insert-playlist.dto';
+import { ImageFileMediaTypes } from 'src/media-types';
+import { BufferedFile } from 'src/minio-client/file.model';
+import { MinioClientService } from 'src/minio-client/minio-client.service';
+import { Track } from 'src/tracks/track.entity';
+import { TracksService } from 'src/tracks/tracks.service';
+import {
+  DeleteResult,
+  FindConditions,
+  FindManyOptions,
+  Repository,
+} from 'typeorm';
 import { FindPlaylistDTO } from './dto/find-playlist.dto';
+import { InsertPlaylistDTO } from './dto/insert-playlist.dto';
 import { InsertUpdatedPlaylistDTO } from './dto/inset-updated-playlist.dto';
+import { Playlist } from './playlists.entity';
 
 @Injectable()
 export class PlaylistsService {
@@ -131,5 +132,10 @@ export class PlaylistsService {
 
     this.minioClientService.delete(playlist.coverFilename);
     return this.playlistsRepository.delete(playlist.id);
+  }
+
+  async addTrack(playlist: Playlist, track: Track): Promise<Playlist> {
+    playlist.tracks.push(track);
+    return this.playlistsRepository.save(playlist);
   }
 }

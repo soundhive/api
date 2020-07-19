@@ -1,55 +1,58 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Query,
+  Request,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
-  Post,
-  Body,
-  UploadedFile,
-  Request,
-  BadRequestException,
-  Get,
-  Param,
-  NotFoundException,
-  Put,
-  ForbiddenException,
-  HttpCode,
-  Delete,
-  Query,
 } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiConsumes,
-  ApiBody,
-  ApiCreatedResponse,
-  ApiBadRequestResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
-  ApiOkResponse,
-  ApiNoContentResponse,
-} from '@nestjs/swagger';
-import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
-import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
-import { BufferedFile } from 'src/minio-client/file.model';
-import { Track } from 'src/tracks/track.entity';
-import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
+import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ListeningsService } from 'src/listenings/listenings.service';
-import { PlaylistsService } from './playlists.service';
+import { BufferedFile } from 'src/minio-client/file.model';
+import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
+import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import { Track } from 'src/tracks/track.entity';
+import { TracksService } from 'src/tracks/tracks.service';
+import { AddTrackToPlaylistDTO } from './dto/add-track-to-playlist.dto';
 import { CreatePlaylistAPIBody } from './dto/create-playlist-api-body.dto';
 import { CreatePlaylistDTO } from './dto/create-playlist.dto';
-import { Playlist } from './playlists.entity';
 import { FindPlaylistDTO } from './dto/find-playlist.dto';
-import { UpdatePlaylistDTO } from './dto/update-playlist.dto';
 import { UpdatePlaylistAPIBody } from './dto/update-playlist-api-body.dto';
+import { UpdatePlaylistDTO } from './dto/update-playlist.dto';
+import { Playlist } from './playlists.entity';
+import { PlaylistsService } from './playlists.service';
 
 @Controller('playlists')
 export class PlaylistsController {
   constructor(
     private readonly playlistsService: PlaylistsService,
     private readonly listeningsService: ListeningsService,
+    private readonly tracksService: TracksService,
   ) {}
 
   @ApiOperation({ summary: 'Create a playlist' })
@@ -247,5 +250,49 @@ export class PlaylistsController {
     }
 
     await this.playlistsService.delete(playlist);
+  }
+
+  @ApiOperation({ summary: 'Add track to playlist' })
+  @ApiCreatedResponse({ type: Playlist, description: 'Playlist object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/add-track')
+  async addTrack(
+    @Request() req: ValidatedJWTReq,
+    @Param() findPlaylistDTO: FindPlaylistDTO,
+    @Body() trackDTO: AddTrackToPlaylistDTO,
+  ): Promise<Playlist> {
+    const existingPlaylist = await this.playlistsService.findOne(
+      findPlaylistDTO,
+    );
+
+    if (!existingPlaylist) {
+      throw new BadRequestException('Could not find playlist');
+    }
+
+    if (existingPlaylist.user.id !== req.user.id) {
+      throw new ForbiddenException();
+    }
+
+    const trackToAdd = await this.tracksService.findOne({
+      id: trackDTO.track_id,
+    });
+
+    if (!trackToAdd) {
+      throw new BadRequestException(
+        'Could not find track with id',
+        trackDTO.track_id,
+      );
+    }
+
+    return this.playlistsService.addTrack(existingPlaylist, trackToAdd);
   }
 }
