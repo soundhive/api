@@ -129,6 +129,10 @@ export class PlaylistsController {
       throw new NotFoundException();
     }
 
+    playlist.duration = playlist.tracks.reduce((totalDuration, track) => {
+      return totalDuration + track.duration;
+    }, 0);
+
     return playlist;
   }
 

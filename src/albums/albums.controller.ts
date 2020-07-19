@@ -125,6 +125,12 @@ export class AlbumsController {
       throw NotFoundException;
     }
 
+    const albumTracks = await this.tracksService.findBy({ album });
+
+    album.duration = albumTracks.reduce((totalDuration, track) => {
+      return totalDuration + track.duration;
+    }, 0);
+
     return album;
   }
 
