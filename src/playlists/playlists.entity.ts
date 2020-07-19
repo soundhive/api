@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { User } from 'src/users/user.entity';
 import {
@@ -58,4 +58,8 @@ export class Playlist extends BaseEntity {
     eager: true,
   })
   user: User;
+
+  // Not a column!
+  @ApiPropertyOptional()
+  duration?: number;
 }

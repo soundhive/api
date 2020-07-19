@@ -1,18 +1,17 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { User } from 'src/users/user.entity';
 import {
   BaseEntity,
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
+  Entity,
   ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { User } from 'src/users/user.entity';
-import { Exclude } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
 import { Track } from '../tracks/track.entity';
 
 @Entity('albums')
@@ -46,13 +45,18 @@ export class Album extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @ApiProperty({ type: () => Track })
   @OneToMany((type) => Track, (track) => track.album)
   tracks: Track[];
 
+  @ApiProperty({ type: () => User })
   @ManyToOne((type) => User, (user) => user.albums, {
     nullable: false,
     eager: true,
   })
-  @Exclude()
   user: User;
+
+  // Not a column!
+  @ApiPropertyOptional()
+  duration?: number;
 }
