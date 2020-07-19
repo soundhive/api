@@ -210,6 +210,9 @@ export class UsersController {
           track.listeningCount = await this.listeningsService.countForTrack(
             track,
           );
+          track.favoriteCount = await this.favoritesService.countForTrack(
+            track,
+          );
           track.favorited =
             (await this.favoritesService.findOne({
               track,

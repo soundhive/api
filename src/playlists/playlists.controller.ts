@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {
   BadRequestException,
   Body,
@@ -32,6 +33,7 @@ import { Pagination } from 'nestjs-typeorm-paginate';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { FavoritesService } from 'src/favorites/favorites.service';
 import { ListeningsService } from 'src/listenings/listenings.service';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
@@ -53,6 +55,7 @@ export class PlaylistsController {
     private readonly playlistsService: PlaylistsService,
     private readonly listeningsService: ListeningsService,
     private readonly tracksService: TracksService,
+    private readonly favoritesService: FavoritesService,
   ) {}
 
   @ApiOperation({ summary: 'Create a playlist' })
@@ -150,8 +153,10 @@ export class PlaylistsController {
     playlist.tracks = await Promise.all(
       playlist.tracks.map(
         async (track): Promise<Track> => {
-          // eslint-disable-next-line no-param-reassign
           track.listeningCount = await this.listeningsService.countForTrack(
+            track,
+          );
+          track.favoriteCount = await this.favoritesService.countForTrack(
             track,
           );
           return track;
