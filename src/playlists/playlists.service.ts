@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
 import {
@@ -28,6 +33,7 @@ export class PlaylistsService {
     @InjectRepository(Playlist)
     private playlistsRepository: Repository<Playlist>,
     private minioClientService: MinioClientService,
+    @Inject(forwardRef(() => TracksService))
     private tracksService: TracksService,
   ) {}
 
@@ -84,7 +90,7 @@ export class PlaylistsService {
   }
 
   async findBy(params: {}): Promise<Playlist[]> {
-    return this.playlistsRepository.find(params);
+    return this.playlistsRepository.find({ ...params, relations: ['tracks'] });
   }
 
   async update(

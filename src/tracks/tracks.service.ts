@@ -17,6 +17,7 @@ import { ListeningsService } from 'src/listenings/listenings.service';
 import { AudioFileMediaType } from 'src/media-types';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
+import { PlaylistsService } from 'src/playlists/playlists.service';
 import {
   DeleteResult,
   FindConditions,
@@ -36,6 +37,8 @@ export class TracksService {
     private minioClientService: MinioClientService,
     @Inject(forwardRef(() => ListeningsService))
     private listeningsService: ListeningsService,
+    @Inject(forwardRef(() => PlaylistsService))
+    private playlistsService: PlaylistsService,
   ) {}
 
   async paginate(
@@ -135,10 +138,20 @@ export class TracksService {
       throw new NotFoundException('Could not find track');
     }
 
+    // Cascade delete track listengings
     const listenings = await this.listeningsService.findBy({ track });
 
     for (const listening of listenings) {
       await this.listeningsService.delete(listening);
+    }
+
+    // Cascade remove track from playlist
+    const playlists = await this.playlistsService.findBy({ track });
+    for (const playlist of playlists) {
+      playlist.tracks = playlist.tracks.filter((playlistTrack) => {
+        return playlistTrack.id !== track.id;
+      });
+      playlist.save();
     }
 
     this.minioClientService.delete(track.filename);
