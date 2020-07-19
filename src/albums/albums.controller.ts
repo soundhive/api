@@ -140,8 +140,11 @@ export class AlbumsController {
     type: BadRequestResponse,
     description: 'Invalid input',
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':id/tracks')
   async findTracks(
+    @Request() req: ValidatedJWTReq,
     @Param() findAlbumDTO: FindAlbumDTO,
     @Query() paginationQuery: PaginationQuery,
   ): Promise<Pagination<Track>> {
@@ -165,6 +168,11 @@ export class AlbumsController {
     const items = await Promise.all(
       paginatedDataReponse.items.map(
         async (track): Promise<Track> => {
+          track.favorited =
+            (await this.favoritesService.findOne({
+              track,
+              user: req.user,
+            })) !== undefined;
           track.listeningCount = await this.listeningsService.countForTrack(
             track,
           );
