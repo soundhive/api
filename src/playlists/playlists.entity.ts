@@ -1,19 +1,19 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
+import { User } from 'src/users/user.entity';
 import {
   BaseEntity,
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  ManyToMany,
+  Entity,
   JoinTable,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { User } from 'src/users/user.entity';
-import { Exclude } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
 import { Track } from '../tracks/track.entity';
 
 @Entity('playlists')
@@ -52,10 +52,10 @@ export class Playlist extends BaseEntity {
   @JoinTable()
   tracks: Track[];
 
+  @ApiProperty({ type: () => User })
   @ManyToOne((type) => User, (user) => user.playlists, {
     nullable: false,
     eager: true,
   })
-  @Exclude()
   user: User;
 }
