@@ -230,10 +230,20 @@ export class UsersController {
     description: 'Invalid input',
   })
   @Get(':username/albums')
-  async findAlbums(@Param() findUserDTO: FindUserDTO): Promise<Album[]> {
+  async findAlbums(
+    @Param() findUserDTO: FindUserDTO,
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<Album>> {
     const user: User | undefined = await this.usersService.findOne(findUserDTO);
 
-    return this.albumsService.findBy({ user });
+    return this.albumsService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: '/albums',
+      },
+      { where: { user } },
+    );
   }
 
   @ApiOperation({ summary: "Get a user's statistics" })
