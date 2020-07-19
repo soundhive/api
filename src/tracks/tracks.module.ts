@@ -1,16 +1,16 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ListeningsModule } from 'src/listenings/listenings.module';
-import { UsersModule } from 'src/users/users.module';
-
 import { AlbumsModule } from 'src/albums/albums.module';
-import { MinioClientModule } from 'src/minio-client/minio-client.module';
 import { FavoritesModule } from 'src/favorites/favorites.module';
+import { ListeningsModule } from 'src/listenings/listenings.module';
+import { MinioClientModule } from 'src/minio-client/minio-client.module';
+import { PlaylistsModule } from 'src/playlists/playlists.module';
+import { UsersModule } from 'src/users/users.module';
+import { Album } from '../albums/album.entity';
+import { AlbumsService } from '../albums/albums.service';
 import { Track } from './track.entity';
 import { TracksController } from './tracks.controller';
 import { TracksService } from './tracks.service';
-import { Album } from '../albums/album.entity';
-import { AlbumsService } from '../albums/albums.service';
 
 @Module({
   imports: [
@@ -19,6 +19,7 @@ import { AlbumsService } from '../albums/albums.service';
     forwardRef(() => ListeningsModule),
     forwardRef(() => AlbumsModule),
     forwardRef(() => FavoritesModule),
+    forwardRef(() => PlaylistsModule),
     MinioClientModule,
   ],
   controllers: [TracksController],

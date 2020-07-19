@@ -1,22 +1,21 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  DeleteResult,
-  Repository,
-  UpdateResult,
-  FindConditions,
-  FindManyOptions,
-} from 'typeorm';
-
-import { MinioClientService } from 'src/minio-client/minio-client.service';
-import { BufferedFile } from 'src/minio-client/file.model';
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { ImageFileMediaTypes } from 'src/media-types';
+import { BufferedFile } from 'src/minio-client/file.model';
+import { MinioClientService } from 'src/minio-client/minio-client.service';
 import { TracksService } from 'src/tracks/tracks.service';
 import {
-  IPaginationOptions,
-  Pagination,
-  paginate,
-} from 'nestjs-typeorm-paginate';
+  DeleteResult,
+  FindConditions,
+  FindManyOptions,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { Album } from './album.entity';
 import { FindAlbumDTO } from './dto/find-album.dto';
 import { InsertAlbumDTO } from './dto/insert-album-dto';
