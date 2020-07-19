@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Sample } from 'src/samples/samples.entity';
 import { Track } from 'src/tracks/track.entity';
 import { User } from 'src/users/user.entity';
 import {
@@ -6,8 +8,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Sample } from 'src/samples/samples.entity';
-import { ApiProperty } from '@nestjs/swagger';
 
 enum ListeningPeriod {
   Hour = 'hour',
@@ -37,7 +37,7 @@ class Listening {
   })
   user: User;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => Track })
   @ManyToOne(() => Track, (track) => track.listenings, {
     nullable: true,
     eager: true,

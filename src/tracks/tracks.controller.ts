@@ -186,6 +186,9 @@ export class TracksController {
           track.listeningCount = await this.listeningsService.countForTrack(
             track,
           );
+          track.favoriteCount = await this.favoritesService.countForTrack(
+            track,
+          );
           return track;
         },
       ),
@@ -220,6 +223,10 @@ export class TracksController {
             track,
             user: req.user,
           })) !== undefined;
+        track.listeningCount = await this.listeningsService.countForTrack(
+          track,
+        );
+        track.favoriteCount = await this.favoritesService.countForTrack(track);
         return track;
       }),
     );
@@ -255,6 +262,8 @@ export class TracksController {
         track,
         user: req.user,
       })) !== undefined;
+    track.listeningCount = await this.listeningsService.countForTrack(track);
+    track.favoriteCount = await this.favoritesService.countForTrack(track);
 
     return track;
   }

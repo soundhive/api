@@ -5,6 +5,7 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
+import { Track } from 'src/tracks/track.entity';
 import {
   DeleteResult,
   FindConditions,
@@ -50,5 +51,9 @@ export class FavoritesService {
 
   async delete(fav: DeleteFavoriteDTO): Promise<DeleteResult> {
     return this.favoriteRepository.delete(fav);
+  }
+
+  async countForTrack(track: Track): Promise<number> {
+    return this.favoriteRepository.count({ track });
   }
 }

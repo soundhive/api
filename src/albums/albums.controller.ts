@@ -1,53 +1,55 @@
+/* eslint-disable no-param-reassign */
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
   Param,
   Post,
   Put,
-  Request,
-  UseGuards,
-  BadRequestException,
-  UploadedFile,
-  UseInterceptors,
-  ForbiddenException,
   Query,
+  Request,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { TracksService } from 'src/tracks/tracks.service';
-import { Track } from 'src/tracks/track.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { BufferedFile } from 'src/minio-client/file.model';
-import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
-import { UpdateResult } from 'typeorm';
 import {
-  ApiOperation,
-  ApiConsumes,
-  ApiBody,
-  ApiCreatedResponse,
   ApiBadRequestResponse,
-  ApiUnauthorizedResponse,
   ApiBearerAuth,
-  ApiOkResponse,
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
   ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
-import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
-import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
+import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
+import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { FavoritesService } from 'src/favorites/favorites.service';
 import { ListeningsService } from 'src/listenings/listenings.service';
+import { BufferedFile } from 'src/minio-client/file.model';
+import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
+import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
+import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
+import { Track } from 'src/tracks/track.entity';
+import { TracksService } from 'src/tracks/tracks.service';
+import { UpdateResult } from 'typeorm';
 import { Album } from './album.entity';
 import { AlbumsService } from './albums.service';
+import { CreateAlbumAPIBody } from './dto/create-album-api-body.dto';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { FindAlbumDTO } from './dto/find-album.dto';
-import { UpdateAlbumDTO } from './dto/update-album.dto';
-import { CreateAlbumAPIBody } from './dto/create-album-api-body.dto';
-import { UpdateAlbumAPIBody } from './dto/update-album-api-body.dto';
 import { AlbumPagination } from './dto/pagination-response.dto';
+import { UpdateAlbumAPIBody } from './dto/update-album-api-body.dto';
+import { UpdateAlbumDTO } from './dto/update-album.dto';
 
 @Controller('albums')
 export class AlbumsController {
@@ -55,12 +57,13 @@ export class AlbumsController {
     private readonly albumsService: AlbumsService,
     private readonly tracksService: TracksService,
     private readonly listeningsService: ListeningsService,
+    private readonly favoritesService: FavoritesService,
   ) {}
 
   @ApiOperation({ summary: 'Post a album' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateAlbumAPIBody })
-  @ApiCreatedResponse({ type: Album, description: 'Album object' })
+  @ApiCreatedResponse({ type: () => Album, description: 'Album object' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
     description: 'Invalid input',
@@ -107,7 +110,7 @@ export class AlbumsController {
   }
 
   @ApiOperation({ summary: 'Get an album' })
-  @ApiOkResponse({ type: Album, description: 'Track object' })
+  @ApiOkResponse({ type: () => Album, description: 'Track object' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
     description: 'Invalid input',
@@ -156,8 +159,10 @@ export class AlbumsController {
     const items = await Promise.all(
       paginatedDataReponse.items.map(
         async (track): Promise<Track> => {
-          // eslint-disable-next-line no-param-reassign
           track.listeningCount = await this.listeningsService.countForTrack(
+            track,
+          );
+          track.favoriteCount = await this.favoritesService.countForTrack(
             track,
           );
           return track;
@@ -171,7 +176,7 @@ export class AlbumsController {
   @ApiOperation({ summary: 'Update an album' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateAlbumAPIBody })
-  @ApiOkResponse({ type: Album, description: 'Album object' })
+  @ApiOkResponse({ type: () => Album, description: 'Album object' })
   @ApiBadRequestResponse({
     type: BadRequestResponse,
     description: 'Invalid input',

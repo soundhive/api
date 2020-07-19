@@ -63,6 +63,10 @@ export class Track extends BaseEntity {
 
   // Not a column!
   @ApiPropertyOptional()
+  favoriteCount?: number;
+
+  // Not a column!
+  @ApiPropertyOptional()
   favorited?: boolean;
 
   @OneToMany((type) => Listening, (listening) => listening.track)
@@ -79,7 +83,7 @@ export class Track extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => Album })
   @ManyToOne((type) => Album, (album) => album.tracks, {
     nullable: false,
     eager: true,
@@ -90,7 +94,7 @@ export class Track extends BaseEntity {
     nullable: false,
     eager: true,
   })
-  @ApiProperty()
+  @ApiProperty({ type: () => User })
   user: User;
 
   @Exclude()
