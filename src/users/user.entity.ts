@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { Album } from 'src/albums/album.entity';
 import { Favorite } from 'src/favorites/favorite.entity';
@@ -94,7 +94,14 @@ export class User {
   @Column()
   profilePicture: string;
 
+  @ApiPropertyOptional()
   following?: boolean;
+
+  @ApiPropertyOptional()
+  followerCount?: number;
+
+  @ApiPropertyOptional()
+  followingCount?: number;
 
   @BeforeInsert()
   @BeforeUpdate()
