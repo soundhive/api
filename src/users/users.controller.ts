@@ -33,6 +33,7 @@ import {
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { Album } from 'src/albums/album.entity';
 import { AlbumsService } from 'src/albums/albums.service';
+import { AlbumPagination } from 'src/albums/dto/pagination-response.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -370,6 +371,42 @@ export class UsersController {
         page: paginationQuery.page ? paginationQuery.page : 1,
         limit: paginationQuery.limit ? paginationQuery.limit : 10,
         route: `/users/${findUserDTO.username}/followings/tracks`,
+      },
+      {
+        where: { user: In(followedUsersIds) },
+        order: { createdAt: 'DESC' },
+      },
+    );
+
+    return paginatedDataReponse;
+  }
+
+  @ApiOperation({ summary: "Get a user's followings' albums" })
+  @ApiOkResponse({
+    type: AlbumPagination,
+    description: "Followed users's albums",
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @Get(':username/followings/albums')
+  async findFollowingsAlbums(
+    @Param() findUserDTO: FindUserDTO,
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<Album>> {
+    const user = await this.usersService.findOne(findUserDTO);
+
+    const follows = await this.followsService.findBy({
+      from: user,
+    });
+    const followedUsersIds: string[] = follows.map((follow) => follow.to.id);
+
+    const paginatedDataReponse = await this.albumsService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: `/users/${findUserDTO.username}/followings/albums`,
       },
       {
         where: { user: In(followedUsersIds) },
