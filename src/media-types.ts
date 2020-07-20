@@ -4,6 +4,7 @@ enum AudioFileMediaType {
   'audio/ogg',
   'audio/wav',
   'audio/wave',
+  'audio/x-wav',
 }
 
 enum ImageFileMediaTypes {
