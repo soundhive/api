@@ -132,10 +132,23 @@ export class AlbumsController {
       throw NotFoundException;
     }
 
-    const albumTracks = await this.tracksService.findBy({ album });
+    let albumTracks = await this.tracksService.findBy({ album });
+
+    albumTracks = await Promise.all(
+      albumTracks.map(async (track) => {
+        track.listeningCount = await this.listeningsService.countForTrack(
+          track,
+        );
+        return track;
+      }),
+    );
 
     album.duration = albumTracks.reduce((totalDuration, track) => {
       return totalDuration + track.duration;
+    }, 0);
+
+    album.listeningCount = albumTracks.reduce((totalListenings, track) => {
+      return totalListenings + (track.listeningCount || 0);
     }, 0);
 
     return album;

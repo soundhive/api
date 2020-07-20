@@ -59,4 +59,8 @@ export class Album extends BaseEntity {
   // Not a column!
   @ApiPropertyOptional()
   duration?: number;
+
+  // Not a column!
+  @ApiPropertyOptional()
+  listeningCount?: number;
 }
