@@ -190,8 +190,11 @@ export class UsersController {
     type: BadRequestResponse,
     description: 'Invalid input',
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':username/tracks')
   async findTracks(
+    @Request() req: ValidatedJWTReq,
     @Param() findUserDTO: FindUserDTO,
     @Query() paginationQuery: PaginationQuery,
   ): Promise<Pagination<Track>> {
@@ -221,7 +224,7 @@ export class UsersController {
           track.favorited =
             (await this.favoritesService.findOne({
               track,
-              user,
+              user: req.user,
             })) !== undefined;
 
           return track;
