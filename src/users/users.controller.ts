@@ -333,7 +333,7 @@ export class UsersController {
         route: `/users/${findUserDTO.username}/followings`,
       },
       {
-        from: user,
+        where: { from: user },
         order: {
           followedAt: 'DESC',
         },
@@ -366,19 +366,30 @@ export class UsersController {
     });
     const followedUsersIds: string[] = follows.map((follow) => follow.to.id);
 
-    const paginatedDataReponse = await this.tracksService.paginate(
+    if (followedUsersIds.length > 0) {
+      return this.tracksService.paginate(
+        {
+          page: paginationQuery.page ? paginationQuery.page : 1,
+          limit: paginationQuery.limit ? paginationQuery.limit : 10,
+          route: `/users/${findUserDTO.username}/followings/tracks`,
+        },
+        {
+          where: { user: In(followedUsersIds) },
+          order: { createdAt: 'DESC' },
+        },
+      );
+    }
+    return this.tracksService.paginate(
       {
         page: paginationQuery.page ? paginationQuery.page : 1,
         limit: paginationQuery.limit ? paginationQuery.limit : 10,
         route: `/users/${findUserDTO.username}/followings/tracks`,
       },
       {
-        where: { user: In(followedUsersIds) },
+        where: { user: null },
         order: { createdAt: 'DESC' },
       },
     );
-
-    return paginatedDataReponse;
   }
 
   @ApiOperation({ summary: "Get a user's followings' albums" })
@@ -402,19 +413,30 @@ export class UsersController {
     });
     const followedUsersIds: string[] = follows.map((follow) => follow.to.id);
 
-    const paginatedDataReponse = await this.albumsService.paginate(
+    if (followedUsersIds.length > 0) {
+      return this.albumsService.paginate(
+        {
+          page: paginationQuery.page ? paginationQuery.page : 1,
+          limit: paginationQuery.limit ? paginationQuery.limit : 10,
+          route: `/users/${findUserDTO.username}/followings/albums`,
+        },
+        {
+          where: { user: In(followedUsersIds) },
+          order: { createdAt: 'DESC' },
+        },
+      );
+    }
+    return this.albumsService.paginate(
       {
         page: paginationQuery.page ? paginationQuery.page : 1,
         limit: paginationQuery.limit ? paginationQuery.limit : 10,
         route: `/users/${findUserDTO.username}/followings/albums`,
       },
       {
-        where: { user: In(followedUsersIds) },
+        where: { id: null },
         order: { createdAt: 'DESC' },
       },
     );
-
-    return paginatedDataReponse;
   }
 
   @ApiOperation({ summary: "Get a user's followers" })
