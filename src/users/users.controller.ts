@@ -57,9 +57,11 @@ import { PaginationQuery } from 'src/shared/dto/pagination-query.dto';
 import { TrackPagination } from 'src/tracks/dto/pagination-response.dto';
 import { Track } from 'src/tracks/track.entity';
 import { TracksService } from 'src/tracks/tracks.service';
+import { In } from 'typeorm';
 import { CreateUserAPIBody } from './dto/create-user-api-body';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { FindUserDTO } from './dto/find-user.dto';
+import { UserPagination } from './dto/pagination-response.dto';
 import { UpdateUserAPIBody } from './dto/update-user-api-body';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import { User } from './user.entity';
@@ -306,7 +308,7 @@ export class UsersController {
 
   @ApiOperation({ summary: "Get a user's followings" })
   @ApiOkResponse({
-    type: [User],
+    type: UserPagination,
     description: 'Followed users',
   })
   @ApiBadRequestResponse({
@@ -337,6 +339,42 @@ export class UsersController {
     const items = paginatedDataReponse.items.map((e) => e.to);
 
     return { ...paginatedDataReponse, items };
+  }
+
+  @ApiOperation({ summary: "Get a user's followings' tracks" })
+  @ApiOkResponse({
+    type: TrackPagination,
+    description: "Followed users's tracks",
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @Get(':username/followings/tracks')
+  async findFollowingsTracks(
+    @Param() findUserDTO: FindUserDTO,
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<Track>> {
+    const user = await this.usersService.findOne(findUserDTO);
+
+    const follows = await this.followsService.findBy({
+      from: user,
+    });
+    const followedUsersIds: string[] = follows.map((follow) => follow.to.id);
+
+    const paginatedDataReponse = await this.tracksService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: `/users/${findUserDTO.username}/followings/tracks`,
+      },
+      {
+        where: { user: In(followedUsersIds) },
+        order: { createdAt: 'DESC' },
+      },
+    );
+
+    return paginatedDataReponse;
   }
 
   @ApiOperation({ summary: "Get a user's followers" })
