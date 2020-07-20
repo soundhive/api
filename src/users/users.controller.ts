@@ -289,20 +289,6 @@ export class UsersController {
     return this.listeningsService.findLastForUser(findLastListeningsForUserDTO);
   }
 
-  @ApiOperation({ summary: "Get a user's followings" })
-  @ApiOkResponse({
-    type: [User],
-    description: 'Followed users',
-  })
-  @ApiBadRequestResponse({
-    type: BadRequestResponse,
-    description: 'Invalid input',
-  })
-  @Get(':username/followings')
-  async findFollowings(@Param() findUserDTO: FindUserDTO): Promise<User[]> {
-    return this.followsService.findUserFollowed(findUserDTO);
-  }
-
   @ApiOperation({ summary: "Get a user's samples" })
   @ApiOkResponse({
     type: [Sample],
@@ -316,6 +302,41 @@ export class UsersController {
   async findSamples(@Param() findUserDTO: FindUserDTO): Promise<Sample[]> {
     const user = await this.usersService.findOne(findUserDTO);
     return this.samplesService.findBy({ user });
+  }
+
+  @ApiOperation({ summary: "Get a user's followings" })
+  @ApiOkResponse({
+    type: [User],
+    description: 'Followed users',
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @Get(':username/followings')
+  async findFollowings(
+    @Param() findUserDTO: FindUserDTO,
+    @Query() paginationQuery: PaginationQuery,
+  ): Promise<Pagination<User>> {
+    const user = await this.usersService.findOne(findUserDTO);
+
+    const paginatedDataReponse = await this.followsService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: `/users/${findUserDTO.username}/followings`,
+      },
+      {
+        from: user,
+        order: {
+          followedAt: 'DESC',
+        },
+      },
+    );
+
+    const items = paginatedDataReponse.items.map((e) => e.to);
+
+    return { ...paginatedDataReponse, items };
   }
 
   @ApiOperation({ summary: "Get a user's followers" })

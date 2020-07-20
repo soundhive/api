@@ -1,10 +1,15 @@
 /* eslint-disable no-param-reassign */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { ImageFileMediaTypes } from 'src/media-types';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { MinioClientService } from 'src/minio-client/minio-client.service';
-import { Repository } from 'typeorm';
+import { FindConditions, FindManyOptions, Repository } from 'typeorm';
 import { FindUserDTO } from './dto/find-user.dto';
 import { InsertUserDTO } from './dto/insert-user.dto';
 import { User } from './user.entity';
@@ -77,5 +82,12 @@ export class UsersService {
       existingUser[key] = userData[key];
     });
     return this.usersRepository.save(existingUser);
+  }
+
+  async paginate(
+    options: IPaginationOptions,
+    searchOptions?: FindConditions<User> | FindManyOptions<User>,
+  ): Promise<Pagination<User>> {
+    return paginate<User>(this.usersRepository, options, searchOptions);
   }
 }

@@ -1,8 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { Follow } from 'src/follows/follow.entity';
 import { User } from 'src/users/user.entity';
-import { DeleteResult, Repository } from 'typeorm';
+import {
+  DeleteResult,
+  FindConditions,
+  FindManyOptions,
+  Repository,
+} from 'typeorm';
 import { CreateFollowDTO } from './dto/create-follow-dto';
 import { DeleteFollowDTO } from './dto/delete-follow.dto';
 import { FindFollowDTO } from './dto/find-follow-dto';
@@ -32,6 +42,13 @@ export class FollowsService {
 
   async delete(deleteFollowDTO: DeleteFollowDTO): Promise<DeleteResult> {
     return this.followRepository.delete(deleteFollowDTO);
+  }
+
+  async paginate(
+    options: IPaginationOptions,
+    searchOptions?: FindConditions<Follow> | FindManyOptions<Follow>,
+  ): Promise<Pagination<Follow>> {
+    return paginate<Follow>(this.followRepository, options, searchOptions);
   }
 
   async findUserFollowed(
