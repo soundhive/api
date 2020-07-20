@@ -169,20 +169,34 @@ export class TracksController {
 
   @ApiOperation({ summary: 'Get all tracks' })
   @ApiOkResponse({ type: [TrackPagination], description: 'Track objects' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get()
   async find(
+    @Request() req: ValidatedJWTReq,
     @Query() paginationQuery: PaginationQuery,
   ): Promise<Pagination<Track>> {
-    const paginatedDataReponse = await this.tracksService.paginate({
-      page: paginationQuery.page ? paginationQuery.page : 1,
-      limit: paginationQuery.limit ? paginationQuery.limit : 10,
-      route: '/tracks',
-    });
+    const paginatedDataReponse = await this.tracksService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: '/tracks',
+      },
+      {
+        order: {
+          createdAt: 'DESC',
+        },
+      },
+    );
 
     const items = await Promise.all(
       paginatedDataReponse.items.map(
         async (track): Promise<Track> => {
-          // eslint-disable-next-line no-param-reassign
+          track.favorited =
+            (await this.favoritesService.findOne({
+              track,
+              user: req.user,
+            })) !== undefined;
           track.listeningCount = await this.listeningsService.countForTrack(
             track,
           );

@@ -102,11 +102,18 @@ export class AlbumsController {
   async find(
     @Query() paginationQuery: PaginationQuery,
   ): Promise<Pagination<Album>> {
-    return this.albumsService.paginate({
-      page: paginationQuery.page ? paginationQuery.page : 1,
-      limit: paginationQuery.limit ? paginationQuery.limit : 10,
-      route: '/albums',
-    });
+    return this.albumsService.paginate(
+      {
+        page: paginationQuery.page ? paginationQuery.page : 1,
+        limit: paginationQuery.limit ? paginationQuery.limit : 10,
+        route: '/albums',
+      },
+      {
+        order: {
+          createdAt: 'DESC',
+        },
+      },
+    );
   }
 
   @ApiOperation({ summary: 'Get an album' })
