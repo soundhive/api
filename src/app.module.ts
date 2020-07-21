@@ -2,19 +2,19 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerModule } from 'nestjs-pino';
-
+import { AdminModule } from './admin/admin.module';
 import { AlbumsModule } from './albums/albums.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { MinioClientModule } from './minio-client/minio-client.module';
 import * as ormconfig from './ormconfig';
+import { PlaylistsModule } from './playlists/playlists.module';
+import { SamplesModule } from './samples/samples.module';
+import { TicketsModule } from './tickets/tickets.module';
 import { TracksModule } from './tracks/tracks.module';
 import { UsersModule } from './users/users.module';
-import { MinioClientModule } from './minio-client/minio-client.module';
-import { SamplesModule } from './samples/samples.module';
-import { PlaylistsModule } from './playlists/playlists.module';
-import { FavoritesModule } from './favorites/favorites.module';
-import { AdminModule } from './admin/admin.module';
 
 export function DatabaseOrmModule(): DynamicModule {
   // we could load the configuration from dotEnv here,
@@ -42,6 +42,7 @@ export function DatabaseOrmModule(): DynamicModule {
     PlaylistsModule,
     FavoritesModule,
     AdminModule,
+    TicketsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
