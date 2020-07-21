@@ -71,7 +71,7 @@ import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
   constructor(
-    private usersService: UsersService,
+    private readonly usersService: UsersService,
     private readonly listeningsService: ListeningsService,
     private readonly albumsService: AlbumsService,
     private readonly tracksService: TracksService,

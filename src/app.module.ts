@@ -14,6 +14,7 @@ import { MinioClientModule } from './minio-client/minio-client.module';
 import { SamplesModule } from './samples/samples.module';
 import { PlaylistsModule } from './playlists/playlists.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { AdminModule } from './admin/admin.module';
 
 export function DatabaseOrmModule(): DynamicModule {
   // we could load the configuration from dotEnv here,
@@ -40,6 +41,7 @@ export function DatabaseOrmModule(): DynamicModule {
     SamplesModule,
     PlaylistsModule,
     FavoritesModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
