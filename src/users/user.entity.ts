@@ -78,6 +78,10 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
+  @Exclude()
+  @Column({ default: false })
+  isAdmin: boolean;
+
   @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
