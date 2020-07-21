@@ -7,6 +7,8 @@ import { Follow } from 'src/follows/follow.entity';
 import { Listening } from 'src/listenings/listening.entity';
 import { Playlist } from 'src/playlists/playlists.entity';
 import { Sample } from 'src/samples/samples.entity';
+import { TicketComment } from 'src/tickets/ticket-comment.entity';
+import { Ticket } from 'src/tickets/ticket.entity';
 import { Track } from 'src/tracks/track.entity';
 import {
   BeforeInsert,
@@ -73,6 +75,15 @@ export class User {
 
   @OneToMany((type) => Playlist, (playlist) => playlist.user)
   playlists: Playlist[];
+
+  @OneToMany((type) => Ticket, (ticket) => ticket.creator)
+  createdTickets: Ticket[];
+
+  @OneToMany((type) => Ticket, (ticket) => ticket.creator)
+  assignedTickets: Ticket[];
+
+  @OneToMany((type) => TicketComment, (ticketComment) => ticketComment.user)
+  ticketComments: TicketComment[];
 
   @Exclude()
   @Column({ default: true })

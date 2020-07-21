@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   HttpCode,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -49,6 +50,10 @@ import { UpdateSampleDTO } from 'src/samples/dto/update-sample.dto';
 import { Sample } from 'src/samples/samples.entity';
 import { SamplesService } from 'src/samples/samples.service';
 import { BadRequestResponse } from 'src/shared/dto/bad-request-response.dto';
+import { CreateTicketCommentDTO } from 'src/tickets/dto/create-ticket-comment.dto';
+import FindTicketDTO from 'src/tickets/dto/find-ticket.dto';
+import { Ticket } from 'src/tickets/ticket.entity';
+import { TicketsService } from 'src/tickets/tickets.service';
 import { CreateTrackAPIBody } from 'src/tracks/dto/create-track-api-body.dto';
 import { CreateTrackDTO } from 'src/tracks/dto/create-track.dto';
 import { FindTrackDTO } from 'src/tracks/dto/find-track.dto';
@@ -72,6 +77,7 @@ export class AdminController {
     private readonly tracksService: TracksService,
     private readonly playlistsService: PlaylistsService,
     private readonly samplesService: SamplesService,
+    private readonly ticketService: TicketsService,
   ) {}
 
   @ApiOperation({ summary: '[Admin] Post a album' })
@@ -573,5 +579,88 @@ export class AdminController {
   Promise<void> {
     // const existingUser = await this.usersService.findOne(findUserDTO);
     // existingUser.delete()
+  }
+
+  @ApiOperation({ summary: '[Admin] Post a comment to a ticket' })
+  @ApiCreatedResponse({ type: Ticket, description: 'Ticket object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
+  @Post('ticket/:id/comment')
+  async addCommentToTicket(
+    @Request() req: ValidatedJWTReq,
+    @Param() ticketDTO: FindTicketDTO,
+    @Body() createTicketDTO: CreateTicketCommentDTO,
+  ): Promise<Ticket> {
+    const ticketEntity = await this.ticketService.findOne(ticketDTO);
+
+    if (!ticketEntity) {
+      throw new NotFoundException('Could not find ticket');
+    }
+
+    return this.ticketService.addCommentToTicket(
+      req.user,
+      ticketEntity,
+      createTicketDTO,
+    );
+  }
+
+  @ApiOperation({ summary: '[Admin] Assign self to ticket' })
+  @ApiCreatedResponse({ type: Ticket, description: 'Ticket object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
+  @Post('ticket/:id/assign')
+  async assignToTicket(
+    @Request() req: ValidatedJWTReq,
+    @Param() ticketDTO: FindTicketDTO,
+  ): Promise<Ticket> {
+    const ticketEntity = await this.ticketService.findOne(ticketDTO);
+
+    if (!ticketEntity) {
+      throw new NotFoundException('Could not find ticket');
+    }
+
+    return this.ticketService.assignToTicket(req.user, ticketEntity);
+  }
+
+  @ApiOperation({ summary: '[Admin] Close ticket' })
+  @ApiCreatedResponse({ type: Ticket, description: 'Ticket object' })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: 'Invalid input',
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: 'Invalid JWT token',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
+  @Post('ticket/:id/close')
+  async closeTicket(
+    @Request() req: ValidatedJWTReq,
+    @Param() ticketDTO: FindTicketDTO,
+  ): Promise<Ticket> {
+    const ticketEntity = await this.ticketService.findOne(ticketDTO);
+
+    if (!ticketEntity) {
+      throw new NotFoundException('Could not find ticket');
+    }
+
+    return this.ticketService.closeTicket(ticketEntity);
   }
 }
