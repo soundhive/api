@@ -59,6 +59,6 @@ export class Ticket {
   title: string;
 
   @ApiProperty()
-  @Column()
+  @Column({ default: false })
   closed: boolean;
 }

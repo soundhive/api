@@ -34,7 +34,6 @@ import { UpdateAlbumAPIBody } from 'src/albums/dto/update-album-api-body.dto';
 import { UpdateAlbumDTO } from 'src/albums/dto/update-album.dto';
 import { UnauthorizedResponse } from 'src/auth/dto/unothorized-response.dto';
 import { ValidatedJWTReq } from 'src/auth/dto/validated-jwt-req';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { BufferedFile } from 'src/minio-client/file.model';
 import { CreatePlaylistAPIBody } from 'src/playlists/dto/create-playlist-api-body.dto';
 import { CreatePlaylistDTO } from 'src/playlists/dto/create-playlist.dto';
@@ -593,7 +592,7 @@ export class AdminController {
     description: 'Invalid JWT token',
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Post('ticket/:id/comment')
   async addCommentToTicket(
     @Request() req: ValidatedJWTReq,
@@ -624,7 +623,7 @@ export class AdminController {
     description: 'Invalid JWT token',
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Post('ticket/:id/assign')
   async assignToTicket(
     @Request() req: ValidatedJWTReq,
@@ -650,7 +649,7 @@ export class AdminController {
     description: 'Invalid JWT token',
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard)
   @Post('ticket/:id/close')
   async closeTicket(
     @Request() req: ValidatedJWTReq,
