@@ -1,17 +1,17 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddAdmin1595313587450 implements MigrationInterface {
-  name = 'AddAdmin1595313587450';
+export class TicketCommentMessage1595325907420 implements MigrationInterface {
+  name = 'TicketCommentMessage1595325907420';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "users" ADD "isAdmin" boolean NOT NULL DEFAULT false`,
+      `ALTER TABLE "ticket-comment" ADD "message" character varying NOT NULL`,
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "samples" ADD "downloadable" boolean NOT NULL`,
+      `ALTER TABLE "ticket-comment" DROP COLUMN "message"`,
     );
   }
 }
