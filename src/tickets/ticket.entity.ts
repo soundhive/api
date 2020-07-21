@@ -57,4 +57,8 @@ export class Ticket {
   @ApiProperty()
   @Column()
   title: string;
+
+  @ApiProperty()
+  @Column()
+  closed: boolean;
 }
