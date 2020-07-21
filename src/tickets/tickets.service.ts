@@ -41,14 +41,13 @@ export class TicketsService {
 
   async addCommentToTicket(
     user: User,
-    ticket: FindTicketDTO,
+    ticket: Ticket,
     comment: CreateTicketCommentDTO,
   ): Promise<Ticket> {
-    const ticketEntity = await this.findOne(ticket);
     const ticketComment = new TicketComment({
       user,
       message: comment.message,
-      ticket: ticketEntity,
+      ticket,
     });
     await this.ticketCommentRepo.save(ticketComment);
 
@@ -58,5 +57,19 @@ export class TicketsService {
       throw new InternalServerErrorException();
     }
     return updatedTicket;
+  }
+
+  async assignToTicket(user: User, ticket: Ticket): Promise<Ticket> {
+    const updatedTicket = ticket;
+    updatedTicket.assignedUser = user;
+
+    return this.ticketRepo.save(updatedTicket);
+  }
+
+  async closeTicket(ticket: Ticket): Promise<Ticket> {
+    const updatedTicket = ticket;
+    updatedTicket.closed = true;
+
+    return this.ticketRepo.save(updatedTicket);
   }
 }

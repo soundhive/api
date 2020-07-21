@@ -103,9 +103,15 @@ export class TicketsController {
     @Param() ticketDTO: FindTicketDTO,
     @Body() createTicketDTO: CreateTicketCommentDTO,
   ): Promise<Ticket> {
+    const ticketEntity = await this.ticketService.findOne(ticketDTO);
+
+    if (ticketEntity?.creator.id !== req.user.id) {
+      throw new ForbiddenException("You can't see this ticket.");
+    }
+
     return this.ticketService.addCommentToTicket(
       req.user,
-      ticketDTO,
+      ticketEntity,
       createTicketDTO,
     );
   }
