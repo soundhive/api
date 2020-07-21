@@ -64,7 +64,11 @@ npm run start:prod
 
 ## Documentation
 
-An OpenAPI docuemntation is available trough swagger on the `/doc` routes.
+An OpenAPI documentation is available trough swagger on the `/doc` routes.
 
 - When running locally: [localhost:3000/doc/](http://localhost:3000/doc/)
 - Deployed version: [soundhive-api-staging.herokuapp.com/doc/](https://soundhive-api-staging.herokuapp.com/doc/)
+
+### Admin
+
+The admin functionality is still limited but you can still toggle the `isAdmin` column for your user in the database to access the `/admin` routes.
