@@ -55,6 +55,7 @@ import { UpdateTrackAPIBody } from './dto/update-track-api-body.dto';
 import { UpdateTrackDTO } from './dto/update-track.dto';
 import { Track } from './track.entity';
 import { TracksService } from './tracks.service';
+import { getFingerprints } from 'src/fingerprint/fingerprint';
 
 @Controller('tracks')
 export class TracksController {
@@ -481,4 +482,13 @@ export class TracksController {
 
     return favoriters;
   }
+
+  @ApiOperation({ summary: 'Launch the fingerprinting algorithm.' })
+  @Get(':id/fingerprint')
+  fingerrpint(): void {
+    getFingerprints();
+    
+  }
+
+
 }
