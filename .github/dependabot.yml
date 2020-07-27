@@ -5,18 +5,8 @@ updates:
   directory: "/"
   schedule:
     interval: weekly
-  open-pull-requests-limit: 99
-  assignees:
-    - "angristan"
-  reviewers:
-    - "angristan"
 
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
     interval: weekly
-  open-pull-requests-limit: 99
-  assignees:
-    - "angristan"
-  reviewers:
-    - "angristan"
